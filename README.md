@@ -1,6 +1,6 @@
 Aunque gran parte del contenido del curso `LFS201` es texto que se podria consultar 
-perfectamente offline (desde un ebook, por ejemplo) al menos para repasar conceptos,
-la plataforma del curso esta pensada integramente para que se use desde internet.
+perfectamente offline al menos para repasar conceptos,
+la plataforma del curso esta pensada integramente para que se use solo desde internet.
 
 Este proyecto sirve para automatizar parte de la extración del texto del curso
 y su conversión a un formato más manejable, de la siguiente manera:
