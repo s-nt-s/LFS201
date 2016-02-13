@@ -1,12 +1,14 @@
 #!/bin/bash
+echo -n "Copiando html ... "
 mv ~/Descargas/LFS201*.html html/ori 2> /dev/null
 rm html/clean/* 2> /dev/null
 rm md/* 2> /dev/null
 cp html/ori/* html/clean/
+echo "ok"
+echo -n "Limpiando html ... "
 python clean.py
+echo "ok"
 for f in html/clean/*.html; do
-	#cat "$f" | tr -dc '[[:print:]]áéíóúñäëïöüÁÉÍÓÚÑÄËÏÖÜ\n' > aux
-	#mv aux "$f"
 	MD=`basename "$f" | sed 's/html$/md/'`
 	echo "Generando $MD"
 	MD="md/$MD"
