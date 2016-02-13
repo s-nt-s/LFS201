@@ -1,0 +1,13 @@
+{
+   "manifest_version": 2,
+   "content_scripts": [ {
+      "all_frames": true,
+      "js": [ "content/js.js", "content/run.js" ],
+      "matches": [ "http://lms.360training.com/*", "https://lms.360training.com/*" ],
+      "run_at": "document_end"
+   } ],
+   "description": "Autosave",
+   "name": "Autosave",
+   "permissions": [ "tabs" ],
+   "version": "0.13"
+}
