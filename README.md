@@ -7,10 +7,10 @@ y su conversión a un formato más manejable, de la siguiente manera:
 
 1. `chrome/*`: Extensión para `chrome/chromium` que descarga el contenido renderizado según navegas por el curso
 2. `run.sh`: script que realiza las siguiente acciones:
-	a. Mueve los `html` al directorio de trabajo
-	b. Limpia los `html` simplificando su formato con `clean.py`
-	c. Crea ficheros `markdown` a partir de los ficheros `html` con `pandoc`
-	d. Limpia los ficheros `markdown` eliminado cabeceras y demás contenido repetido con `clean.awk`
+	1. Mueve los `html` al directorio de trabajo
+	2. Limpia los `html` simplificando su formato con `clean.py`
+	3. Crea ficheros `markdown` a partir de los ficheros `html` con `pandoc`
+	4. Limpia los ficheros `markdown` eliminado cabeceras y demás contenido repetido con `clean.awk`
 
 Finalmente estos ficheros `markdown` se revisan a mano y se genera un epub
 para poder estudiar comodamente offline.
