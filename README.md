@@ -5,7 +5,7 @@ la plataforma del curso esta pensada integramente para que se use desde internet
 Este proyecto sirve para automatizar parte de la extración del texto del curso
 y su conversión a un formato más manejable, de la siguiente manera:
 
-1- `chrome/*`: Extensión para `chrome/chromium` que descarga el contenido renderizado según navegas por el curso
+1. `chrome/*`: Extensión para `chrome/chromium` que descarga el contenido renderizado según navegas por el curso
 2. `run.sh`: script que realiza las siguiente acciones:
 	a. Mueve los `html` al directorio de trabajo
 	b. Limpia los `html` simplificando su formato con `clean.py`
