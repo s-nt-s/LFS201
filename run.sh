@@ -17,7 +17,8 @@ for f in html/clean/*.html; do
 		tail -n +382 "$MD" | head -n -3 > aux
 		mv aux "$MD"
 	fi
-	cat "$MD"| tr -dc '[[:print:]]áéíóúñäëïöüÁÉÍÓÚÑÄËÏÖÜ\n' | awk -f clean.awk > aux
+	cat "$MD"| tr -dc '[[:print:]]áéíóúñäëïöüÁÉÍÓÚÑÄËÏÖÜ\n' | iconv --from-code=UTF-8 --to-code=UTF-8 -c | awk -f clean.awk > aux
 	mv aux "$MD"
 	sed '/\!\[\].images\/defaultProgBarH.gif/d' -i "$MD"
+
 done
