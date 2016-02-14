@@ -1,7 +1,6 @@
 BEGIN {
 	l=0;
 	p=0;
-	i=0;
 }
 {
 	s=$0;
@@ -16,7 +15,6 @@ BEGIN {
 	}
 	if (length(s)==0) {
 		if (p==0) next;
-		if (i=="-" && $1=="-") next;
 		l++;
 		if (l>1) next;
 	} else {
@@ -24,5 +22,4 @@ BEGIN {
 	}
 	print s;
 	p++;
-	i=$1;
 }

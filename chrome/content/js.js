@@ -18,7 +18,6 @@
 			save:function () {
 				var textToWrite = document.documentElement.outerHTML;
 
-				var d=new Date();
 				var popup=0;
 				var toc=document.getElementById("toc");
 				if (toc==null) {
