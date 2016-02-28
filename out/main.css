@@ -8,6 +8,8 @@ fieldset {
 }
 legend {
     font-size: 120%;
+    padding-left: 5px;
+    padding-right: 5px;
 }
 fieldset > fieldset > legend {
     font-size: 110%;
