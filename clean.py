@@ -62,6 +62,9 @@ for f in htmls:
 		soup.body.clear()
 		for t in ttxt:
 			soup.body.append(t)
+	ttxt=soup.select("div.ttxt")
+	for t in ttxt:
+		t.replaceWithChildren()
 
 	comments = soup.findAll(text=lambda text:isinstance(text, bs4.Comment))
 	for n in comments:
