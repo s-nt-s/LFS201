@@ -5,12 +5,36 @@ body {
 fieldset {
     margin-top: 1em;
     margin-bottom: 1em;
+    border-radius: 6px;
+    background-color: white;
+}
+fieldset > fieldset {
+	border: 1px solid #c0c0c0;
 }
 legend {
-    font-size: 120%;
     padding-left: 5px;
     padding-right: 5px;
 }
-fieldset > fieldset > legend {
+body > div > fieldset > legend {
+    background-color: black;
+    color: white;
+    padding: 5px;
     font-size: 110%;
+    border-radius: 6px;
+}
+h1 {
+	background-color: dimgray;
+	border-radius: 6px;
+	color: white;
+	padding: 10px;
+	margin: 0;
+}
+body {
+	background-color: #c0c0c0;
+}
+body > div {
+	max-width:800px;
+	margin: 0 auto;
+	padding: 10px;
+	background-color: #f0f0f0;
 }

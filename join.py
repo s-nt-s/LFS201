@@ -9,14 +9,15 @@ tt=re.compile(".*?LFS201_\d+.\d+_([^/]+?)(_popup \(\d+\))?.md$")
 cp=re.compile(".*?LFS201_(\d+)\..*$")
 pr=re.compile("(.*)¿(.*?)-(.*)")
 bk=re.compile("<(fieldset|head|body|meta|link|script|p|ul|ol|li|div)>")
-ck=re.compile("(Haga|Haz) click (en|sobre) (el|los)")
+ck=re.compile("(Haga|Haz) click (en|sobre) (el|los|en)")
 ct=re.compile(".*? para ")
+sp=re.compile("\s+", re.UNICODE)
 
 hts=sorted(glob.glob('html/clean/*.html'))
 
 p=1
 t=""
-c=0
+caB=0
 n=0
 
 oht="out/LFS201.html"
@@ -28,14 +29,14 @@ def get_soup(html):
 	return soup
 
 soup = get_soup(oht)
-soup.body.clear()
+soup.body.div.clear()
 
 fldB=None
 
 for ht in hts:
-	sp = get_soup(ht)
-	t=sp.title
-	b=sp.body
+	soup2 = get_soup(ht)
+	t=soup2.title
+	b=soup2.body
 
 	if "_popup" in ht:
 		n=3
@@ -44,16 +45,16 @@ for ht in hts:
 	else:
 		p=1
 		ca=int(cp.sub("\\1",ht))
-		if ca>c:
+		if ca>caB:
 			n=1
-			c=ca
+			caB=ca
 		else:
 			n=2
 
 	if n==1:
 		h=soup.new_tag("h1")
-		h.string=u"Capítulo "+str(ca)+": "+t.get_text().strip()
-		soup.body.append(h)
+		h.string=u"Capítulo "+str(ca)
+		soup.body.div.append(h)
 
 	fld = soup.new_tag("fieldset")
 	t.name="legend"
@@ -66,13 +67,20 @@ for ht in hts:
 		cs=fldB.find_all('p',text=ck)
 		if len(cs)>0:
 			c=cs[0]
-			fld.legend.append(": "+ct.sub("",c.string))
+			frs=ct.sub("",c.string).strip().strip('.').capitalize()
+			fld.legend.string=sp.sub(" ",frs)
 			c.replace_with(fld)
 		else:
 			fldB.append(fld)
 	else:
-		soup.body.append(fld)
+		soup.body.div.append(fld)
 		fldB=fld
+
+flds=soup.body.div.select("fieldset > fieldset")
+for fld in flds:
+	if len(fld.parent.select(" > *"))==2:
+		fld.legend.extract()
+		fld.replaceWithChildren()
 
 h = str(soup)
 h=bk.sub("\\n<\\1>",h)
