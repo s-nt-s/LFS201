@@ -52,8 +52,11 @@ for ht in hts:
 			n=2
 
 	if n==1:
-		h=soup.new_tag("h1")
-		h.string=u"Capítulo "+str(ca)
+		#h=soup.new_tag("h1")
+		#h.string=u"Capítulo "+str(ca)
+		h=b.p.extract().strong
+		h.name="h1"
+		h.string=sp.sub(" ",h.string).strip('.')[9:]
 		soup.body.div.append(h)
 
 	fld = soup.new_tag("fieldset")
