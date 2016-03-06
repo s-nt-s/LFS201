@@ -16,10 +16,9 @@ sp=re.compile("\s+", re.UNICODE)
 
 hts=sorted(glob.glob('html/clean/*.html'))
 
-p=1
-t=""
 caB=0
 n=0
+f=0
 
 oht="out/LFS201.html"
 
@@ -49,16 +48,15 @@ for ht in hts:
 
 	if "_popup" in ht:
 		n=3
-		#t.string="Popup "+str(p)
-		p=p+1
 	else:
-		p=1
 		ca=int(cp.sub("\\1",ht))
 		if ca>caB:
 			n=1
+			f=1
 			caB=ca
 		else:
 			n=2
+			f=f+1
 
 	if n==1:
 		h=b.p.extract().strong
@@ -73,6 +71,7 @@ for ht in hts:
 	t.name="legend"
 	fld.append(t)
 	b.name="div"
+	fld.attrs['id']="c"+str(ca)+"f"+str(f)
 	fld.append(b)
 
 	if n==3:
@@ -83,9 +82,6 @@ for ht in hts:
 			cs=find_text(fldB,ck)
 		if len(cs)>0:
 			c=cs[0]
-#			if fld.legend.string == "Popup Window":
-#				frs=ct.sub("",c.string).strip().strip('.').capitalize()
-#				fld.legend.string=sp.sub(" ",frs)
 			c.replace_with(fld)
 		else:
 			fldB.append(fld)
