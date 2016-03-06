@@ -45,3 +45,7 @@ body > div {
 	padding: 10px;
 	background-color: #f0f0f0;
 }
+
+table tr:nth-child(even) {
+	background-color: #ddd;
+}
