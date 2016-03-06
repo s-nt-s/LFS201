@@ -8,25 +8,25 @@ fieldset {
     border-radius: 6px;
     background-color: white;
 }
-fieldset > fieldset {
-	border: 1px solid #c0c0c0;
-}
 legend {
     padding-left: 5px;
     padding-right: 5px;
 	margin-bottom: 5px;
 }
-body > div > fieldset > legend {
+fieldset.n3 {
+	border: 1px solid #c0c0c0;
+}
+fieldset.n2 > legend {
     background-color: black;
     color: white;
     padding: 5px;
     font-size: 110%;
     border-radius: 6px;
 }
-fieldset > *:nth-child(2) {
+fieldset > div > *:first-child {
 	margin-top:0;
 }
-fieldset > *:last-child {
+fieldset > div > *:last-child {
 	margin-bottom:0;
 }
 h1 {
