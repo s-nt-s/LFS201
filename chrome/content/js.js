@@ -16,8 +16,6 @@
 		)) return;
 		var obj= {
 			save:function () {
-				var textToWrite = document.documentElement.outerHTML;
-
 				var popup=0;
 				var toc=document.getElementById("toc");
 				if (toc==null) {
@@ -36,10 +34,23 @@
 				}
 				if (ch==null) return;
 				title=((Number(ch)+100)+"").substring(1)+"."+((Number(toc.selectedOptions[0].index-i+1)+100)+"").substring(1)+"_"+title.replace(/\s+/g,"_");
-				if (popup==1) title=title+"_popup";
+				if (popup==1) {
+					tt=window.parent.document.getElementsByClassName("DLG_Triv_titleText")[0];
+					if (tt) {
+						document.title=tt.innerText.replace(/^\s+|\s+$/g,"");
+					}
+					title=title+"_popup";
+				}
+				
+				var imgs=document.getElementsByTagName("img");
+				for (i=0;i<imgs.length;i++) {
+					img=imgs[i];
+					img.src=img.src;
+				}
 				
 				var f="LFS201_"+title+".html";
 
+				var textToWrite = document.documentElement.outerHTML;
 				var textFileAsBlob = new Blob([textToWrite], {type:'text/html'});
 				var fileNameToSaveAs = f;
 				var downloadLink = document.createElement("a");
