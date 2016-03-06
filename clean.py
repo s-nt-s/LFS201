@@ -38,11 +38,14 @@ def vacio(soup,nodos, jump=False):
 	return r
 
 def nclean(ls):
-	ntxt = soup.new_tag("div")
+	txt=""
 	if ls:
 		for n in ls:
-			ntxt.append(n)
-	txt=sclean(ntxt.get_text())
+			if isinstance(n, bs4.NavigableString) or isinstance(n, unicode):
+				txt=txt+n
+			else:
+				txt=txt+n.get_text()
+	txt=sclean(txt)
 	return txt
 
 for f in htmls:
@@ -55,6 +58,9 @@ for f in htmls:
 	for h in head:
 		soup.head.append(h)
 
+#	imgs=[a.attrs['src'] for a in soup.select("img") if "_small_" in a.attrs['src']]
+#	print str(imgs)
+
 	ttxt=soup.select("div.ttxt")
 	if len(ttxt)>0:
 		if len(ttxt)>1:
@@ -62,6 +68,12 @@ for f in htmls:
 		soup.body.clear()
 		for t in ttxt:
 			soup.body.append(t)
+	elif len(sclean(soup.body.get_text()))==0:
+		imgs=soup.select("img")
+		soup.body.clear()
+		for i in imgs:
+			soup.body.append(i)
+
 	ttxt=soup.select("div.ttxt")
 	for t in ttxt:
 		t.replaceWithChildren()
@@ -88,6 +100,12 @@ for f in htmls:
 	tags=vacio(soup, ['table'], True)
 	for t in tags:
 		t.extract()
+
+	lis=soup.findAll("li")
+	for li in lis:
+		n=li.select(" > *")
+		if len(n)==1 and n[0].name=="p":
+			n[0].unwrap()
 
 	for a in soup.select("a"):
 		if "ObjLayerActionGoToNewWindow" in a.attrs['href']:

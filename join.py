@@ -10,6 +10,7 @@ cp=re.compile(".*?LFS201_(\d+)\..*$")
 pr=re.compile("(.*)¿(.*?)-(.*)")
 bk=re.compile("<(fieldset|head|body|meta|link|script|p|ul|ol|li|div)>")
 ck=re.compile("(Haga|Haz) click (en|sobre) (el|los|en)")
+fg=re.compile(".*?(Figura|Figure)\s+\d+\.\d+(:|.)", re.UNICODE|re.MULTILINE|re.DOTALL)
 ct=re.compile(".*? para ")
 sp=re.compile("\s+", re.UNICODE)
 
@@ -28,6 +29,14 @@ def get_soup(html):
 	html.close()
 	return soup
 
+def find_text(soup,r):
+	rt=[]
+	ps=soup.findAll('p')
+	for p in ps:
+		if r.match(p.get_text()):
+			rt.append(p)
+	return rt
+
 soup = get_soup(oht)
 soup.body.div.clear()
 
@@ -40,7 +49,7 @@ for ht in hts:
 
 	if "_popup" in ht:
 		n=3
-		t.string="Popup "+str(p)
+		#t.string="Popup "+str(p)
 		p=p+1
 	else:
 		p=1
@@ -52,26 +61,31 @@ for ht in hts:
 			n=2
 
 	if n==1:
-		#h=soup.new_tag("h1")
-		#h.string=u"Capítulo "+str(ca)
 		h=b.p.extract().strong
 		h.name="h1"
 		h.string=sp.sub(" ",h.string).strip('.')[9:]
+		h.attrs['id']="c"+str(ca)
 		soup.body.div.append(h)
+		n=2
 
 	fld = soup.new_tag("fieldset")
+	fld.attrs['class']="n"+str(n)
 	t.name="legend"
 	fld.append(t)
 	b.name="div"
 	fld.append(b)
-	fld.div.replaceWithChildren()
 
 	if n==3:
-		cs=fldB.find_all('p',text=ck)
+		cs=[]
+		if fg.match(fld.legend.string):
+			cs=find_text(fldB,fg)
+		else:
+			cs=find_text(fldB,ck)
 		if len(cs)>0:
 			c=cs[0]
-			frs=ct.sub("",c.string).strip().strip('.').capitalize()
-			fld.legend.string=sp.sub(" ",frs)
+#			if fld.legend.string == "Popup Window":
+#				frs=ct.sub("",c.string).strip().strip('.').capitalize()
+#				fld.legend.string=sp.sub(" ",frs)
 			c.replace_with(fld)
 		else:
 			fldB.append(fld)
@@ -79,11 +93,10 @@ for ht in hts:
 		soup.body.div.append(fld)
 		fldB=fld
 
-flds=soup.body.div.select("fieldset > fieldset")
+flds=soup.findAll("fieldset", attrs={'class': re.compile(r".*\bn3\b.*")})
 for fld in flds:
-	if len(fld.parent.select(" > *"))==2:
-		fld.legend.extract()
-		fld.replaceWithChildren()
+	if len(fld.parent.select(" > *"))==1:
+		fld.parent.replace_with(fld.div)
 
 h = str(soup)
 h=bk.sub("\\n<\\1>",h)
