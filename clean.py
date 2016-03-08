@@ -115,6 +115,11 @@ for f in htmls:
 		if isinstance(n, bs4.Comment) or isinstance(n, bs4.NavigableString):
 			n.extract()
 
+	for lb in soup.findAll("label"):
+		n=lb.select(" > *")
+		if len(n)==1 and n[0].name=="p":
+			lb.replaceWithChildren()
+
 	for p in soup.select("*"):
 		if 'style' in p.attrs:
 			del p.attrs['style']
@@ -122,6 +127,8 @@ for f in htmls:
 			del p.attrs['class']
 		if 'name' in p.attrs:
 			del p.attrs['name']
+		if 'align' in p.attrs and p.attrs['align']=="left":
+			del p.attrs['align']
 
 	h = str(soup)
 	#h=sp.sub(" ",h)
