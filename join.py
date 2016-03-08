@@ -36,8 +36,17 @@ def find_text(soup,r):
 			rt.append(p)
 	return rt
 
+def set_anchor(i):
+	a=soup.new_tag("a", **{"class":"mrk", "href": "#"+i.attrs['id'], "title":i.attrs['id']})
+	a.string="#"
+	if i.name=="fieldset":
+		i=i.legend
+	i.append(a)
+
 soup = get_soup(oht)
-soup.body.div.clear()
+soup.body.clear()
+div=soup.new_tag("div", **{"class":"content"})
+soup.body.append(div)
 
 fldB=None
 
@@ -61,8 +70,9 @@ for ht in hts:
 	if n==1:
 		h=b.p.extract().strong
 		h.name="h1"
-		h.string=sp.sub(" ",h.string).strip('.')[9:]
+		h.string=sp.sub(" ",h.string).strip('.')[9:].strip()
 		h.attrs['id']="c"+str(ca)
+		set_anchor(h)
 		soup.body.div.append(h)
 		n=2
 
@@ -86,6 +96,7 @@ for ht in hts:
 		else:
 			fldB.append(fld)
 	else:
+		set_anchor(fld)
 		soup.body.div.append(fld)
 		fldB=fld
 

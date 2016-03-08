@@ -49,3 +49,17 @@ body > div {
 table tr:nth-child(even) {
 	background-color: #ddd;
 }
+a.mrk {
+	background-color: white;
+	border-radius: 50%;
+	display: none;
+	font-weight: bold;
+	margin-left: 0.3em;
+	margin-right: 0.3em;
+	padding-left: 0.3em;
+	padding-right: 0.3em;
+	text-decoration: none;
+}
+h1:hover a.mrk, legend:hover a.mrk {
+	display:inline;
+}
