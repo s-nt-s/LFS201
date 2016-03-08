@@ -8,12 +8,8 @@ import re
 import nltk
 import string
 
-u1=re.compile("</(ul)>\s*<(ul)>", re.IGNORECASE|re.MULTILINE|re.DOTALL|re.UNICODE)
-o1=re.compile("</(ol)>\s*<(ol)>", re.IGNORECASE|re.MULTILINE|re.DOTALL|re.UNICODE)
-i1=re.compile("</(i|em)>\s+<(i|em)>", re.IGNORECASE|re.MULTILINE|re.DOTALL|re.UNICODE)
-b1=re.compile("</(b|strong)>\s+<(b|strong)>", re.IGNORECASE|re.MULTILINE|re.DOTALL|re.UNICODE)
-i2=re.compile("</(i|em)><(i|em)>", re.IGNORECASE|re.MULTILINE|re.DOTALL)
-b2=re.compile("</(b|strong)><(b|strong)>", re.IGNORECASE|re.MULTILINE|re.DOTALL)
+
+tag_concat=['u','ul','ol','i','em','b','strong']
 hr=re.compile(".*ObjLayerActionGoToNewWindow.*?'(.*?)'.*")
 sp=re.compile("\s+", re.UNICODE)
 
@@ -84,14 +80,29 @@ for f in htmls:
 
 	spans=soup.select("span")
 	for s in spans:
-		s.unwrap()
+		if 'style' not in s.attrs:
+			s.unwrap()
+		elif "rgb(0, 150, 200)" in s.attrs['style'] and s.parent.name!="a" and len(s.select(" > *"))==1 and s.select(" > *")[0].name!="a":
+			s.attrs['class']="enlace"
+		elif "rgb(0, 0, 255)" in s.attrs['style']:
+			s.attrs['class']="comando"
+		elif "rgb(0, 200, 0)" in s.attrs['style']:
+			s.attrs['class']="stout"
+		elif "rgb(125, 110, 70)" in s.attrs['style']:
+			s.attrs['class']="archivo"
+		else:
+			s.unwrap()
+	us=soup.select("u")
+	for u in us:
+		if u.parent.name=="a":
+			u.unwrap()
 
 	brs=soup.select("br")
 	for b in brs:
 		if len(nclean(b.next_sibling))==0 or len(nclean(b.previous_sibling))==0:
 			b.extract()
 
-	tags=vacio(soup, ['strong', 'em' , 'i', 'b'])
+	tags=vacio(soup, ['strong', 'em' , 'i', 'b', 'span', 'u'])
 	for t in tags:
 		t.unwrap()
 	tags=vacio(soup, ['p', 'div', 'ul', 'li', 'ol'])
@@ -123,21 +134,19 @@ for f in htmls:
 	for p in soup.select("*"):
 		if 'style' in p.attrs:
 			del p.attrs['style']
-		if 'class' in p.attrs:
+		if p.name!='span' and 'class' in p.attrs:
 			del p.attrs['class']
 		if 'name' in p.attrs:
 			del p.attrs['name']
+		if 'id' in p.attrs:
+			del p.attrs['id']
 		if 'align' in p.attrs and p.attrs['align']=="left":
 			del p.attrs['align']
 
 	h = str(soup)
-	#h=sp.sub(" ",h)
-	h=i1.sub(" ",h)
-	h=b1.sub(" ",h)
-	h=u1.sub("",h)
-	h=o1.sub("",h)
-	h=i2.sub("",h)
-	h=b2.sub("",h)
+	for t in tag_concat:
+		r=re.compile("</"+t+">(\s*)<"+t+">", re.IGNORECASE|re.MULTILINE|re.DOTALL|re.UNICODE)
+		h=r.sub("\\1",h)
 
 	with open(f, "wb") as file:
 		file.write(h)
