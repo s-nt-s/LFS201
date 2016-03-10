@@ -84,7 +84,7 @@ for f in htmls:
 			s.unwrap()
 		elif "rgb(0, 150, 200)" in s.attrs['style'] and s.parent.name!="a" and len(s.select(" > *"))==1 and s.select(" > *")[0].name!="a":
 			s.attrs['class']="enlace"
-		elif "rgb(0, 0, 255)" in s.attrs['style']:
+		elif "rgb(0, 0, 255)" in s.attrs['style'] or "rgb(0, 0, 205)" in s.attrs['style']:
 			s.attrs['class']="comando"
 		elif "rgb(0, 200, 0)" in s.attrs['style']:
 			s.attrs['class']="stout"
