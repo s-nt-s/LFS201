@@ -55,7 +55,6 @@ a.mrk {
 	display: none;
 	font-weight: bold;
 	margin-left: 0.3em;
-	margin-right: 0.3em;
 	padding-left: 0.3em;
 	padding-right: 0.3em;
 	text-decoration: none;
@@ -64,7 +63,7 @@ h1:hover a.mrk, legend:hover a.mrk {
 	display:inline;
 }
 
-.enlace {
+.enlace, a {
 	color:rgb(0, 150, 200);
 }
 .comando {
@@ -76,6 +75,3 @@ h1:hover a.mrk, legend:hover a.mrk {
 .archivo {
 	color:rgb(125, 110, 70);
 }
-
-rgb(0, 200, 0); = verde
-rgb(125, 110, 70); = cafe
