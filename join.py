@@ -12,6 +12,7 @@ bk=re.compile("<(fieldset|head|body|meta|link|script|p|ul|ol|li|div)>")
 ck=re.compile("(Haga|Haz) click (en|sobre) (el|los|en)")
 fg=re.compile(".*?(Figura|Figure)\s+\d+\.\d+(:|.)", re.UNICODE|re.MULTILINE|re.DOTALL)
 ct=re.compile(".*? para ")
+lab=re.compile(".*\s+para\s+descargar\s+el\s+Laboratorio\s+(\d+\.\d+).*",re.UNICODE)
 sp=re.compile("\s+", re.UNICODE)
 
 hts=sorted(glob.glob('html/clean/*.html'))
@@ -36,8 +37,10 @@ def find_text(soup,r):
 			rt.append(p)
 	return rt
 
-def set_anchor(i):
-	a=soup.new_tag("a", **{"class":"mrk", "href": "#"+i.attrs['id'], "title":i.attrs['id']})
+def set_anchor(i,ca,f=None):
+	a=soup.new_tag("a", **{"class":"mrk", "href": "#"+i.attrs['id'], "title":u"Cápitulo "+str(ca)})
+	if f:
+		a.attrs['title']=a.attrs['title']+" ficha "+str(f)
 	a.string="#"
 	if i.name=="fieldset":
 		i=i.legend
@@ -72,7 +75,7 @@ for ht in hts:
 		h.name="h1"
 		h.string=sp.sub(" ",h.string).strip('.')[9:].strip()
 		h.attrs['id']="c"+str(ca)
-		set_anchor(h)
+		set_anchor(h,ca)
 		soup.body.div.append(h)
 		n=2
 
@@ -96,7 +99,7 @@ for ht in hts:
 		else:
 			fldB.append(fld)
 	else:
-		set_anchor(fld)
+		set_anchor(fld,ca,f)
 		soup.body.div.append(fld)
 		fldB=fld
 
@@ -104,6 +107,14 @@ flds=soup.findAll("fieldset", attrs={'class': re.compile(r".*\bn3\b.*")})
 for fld in flds:
 	if len(fld.parent.select(" > *"))==1:
 		fld.parent.replace_with(fld.div)
+
+labs=find_text(soup,lab)
+for f in labs:
+	l=lab.sub("\\1",f.string)
+	n=f.select(" > *")[0]
+	a=soup.new_tag("a", href="https://lms.360training.com/custom/12396/808239/LAB_"+l+".pdf")
+	a.append(n)
+	f.append(a)
 
 h = str(soup)
 h=bk.sub("\\n<\\1>",h)
