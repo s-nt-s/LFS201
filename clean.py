@@ -7,9 +7,15 @@ import glob
 import re
 import nltk
 import string
+import unicodedata
 
+all_chars = (unichr(i) for i in xrange(0x110000))
+control_chars = ''.join(map(unichr, range(0,32) + range(127,160)))
+#sp = re.compile('[%s\s]+' % re.escape(control_chars), re.UNICODE)
 
 tag_concat=['u','ul','ol','i','em','b','strong']
+tag_round=['u','i','em','b','strong','span']
+tag_trim=['li']
 hr=re.compile(".*ObjLayerActionGoToNewWindow.*?'(.*?)'.*")
 sp=re.compile("\s+", re.UNICODE)
 
@@ -17,20 +23,23 @@ printable = set(string.printable)
 
 htmls=sorted(glob.glob('html/clean/*.html'))
 
-def sclean(txt):
+def get_print(txt):
 	txt=filter(lambda x: x in printable, txt)
-	txt=sp.sub("",txt)
-	txt=txt.replace("&nbsp;", "").strip()
+	txt=sp.sub(" ",txt).strip()
 	return txt
 
-def vacio(soup,nodos, jump=False):
+def sclean(txt):
+	txt=get_print(txt)
+	txt=sp.sub("",txt)
+	return txt
+
+def vacio(soup,nodos):
 	r=[]
 	tags=soup.find_all(nodos)
 	for t in tags:
-		if jump or (len(t.contents)==0 or len(t.select(" > *"))==0):
-			txt=sclean(t.get_text())
-			if len(txt)==0:
-				r.append(t)
+		txt=sclean(t.get_text())
+		if len(txt)==0:
+			r.append(t)
 	return r
 
 def nclean(ls):
@@ -43,6 +52,46 @@ def nclean(ls):
 				txt=txt+n.get_text()
 	txt=sclean(txt)
 	return txt
+
+def trim_node(n, left=True, right=True):
+	r=[]
+	if len(n.contents)==0:
+		return r
+	if left:
+		flag=True
+		i=0
+		while i<len(n.contents) and flag:
+			c=n.contents[i]
+			i=i+1
+			txt=""
+			if isinstance(c, bs4.NavigableString) or isinstance(c, unicode):
+				txt=txt+c
+			else:
+				txt=txt+c.get_text()
+			txt=sclean(txt)
+			if len(txt)==0:
+				r.append(c)
+			else:
+				flag=False
+		if len(r)==len(n.contents):
+			return r
+	if right:
+		flag=True
+		i=len(n.contents)-1
+		while i>0 and flag:
+			c=n.contents[i]
+			i=i-1
+			txt=""
+			if isinstance(c, bs4.NavigableString) or isinstance(c, unicode):
+				txt=txt+c
+			else:
+				txt=txt+c.get_text()
+			txt=sclean(txt)
+			if len(txt)==0:
+				r.append(c)
+			else:
+				flag=False
+	return r
 
 for f in htmls:
 	html = open(f,"r+")
@@ -84,7 +133,7 @@ for f in htmls:
 			s.unwrap()
 		elif "rgb(0, 150, 200)" in s.attrs['style'] and s.parent.name!="a" and len(s.select(" > *"))==1 and s.select(" > *")[0].name!="a":
 			s.attrs['class']="enlace"
-		elif "rgb(0, 0, 255)" in s.attrs['style'] or "rgb(0, 0, 205)" in s.attrs['style']:
+		elif "rgb(0, 0, 255)" in s.attrs['style'] or "rgb(0, 0, 205)" in s.attrs['style'] or "color:#0000CD;" in s.attrs['style']:
 			s.attrs['class']="comando"
 		elif "rgb(0, 200, 0)" in s.attrs['style']:
 			s.attrs['class']="stout"
@@ -102,21 +151,35 @@ for f in htmls:
 		if len(nclean(b.next_sibling))==0 or len(nclean(b.previous_sibling))==0:
 			b.extract()
 
+	tags=vacio(soup, ['table', 'p', 'div', 'ul', 'ol', 'li'])
+	for t in tags:
+		t.extract()
 	tags=vacio(soup, ['strong', 'em' , 'i', 'b', 'span', 'u'])
 	for t in tags:
 		t.unwrap()
-	tags=vacio(soup, ['p', 'div', 'ul', 'li', 'ol'])
-	for t in tags:
-		t.extract()
-	tags=vacio(soup, ['table'], True)
-	for t in tags:
-		t.extract()
+
+	for lb in soup.findAll("label"):
+		n=lb.select(" > *")
+		if len(n)==1 and n[0].name=="p":
+			lb.replaceWithChildren()
 
 	lis=soup.findAll("li")
 	for li in lis:
 		n=li.select(" > *")
 		if len(n)==1 and n[0].name=="p":
 			n[0].unwrap()
+		tr=trim_node(li)
+		for r in tr:
+			r.extract()
+
+	tags=soup.find_all(['p','div'])
+	for t in tags:
+		left=True
+		if len(t.find_all(['span','strong']))>0:
+			left=False
+		tr=trim_node(t,left,True)
+		for r in tr:
+			r.extract()
 
 	for a in soup.select("a"):
 		if "ObjLayerActionGoToNewWindow" in a.attrs['href']:
@@ -125,11 +188,6 @@ for f in htmls:
 	for n in soup.html:
 		if isinstance(n, bs4.Comment) or isinstance(n, bs4.NavigableString):
 			n.extract()
-
-	for lb in soup.findAll("label"):
-		n=lb.select(" > *")
-		if len(n)==1 and n[0].name=="p":
-			lb.replaceWithChildren()
 
 	for p in soup.select("*"):
 		if 'style' in p.attrs:
@@ -142,11 +200,27 @@ for f in htmls:
 			del p.attrs['id']
 		if 'align' in p.attrs and p.attrs['align']=="left":
 			del p.attrs['align']
+	for t in soup.select("table"):
+		t.attrs.clear()
 
 	h = str(soup)
-	for t in tag_concat:
-		r=re.compile("</"+t+">(\s*)<"+t+">", re.IGNORECASE|re.MULTILINE|re.DOTALL|re.UNICODE)
-		h=r.sub("\\1",h)
 
+	for t in tag_concat:
+		r=re.compile("</"+t+">(\s*)<"+t+">", re.MULTILINE|re.DOTALL|re.UNICODE)
+		h=r.sub("\\1",h)
+	'''
+	for t in tag_round:
+		r=re.compile("(<"+t+"[^>]*>)(\s+)", re.MULTILINE|re.DOTALL|re.UNICODE)
+		h=r.sub("\\2\\1",h)
+		r=re.compile("(\s+)(</"+t+">)", re.MULTILINE|re.DOTALL|re.UNICODE)
+		h=r.sub("\\2\\1",h)
+	for t in tag_trim:
+		r= re.compile('(<"+t+">)[%s\s]+' % re.escape(control_chars), re.MULTILINE|re.DOTALL|re.UNICODE)
+		#r=re.compile("(<"+t+">)\s+", re.MULTILINE|re.DOTALL|re.UNICODE)
+		h=r.sub("\\1",h)
+		r= re.compile('[%s\s]+(</"+t+">)' % re.escape(control_chars), re.MULTILINE|re.DOTALL|re.UNICODE)
+		#r=re.compile("\s+(</"+t+">)", re.MULTILINE|re.DOTALL|re.UNICODE)
+		h=r.sub("\\1",h)
+	'''
 	with open(f, "wb") as file:
 		file.write(h)

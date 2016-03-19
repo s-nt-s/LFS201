@@ -21,7 +21,15 @@ caB=0
 n=0
 f=0
 
+tpt="out/_LFS201.html"
 oht="out/LFS201.html"
+
+def is_in(n,p):
+	while n.parent:
+		n=n.parent
+		if n.name=='p':
+			return True
+	return False
 
 def get_soup(html):
 	html = open(html,"r+")
@@ -38,15 +46,16 @@ def find_text(soup,r):
 	return rt
 
 def set_anchor(i,ca,f=None):
-	a=soup.new_tag("a", **{"class":"mrk", "href": "#"+i.attrs['id'], "title":u"Cápitulo "+str(ca)})
+	a=soup.new_tag("a", **{"href": "#"+i.attrs['id'], "title":u"Cápitulo "+str(ca)})
 	if f:
 		a.attrs['title']=a.attrs['title']+" ficha "+str(f)
-	a.string="#"
 	if i.name=="fieldset":
 		i=i.legend
+	a.string=i.string
+	i.string=""
 	i.append(a)
 
-soup = get_soup(oht)
+soup = get_soup(tpt)
 soup.body.clear()
 div=soup.new_tag("div", **{"class":"content"})
 soup.body.append(div)
@@ -87,6 +96,10 @@ for ht in hts:
 	fld.attrs['id']="c"+str(ca)+"f"+str(f)
 	fld.append(b)
 
+	ps=fld.div.select(" > *")
+	if len(ps)>0 and ps[0].name=="p" and ps[0].get_text().lower() == fld.legend.get_text().lower():
+		ps[0].extract()
+
 	if n==3:
 		cs=[]
 		if fg.match(fld.legend.string):
@@ -115,6 +128,11 @@ for f in labs:
 	a=soup.new_tag("a", href="https://lms.360training.com/custom/12396/808239/LAB_"+l+".pdf")
 	a.append(n)
 	f.append(a)
+
+#texts = soup.find_all(text=True)
+#for t in texts:
+#	if not(is_in(t,'span')) and not(is_in(t,'strong')):
+		#t.replace_with(sp.sub(" ",t.replace("&nbsp", " ")))
 
 h = str(soup)
 h=bk.sub("\\n<\\1>",h)
