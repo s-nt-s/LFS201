@@ -49,20 +49,10 @@ body > div {
 table tr:nth-child(even) {
 	background-color: #ddd;
 }
-a.mrk {
-	background-color: white;
-	border-radius: 50%;
-	display: none;
-	font-weight: bold;
-	margin-left: 0.3em;
-	padding-left: 0.3em;
-	padding-right: 0.3em;
+h1 a, legend a {
 	text-decoration: none;
+	color: inherit;
 }
-h1:hover a.mrk, legend:hover a.mrk {
-	display:inline;
-}
-
 .enlace, a {
 	color:rgb(0, 150, 200);
 }
