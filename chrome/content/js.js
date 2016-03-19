@@ -2,7 +2,7 @@
 	init: function(bind) {
 		if (bind==null && (bind=gBrowser)==null) return;
         bind.addEventListener("DOMContentLoaded", this.onPageLoad, false);
-    },  
+    },
     onPageLoad: function(aEvent) {
         var doc = aEvent?(aEvent.originalTarget||aEvent.target):window.document;
         var win = doc.defaultView;
@@ -41,13 +41,13 @@
 					}
 					title=title+"_popup";
 				}
-				
+
 				var imgs=document.getElementsByTagName("img");
 				for (i=0;i<imgs.length;i++) {
 					img=imgs[i];
 					img.src=img.src;
 				}
-				
+
 				var f="LFS201_"+title+".html";
 
 				var textToWrite = document.documentElement.outerHTML;
@@ -59,10 +59,15 @@
 				downloadLink.href = window.webkitURL.createObjectURL(textFileAsBlob);
 				downloadLink.click();
 			},
+			nav:function() {
+				var a=document.getElementsByName("45297anc");
+				if (a.length==1) a[0].click();
+			},
 			run:function(doc){
 				setTimeout(this.save,2000);
+				//setTimeout(this.nav,5000);
 			}
 		}
 		obj.run(doc);
-    }  
+    }
 }
