@@ -4,15 +4,17 @@ import os.path
 import glob
 import re
 import bs4
+from tidylib import tidy_document
+
+tag_compat=['p','li', 'legend', 'td', 'th']
 
 tt=re.compile(".*?LFS201_\d+.\d+_([^/]+?)(_popup \(\d+\))?.md$")
 cp=re.compile(".*?LFS201_(\d+)\..*$")
 pr=re.compile("(.*)¿(.*?)-(.*)")
 bk=re.compile("<(fieldset|head|body|meta|link|script|p|ul|ol|li|div)>")
-ck=re.compile("(Haga|Haz) click (en|sobre) (el|los|en)")
+ck=re.compile("(Haga|Haz) click (en|sobre) (el|los|en)", re.UNICODE|re.MULTILINE|re.DOTALL)
 fg=re.compile(".*?(Figura|Figure)\s+\d+\.\d+(:|.)", re.UNICODE|re.MULTILINE|re.DOTALL)
-ct=re.compile(".*? para ")
-lab=re.compile(".*\s+para\s+descargar\s+el\s+Laboratorio\s+(\d+\.\d+).*",re.UNICODE)
+lab=re.compile(".*\s+para\s+descargar\s+el\s+Laboratorio\s+(\d+\.\d+).*", re.UNICODE|re.MULTILINE|re.DOTALL)
 sp=re.compile("\s+", re.UNICODE)
 
 hts=sorted(glob.glob('html/clean/*.html'))
@@ -23,13 +25,7 @@ f=0
 
 tpt="out/_LFS201.html"
 oht="out/LFS201.html"
-
-def is_in(n,p):
-	while n.parent:
-		n=n.parent
-		if n.name=='p':
-			return True
-	return False
+html4="out/LFS201_4.html"
 
 def get_soup(html):
 	html = open(html,"r+")
@@ -80,9 +76,9 @@ for ht in hts:
 			f=f+1
 
 	if n==1:
-		h=b.p.extract().strong
+		h=b.p.extract()#.strong
 		h.name="h1"
-		h.string=sp.sub(" ",h.string).strip('.')[9:].strip()
+		h.string=sp.sub(" ",h.get_text()).strip('.')[9:].strip()
 		h.attrs['id']="c"+str(ca)
 		set_anchor(h,ca)
 		soup.body.div.append(h)
@@ -123,18 +119,16 @@ for fld in flds:
 
 labs=find_text(soup,lab)
 for f in labs:
-	l=lab.sub("\\1",f.string)
+	l=lab.sub("\\1",f.get_text())
 	n=f.select(" > *")[0]
 	a=soup.new_tag("a", href="https://lms.360training.com/custom/12396/808239/LAB_"+l+".pdf")
 	a.append(n)
 	f.append(a)
 
-#texts = soup.find_all(text=True)
-#for t in texts:
-#	if not(is_in(t,'span')) and not(is_in(t,'strong')):
-		#t.replace_with(sp.sub(" ",t.replace("&nbsp", " ")))
-
-h = str(soup)
+h=unicode(soup)
 h=bk.sub("\\n<\\1>",h)
 with open(oht, "wb") as file:
-	file.write(h)
+	file.write(h.encode('utf8'))
+h,e = tidy_document(h)
+with open(html4, "wb") as file:
+	file.write(h.encode('utf8'))

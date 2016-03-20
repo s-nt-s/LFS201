@@ -7,30 +7,21 @@ import glob
 import re
 import nltk
 import string
-import unicodedata
 
-all_chars = (unichr(i) for i in xrange(0x110000))
-control_chars = ''.join(map(unichr, range(0,32) + range(127,160)))
-#sp = re.compile('[%s\s]+' % re.escape(control_chars), re.UNICODE)
+uni_remove=('Mn', 'Me','Z', 'C')
 
 tag_concat=['u','ul','ol','i','em','b','strong']
-tag_round=['u','i','em','b','strong','span']
-tag_trim=['li']
-hr=re.compile(".*ObjLayerActionGoToNewWindow.*?'(.*?)'.*")
+tag_round=['u','i','em','b','span','strong', 'a']
+tag_trim=['li', 'th', 'td', 'div']
+tag_right=['p']
+hr=re.compile(".*ObjLayerActionGoTo.*?'(.*?)'.*")
 sp=re.compile("\s+", re.UNICODE)
 
 printable = set(string.printable)
 
-htmls=sorted(glob.glob('html/clean/*.html'))
-
-def get_print(txt):
-	txt=filter(lambda x: x in printable, txt)
-	txt=sp.sub(" ",txt).strip()
-	return txt
-
 def sclean(txt):
-	txt=get_print(txt)
-	txt=sp.sub("",txt)
+	txt=filter(lambda x: x in printable, txt)
+	txt=sp.sub("",txt).strip()
 	return txt
 
 def vacio(soup,nodos):
@@ -42,56 +33,81 @@ def vacio(soup,nodos):
 			r.append(t)
 	return r
 
-def nclean(ls):
-	txt=""
-	if ls:
-		for n in ls:
-			if isinstance(n, bs4.NavigableString) or isinstance(n, unicode):
-				txt=txt+n
-			else:
-				txt=txt+n.get_text()
-	txt=sclean(txt)
-	return txt
+def eqtxt(a,b):
+	sa=sclean(a.get_text())
+	sb=sclean(b.get_text())
+	return sa==sb
 
-def trim_node(n, left=True, right=True):
+def tail(n):
+	txt=""
+	s=n
+	while s.next_sibling and len(txt)==0:
+		s=s.next_sibling
+		if isinstance(s, bs4.NavigableString) or isinstance(s, unicode):
+			txt=txt+sclean(s)
+		else:
+			txt=txt+sclean(s.get_text())
+	if len(txt)==0:
+		return True
+	txt=""
+	s=n
+	while s.previous_sibling and len(txt)==0:
+		s=s.previous_sibling
+		if isinstance(s, bs4.NavigableString) or isinstance(s, unicode):
+			txt=txt+sclean(s)
+		else:
+			txt=txt+sclean(s.get_text())
+	txt=sclean(txt)
+	if len(txt)==0:
+		return True
+	return False
+
+
+
+def parrafos(soup):
+	prfs= soup.find_all(['li','table'])
+	ps = soup.find_all('p')
+	for p in ps:
+		flag=False
+		for c in p.contents:
+			#(isinstance(c, bs4.Tag) and c.name=="a") or
+			if ((isinstance(c, bs4.NavigableString) or isinstance(c, unicode)) and len(sclean(c))>0):
+				flag=True
+				break
+		if flag:
+			prfs.append(p)
+	return prfs
+
+def eqparents(n,tag=None):
 	r=[]
-	if len(n.contents)==0:
-		return r
-	if left:
-		flag=True
-		i=0
-		while i<len(n.contents) and flag:
-			c=n.contents[i]
-			i=i+1
-			txt=""
-			if isinstance(c, bs4.NavigableString) or isinstance(c, unicode):
-				txt=txt+c
-			else:
-				txt=txt+c.get_text()
-			txt=sclean(txt)
-			if len(txt)==0:
-				r.append(c)
-			else:
-				flag=False
-		if len(r)==len(n.contents):
-			return r
-	if right:
-		flag=True
-		i=len(n.contents)-1
-		while i>0 and flag:
-			c=n.contents[i]
-			i=i-1
-			txt=""
-			if isinstance(c, bs4.NavigableString) or isinstance(c, unicode):
-				txt=txt+c
-			else:
-				txt=txt+c.get_text()
-			txt=sclean(txt)
-			if len(txt)==0:
-				r.append(c)
-			else:
-				flag=False
+	txt=sclean(n.get_text())
+	if not tag:
+		tag=n.name
+	n=n.parent
+	while n.parent:
+		n=n.parent
+		if txt!=sclean(n.get_text()):
+			break
+		if n.name==tag:
+			r.append(n)
 	return r
+
+def eqsibling(n):
+	r=[]
+	tag=n.name
+	s=n
+	while s.next_sibling:
+		s=s.next_sibling
+		if isinstance(s, bs4.NavigableString) or isinstance(s, unicode):
+			break
+		if s.name!=tag:
+			break
+		if tag!="span" or n.attrs['class']==s.attrs['class']:
+			r.append(s)
+	return r
+
+
+htmls=sorted(glob.glob('html/clean/*.html'))
 
 for f in htmls:
 	html = open(f,"r+")
@@ -131,7 +147,7 @@ for f in htmls:
 	for s in spans:
 		if 'style' not in s.attrs:
 			s.unwrap()
-		elif "rgb(0, 150, 200)" in s.attrs['style'] and s.parent.name!="a" and len(s.select(" > *"))==1 and s.select(" > *")[0].name!="a":
+		elif "rgb(0, 150, 200)" in s.attrs['style'] and s.parent.name!="a" and not(len(s.select(" > *"))==1 and s.select(" > *")[0].name=="a"):
 			s.attrs['class']="enlace"
 		elif "rgb(0, 0, 255)" in s.attrs['style'] or "rgb(0, 0, 205)" in s.attrs['style'] or "color:#0000CD;" in s.attrs['style']:
 			s.attrs['class']="comando"
@@ -145,10 +161,20 @@ for f in htmls:
 	for u in us:
 		if u.parent.name=="a":
 			u.unwrap()
+	strongs=soup.select("strong")
+	for s in strongs:
+		ps=eqparents(s)
+		for p in ps:
+			p.unwrap()
+	spans=soup.select("span")
+	for s in spans:
+		ps=eqparents(s)
+		for p in ps:
+			p.unwrap()
 
 	brs=soup.select("br")
 	for b in brs:
-		if len(nclean(b.next_sibling))==0 or len(nclean(b.previous_sibling))==0:
+		if tail(b):
 			b.extract()
 
 	tags=vacio(soup, ['table', 'p', 'div', 'ul', 'ol', 'li'])
@@ -168,26 +194,21 @@ for f in htmls:
 		n=li.select(" > *")
 		if len(n)==1 and n[0].name=="p":
 			n[0].unwrap()
-		tr=trim_node(li)
-		for r in tr:
-			r.extract()
-
-	tags=soup.find_all(['p','div'])
-	for t in tags:
-		left=True
-		if len(t.find_all(['span','strong']))>0:
-			left=False
-		tr=trim_node(t,left,True)
-		for r in tr:
-			r.extract()
 
 	for a in soup.select("a"):
-		if "ObjLayerActionGoToNewWindow" in a.attrs['href']:
+		if "ObjLayerActionGoTo" in a.attrs['href']:
 			a.attrs['href']=hr.sub("\\1",a.attrs['href'])
 
 	for n in soup.html:
 		if isinstance(n, bs4.Comment) or isinstance(n, bs4.NavigableString):
 			n.extract()
+
+	prfs=parrafos(soup)
+	for p in prfs:
+		texts=p.find_all(text=True)
+		for t in texts:
+			b=sp.sub(" ",t.string)
+			t.replace_with(b)
 
 	for p in soup.select("*"):
 		if 'style' in p.attrs:
@@ -203,24 +224,46 @@ for f in htmls:
 	for t in soup.select("table"):
 		t.attrs.clear()
 
-	h = str(soup)
+	spans=soup.select("span")
+	for s in spans:
+		sb=eqsibling(s)
+		if len(sb)>0:
+			sblng=soup.new_tag("sblng")
+			s.append(sblng)
+			for b in sb:
+				s.sblng.append(b)
+				s.sblng.span.unwrap()
+			s.sblng.unwrap()
+
+	enlaces=soup.findAll("span", attrs={'class': "enlace"})
+	for e in enlaces:
+		us=e.findAll('u')
+		for u in us:
+			u.unwrap()
+		txt=sp.sub(" ",e.get_text()).strip()
+		if txt.startswith("http") and " " not in txt:
+			e.name="a"
+			e.attrs['href']=txt
+			del e.attrs['class']
+
+	h = unicode(soup)
 
 	for t in tag_concat:
 		r=re.compile("</"+t+">(\s*)<"+t+">", re.MULTILINE|re.DOTALL|re.UNICODE)
 		h=r.sub("\\1",h)
-	'''
 	for t in tag_round:
 		r=re.compile("(<"+t+"[^>]*>)(\s+)", re.MULTILINE|re.DOTALL|re.UNICODE)
 		h=r.sub("\\2\\1",h)
 		r=re.compile("(\s+)(</"+t+">)", re.MULTILINE|re.DOTALL|re.UNICODE)
 		h=r.sub("\\2\\1",h)
 	for t in tag_trim:
-		r= re.compile('(<"+t+">)[%s\s]+' % re.escape(control_chars), re.MULTILINE|re.DOTALL|re.UNICODE)
-		#r=re.compile("(<"+t+">)\s+", re.MULTILINE|re.DOTALL|re.UNICODE)
+		r=re.compile("(<"+t+">)\s+", re.MULTILINE|re.DOTALL|re.UNICODE)
 		h=r.sub("\\1",h)
-		r= re.compile('[%s\s]+(</"+t+">)' % re.escape(control_chars), re.MULTILINE|re.DOTALL|re.UNICODE)
-		#r=re.compile("\s+(</"+t+">)", re.MULTILINE|re.DOTALL|re.UNICODE)
+		r=re.compile("\s+(</"+t+">)", re.MULTILINE|re.DOTALL|re.UNICODE)
 		h=r.sub("\\1",h)
-	'''
+	for t in tag_right:
+		r=re.compile("\s+(</"+t+">)", re.MULTILINE|re.DOTALL|re.UNICODE)
+		h=r.sub("\\1",h)
+
 	with open(f, "wb") as file:
-		file.write(h)
+		file.write(h.encode('utf8'))
