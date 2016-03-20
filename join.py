@@ -44,7 +44,7 @@ def find_text(soup,r):
 def set_anchor(i,ca,f=None):
 	a=soup.new_tag("a", **{"href": "#"+i.attrs['id'], "title":u"Cápitulo "+str(ca)})
 	if f:
-		a.attrs['title']=a.attrs['title']+" ficha "+str(f)
+		a.attrs['title']=a.attrs['title']+", ficha "+str(f)
 	if i.name=="fieldset":
 		i=i.legend
 	a.string=i.string
@@ -57,6 +57,7 @@ div=soup.new_tag("div", **{"class":"content"})
 soup.body.append(div)
 
 fldB=None
+divCp=None
 
 for ht in hts:
 	soup2 = get_soup(ht)
@@ -81,7 +82,10 @@ for ht in hts:
 		h.string=sp.sub(" ",h.get_text()).strip('.')[9:].strip()
 		h.attrs['id']="c"+str(ca)
 		set_anchor(h,ca)
-		soup.body.div.append(h)
+		divCp=soup.new_tag("div", **{"id":"cp"+str(ca)})
+		soup.body.div.append(divCp)
+		#soup.body.div
+		divCp.append(h)
 		n=2
 
 	fld = soup.new_tag("fieldset")
@@ -109,7 +113,8 @@ for ht in hts:
 			fldB.append(fld)
 	else:
 		set_anchor(fld,ca,f)
-		soup.body.div.append(fld)
+		#soup.body.div
+		divCp.append(fld)
 		fldB=fld
 
 flds=soup.findAll("fieldset", attrs={'class': re.compile(r".*\bn3\b.*")})
@@ -124,6 +129,16 @@ for f in labs:
 	a=soup.new_tag("a", href="https://lms.360training.com/custom/12396/808239/LAB_"+l+".pdf")
 	a.append(n)
 	f.append(a)
+
+divs=soup.body.div.select(" > div")
+c=str(len(divs))
+for d in divs:
+	a=d.h1.a
+	a.attrs['title']=a.attrs['title']+" de "+c
+	mrks=d.select(" > fieldset > legend > a")
+	z=str(len(mrks))
+	for m in mrks:
+		m.attrs['title']=m.attrs['title']+" de "+z
 
 h=unicode(soup)
 h=bk.sub("\\n<\\1>",h)
