@@ -4,7 +4,6 @@ import os.path
 import glob
 import re
 import bs4
-from tidylib import tidy_document
 
 tag_compat=['p','li', 'legend', 'td', 'th']
 
@@ -29,7 +28,7 @@ html4="out/LFS201_4.html"
 
 def get_soup(html):
 	html = open(html,"r+")
-	soup = bs4.BeautifulSoup(html)
+	soup = bs4.BeautifulSoup(html,'html.parser')#"lxml")
 	html.close()
 	return soup
 
@@ -130,20 +129,19 @@ for f in labs:
 	a.append(n)
 	f.append(a)
 
-divs=soup.body.div.select(" > div")
-c=str(len(divs))
-for d in divs:
+for d in soup.body.div.select(" > div"):
 	a=d.h1.a
-	a.attrs['title']=a.attrs['title']+" de "+c
+	a.attrs['title']=a.attrs['title']+" de "+str(ca)
 	mrks=d.select(" > fieldset > legend > a")
 	z=str(len(mrks))
 	for m in mrks:
 		m.attrs['title']=m.attrs['title']+" de "+z
 
-h=unicode(soup)
+h=unicode(soup)#HTMLBeautifier.beautify(unicode(soup), 4) soup.prettify()
 h=bk.sub("\\n<\\1>",h)
+# Erratas
+h=h.replace("Objectivos de aprendizaje","Objetivos de aprendizaje") #7 11
+h=h.replace(">31.</a></h1>",">31. zypper</a></h1>") #31
 with open(oht, "wb") as file:
 	file.write(h.encode('utf8'))
-h,e = tidy_document(h)
-with open(html4, "wb") as file:
-	file.write(h.encode('utf8'))
+
