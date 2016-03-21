@@ -22,7 +22,7 @@ caB=0
 n=0
 f=0
 
-tpt="out/_LFS201.html"
+tpt="out/LFS201.htm"
 oht="out/LFS201.html"
 html4="out/LFS201_4.html"
 
