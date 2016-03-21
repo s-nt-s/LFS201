@@ -18,3 +18,6 @@ echo -n "Creando salida ... "
 python join.py
 echo "ok"
 
+echo -n "Creando listado de objetivos... "
+python obj.py
+echo "ok"
