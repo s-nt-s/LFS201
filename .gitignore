@@ -2,3 +2,5 @@ html/ori/*
 html/clean/*
 out/*.html
 pdf/*
+out/imgs/*.png
+
