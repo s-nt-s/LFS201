@@ -119,9 +119,6 @@ for f in htmls:
 	for h in head:
 		soup.head.append(h)
 
-#	imgs=[a.attrs['src'] for a in soup.select("img") if "_small_" in a.attrs['src']]
-#	print str(imgs)
-
 	ttxt=soup.select("div.ttxt")
 	if len(ttxt)>0:
 		if len(ttxt)>1:

@@ -4,13 +4,10 @@ import os.path
 import glob
 import re
 import bs4
+import unicodedata
 
-tag_compat=['p','li', 'legend', 'td', 'th']
-
-tt=re.compile(".*?LFS201_\d+.\d+_([^/]+?)(_popup \(\d+\))?.md$")
 cp=re.compile(".*?LFS201_(\d+)\..*$")
 pr=re.compile("(.*)¿(.*?)-(.*)")
-bk=re.compile("<(fieldset|head|body|meta|link|script|p|ul|ol|li|div)>")
 ck=re.compile("(Haga|Haz) click (en|sobre) (el|los|en)", re.UNICODE|re.MULTILINE|re.DOTALL)
 fg=re.compile(".*?(Figura|Figure)\s+\d+\.\d+(:|.)", re.UNICODE|re.MULTILINE|re.DOTALL)
 lab=re.compile(".*\s+para\s+descargar\s+el\s+Laboratorio\s+(\d+\.\d+).*", re.UNICODE|re.MULTILINE|re.DOTALL)
@@ -25,6 +22,34 @@ f=0
 tpt="out/LFS201.htm"
 oht="out/LFS201.html"
 html4="out/LFS201_4.html"
+
+def escribir(html,out):
+	tags_tab="html|head|ul|ol|div|fieldset"
+	tags_ln=tags_tab+"|meta|link|title|p|li|h1|legend"
+	bks1=re.compile("(<("+tags_ln+")[^>]*>)")
+	bks2=re.compile("(</("+tags_ln+")>)")
+	bks3=re.compile("(<(meta|link) [^>]+/>)")
+	begin_tag=re.compile("^<("+tags_tab+")[^>]*>$")
+	end_tag=re.compile("^</("+tags_tab+")>$")
+
+	html=bks1.sub("\n\\1",html)
+	html=bks2.sub("\\1\n",html)
+	html=bks3.sub("\\1\n",html)
+	lineas=html.split("\n")
+
+	with open(out, "wb") as file:
+		tab=""
+		for l in lineas:
+			cl=sp.sub("",l).strip()
+			if len(cl)==0:
+				continue
+			m1=end_tag.match(l)
+			if m1:
+				tab=tab[:-2]
+			file.write((tab+l+"\n").encode('utf8'))
+			m2=begin_tag.match(l)
+			if m2 and not m1 and not l.endswith("/>"):
+				tab=tab+"  "
 
 def get_soup(html):
 	html = open(html,"r+")
@@ -83,7 +108,6 @@ for ht in hts:
 		set_anchor(h,ca)
 		divCp=soup.new_tag("div", **{"id":"cp"+str(ca)})
 		soup.body.div.append(divCp)
-		#soup.body.div
 		divCp.append(h)
 		n=2
 
@@ -112,7 +136,6 @@ for ht in hts:
 			fldB.append(fld)
 	else:
 		set_anchor(fld,ca,f)
-		#soup.body.div
 		divCp.append(fld)
 		fldB=fld
 
@@ -137,11 +160,19 @@ for d in soup.body.div.select(" > div"):
 	for m in mrks:
 		m.attrs['title']=m.attrs['title']+" de "+z
 
-h=unicode(soup)#HTMLBeautifier.beautify(unicode(soup), 4) soup.prettify()
-h=bk.sub("\\n<\\1>",h)
+for i in soup.findAll("img"):
+	src=i.attrs['src']
+	i.attrs['alt']="Imagen original en: "+src
+	i.attrs['src']="imgs"+src[src.rfind("/"):]
+
+def ischar(ch):
+	c=unicodedata.category(ch)
+	return c[0] not in ('M','C') and c not in ('Zl', 'Zp')
+
+h=unicode(soup)
+h=filter(ischar , h)
 # Erratas
 h=h.replace("Objectivos de aprendizaje","Objetivos de aprendizaje") #7 11
 h=h.replace(">31.</a></h1>",">31. zypper</a></h1>") #31
-with open(oht, "wb") as file:
-	file.write(h.encode('utf8'))
+escribir(h,oht)
 
