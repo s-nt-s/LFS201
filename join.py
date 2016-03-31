@@ -12,6 +12,7 @@ ck=re.compile("(Haga|Haz) click (en|sobre) (el|los|en)", re.UNICODE|re.MULTILINE
 fg=re.compile(".*?(Figura|Figure)\s+\d+\.\d+(:|.)", re.UNICODE|re.MULTILINE|re.DOTALL)
 lab=re.compile(".*\s+para\s+descargar\s+el\s+Laboratorio\s+(\d+\.\d+).*", re.UNICODE|re.MULTILINE|re.DOTALL)
 sp=re.compile("\s+", re.UNICODE)
+url=re.compile("(.*)(http://\S+)(.*)", re.UNICODE|re.MULTILINE|re.DOTALL)
 
 hts=sorted(glob.glob('html/clean/*.html'))
 
@@ -24,8 +25,8 @@ oht="out/LFS201.html"
 html4="out/LFS201_4.html"
 
 def escribir(html,out):
-	tags_tab="html|head|ul|ol|div|fieldset"
-	tags_ln=tags_tab+"|meta|link|title|p|li|h1|legend"
+	tags_tab="html|head|ul|ol|div|fieldset|body|html|table|tbody|thead"
+	tags_ln=tags_tab+"|meta|link|title|p|li|h1|legend|div|tr"
 	bks1=re.compile("(<("+tags_ln+")[^>]*>)")
 	bks2=re.compile("(</("+tags_ln+")>)")
 	bks3=re.compile("(<(meta|link) [^>]+/>)")
@@ -65,10 +66,8 @@ def find_text(soup,r):
 			rt.append(p)
 	return rt
 
-def set_anchor(i,ca,f=None):
+def set_anchor(i,ca):
 	a=soup.new_tag("a", **{"href": "#"+i.attrs['id'], "title":u"Cápitulo "+str(ca)})
-	if f:
-		a.attrs['title']=a.attrs['title']+", ficha "+str(f)
 	if i.name=="fieldset":
 		i=i.legend
 	a.string=i.string
@@ -102,6 +101,7 @@ for ht in hts:
 
 	if n==1:
 		h=b.p.extract()#.strong
+		h.attrs.clear()
 		h.name="h1"
 		h.string=sp.sub(" ",h.get_text()).strip('.')[9:].strip()
 		h.attrs['id']="c"+str(ca)
@@ -120,7 +120,7 @@ for ht in hts:
 	fld.append(b)
 
 	ps=fld.div.select(" > *")
-	if len(ps)>0 and ps[0].name=="p" and ps[0].get_text().lower() == fld.legend.get_text().lower():
+	if len(ps)>0 and ps[0].name=="p" and ps[0].get_text().strip(':').lower() == fld.legend.get_text().lower():
 		ps[0].extract()
 
 	if n==3:
@@ -135,7 +135,7 @@ for ht in hts:
 		else:
 			fldB.append(fld)
 	else:
-		set_anchor(fld,ca,f)
+		set_anchor(fld,ca)
 		divCp.append(fld)
 		fldB=fld
 
@@ -144,21 +144,119 @@ for fld in flds:
 	if len(fld.parent.select(" > *"))==1:
 		fld.parent.replace_with(fld.div)
 
+'''
 labs=find_text(soup,lab)
 for f in labs:
 	l=lab.sub("\\1",f.get_text())
 	n=f.select(" > *")[0]
 	a=soup.new_tag("a", href="https://lms.360training.com/custom/12396/808239/LAB_"+l+".pdf")
-	a.append(n)
-	f.append(a)
-
+	codigo=None
+	if l == "4.1":
+		codigo="https://lms.360training.com/custom/12396/808239/fake_service"
+	elif l == "18.2":
+		codigo="https://lms.360training.com/custom/12396/808239/writeit.c"
+	elif l == "21.1":
+		codigo="https://lms.360training.com/custom/12396/808239/signals.c"
+	elif l == "25.1":
+		codigo="https://lms.360training.com/custom/12396/808239/ioscript.sh"
+	frase=n.get_text()
+	if frase.endswith("."):
+		frase=frase[:-1]
+	n.string=""
+	if codigo:
+		y=frase.find(" y ")
+		a.string=frase[:y].strip()
+		c=soup.new_tag("a", href=codigo)
+		c.string=frase[y+3:].strip()
+		n.append(a)
+		n.append(" y ")
+		n.append(c)
+		n.append(".")
+	else:
+		a.string=frase
+		n.append(a)
+		n.append(".")
+'''
+nxs=re.compile("^\s*(\d+\.\d+).*$", re.UNICODE|re.MULTILINE|re.DOTALL)
 for d in soup.body.div.select(" > div"):
 	a=d.h1.a
 	a.attrs['title']=a.attrs['title']+" de "+str(ca)
+
+	labos=find_text(d,lab)
+	if len(labos)>0:
+		ul=soup.new_tag("ul")
+		primero=True
+		for lb in labos:
+			fld=lb.find_parent("fieldset")
+			li=soup.new_tag("li")
+			l=lab.sub("\\1",lb.get_text())
+			a=soup.new_tag("a", href="https://lms.360training.com/custom/12396/808239/LAB_"+l+".pdf")
+			a.string="Laboratorio "+l
+			li.append(a)
+			codigo=None
+			if l == "4.1":
+				codigo="https://lms.360training.com/custom/12396/808239/fake_service"
+			elif l == "18.2":
+				codigo="https://lms.360training.com/custom/12396/808239/writeit.c"
+			elif l == "21.1":
+				codigo="https://lms.360training.com/custom/12396/808239/signals.c"
+			elif l == "25.1":
+				codigo="https://lms.360training.com/custom/12396/808239/ioscript.sh"
+			if codigo:
+				c=soup.new_tag("a", href=codigo)
+				c.string=codigo[codigo.rfind("/")+1:]
+				li.append(u" (código fuente: ")
+				li.append(c)
+				li.append(")")
+			ul.append(li)
+			if primero:
+				fld.legend.a.string=nxs.sub("\\1. Laboratorios",fld.legend.a.string)
+				fld.div.clear()
+				fld.div.append(ul)
+				primero=False
+			else:
+				fld.extract()
+
 	mrks=d.select(" > fieldset > legend > a")
 	z=str(len(mrks))
+	i=1
 	for m in mrks:
-		m.attrs['title']=m.attrs['title']+" de "+z
+		m.attrs['title']=m.attrs['title']+", ficha "+str(i)+" de "+z
+		i=i+1
+
+urls=soup.findAll(text=url)
+for u in urls:
+	if u.parent.name not in ["a","span"] and "class" not in u.parent.attrs:
+		m=url.match(u)
+		antes=m.group(1)
+		link=m.group(2)
+		despues=m.group(3)
+		enlace=soup.new_tag("enlace")
+		if len(antes)>0:
+			enlace.append(antes)
+		a=soup.new_tag("a",href=link)
+		a.append(link)
+		enlace.append(a)
+		if len(despues)>0:
+			enlace.append(despues)
+		u.replace_with(enlace)
+		enlace.unwrap()
+
+ptabs=re.compile("(.*?)([^\.\?\s][^\.\?]+ 'tab' [^\.]+\.)(.*)", re.UNICODE|re.MULTILINE|re.DOTALL)
+for p in soup.findAll(text=re.compile(" 'tab' ")):
+	txt=ptabs.sub("\\1\\3",p).strip()
+	padre=p.parent
+	if len(txt)>0:
+		if p.previous_sibling:
+			txt=" "+txt
+		if p.next_sibling:
+			txt=txt+" "
+		p.replace_with(txt)
+	else:
+		if p.parent.get_text().strip()==p.strip():
+			p.parent.extract()
+		else:
+			p.extract()
 
 for i in soup.findAll("img"):
 	src=i.attrs['src']
@@ -171,8 +269,23 @@ def ischar(ch):
 
 h=unicode(soup)
 h=filter(ischar , h)
+
 # Erratas
 h=h.replace("Objectivos de aprendizaje","Objetivos de aprendizaje") #7 11
-h=h.replace(">31.</a></h1>",">31. zypper</a></h1>") #31
+h=h.replace(">31</a></h1>",">31. zypper</a></h1>") #31
+h=h.replace(" del sisco "," del disco ")
+h=h.replace("___ -","-")
+h=h.replace("miltihebra","multihebra")
+h=h.replace("el ajusta de E/S","el ajuste de E/S")
+h=h.replace(". Se este",". Si este")
+h=h.replace(" tital "," total ")
+h=h.replace(" para para "," para ")
+h=h.replace("revision_umber","revision_number")
+h=h.replace("cuentasde","cuentas de")
+h=h.replace("/opt/dolphy_app /man","/opt/dolphy_app/man")
+h=h.replace("archivosy propietarios","archivos y propietarios")
+h=h.replace("$tar","$ tar")
+h=h.replace("cpio -i somefile -I /dev/st0","cpio -i -I /dev/st0 somefile")
+
 escribir(h,oht)
 
