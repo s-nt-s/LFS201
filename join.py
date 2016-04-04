@@ -286,6 +286,7 @@ h=h.replace("/opt/dolphy_app /man","/opt/dolphy_app/man")
 h=h.replace("archivosy propietarios","archivos y propietarios")
 h=h.replace("$tar","$ tar")
 h=h.replace("cpio -i somefile -I /dev/st0","cpio -i -I /dev/st0 somefile")
+h=h.replace("html://","http://")
 
 escribir(h,oht)
 
