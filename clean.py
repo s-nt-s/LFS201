@@ -18,7 +18,7 @@ tag_right=['p']
 hr=re.compile(".*ObjLayerActionGoTo.*?'(.*?)'.*")
 sp=re.compile("\s+", re.UNICODE)
 punto=re.compile(u'\u2022\s*', re.UNICODE)
-
+comandos=re.compile("^\s*(yum|zypper|apt-get|apt-cache|apt-file|dpkg)\s+.*", re.UNICODE)
 
 printable = set(string.printable)
 
@@ -106,6 +106,19 @@ def has(s,ar):
 			return True
 	return False
 
+def get_spbr(soup):
+	pcmd=[]
+	for p in soup.findAll("p"):
+		if len(p.contents)>2:
+			c1=p.contents[0]
+			c2=p.contents[1]
+			c3=p.contents[2]
+			if isinstance(c1, bs4.Tag) and isinstance(c2, bs4.Tag):
+				if c1.name=="span" and c2.name=="br":
+					if not isinstance(c3, bs4.Tag) or c3.name!="span" or c1.attrs["class"]!=c3.attrs["class"]:
+						pcmd.append(p)
+	return pcmd
+
 htmls=sorted(glob.glob('html/clean/*.html'))
 
 for f in htmls:
@@ -155,14 +168,13 @@ for f in htmls:
 		elif has(s.attrs['style'],["rgb(0, 0, 255)","rgb(0, 0, 205)", "color:#0000CD", "rgb(41, 1, 208)", "color:#0000FF"]):
 			s.attrs['class']="comando"
 		elif has(s.attrs['style'],["rgb(0, 200, 0)", "color:#00FF00", "color:#00c800"]):
-			s.attrs['class']="stout"
-		elif "rgb(125, 110, 70)" in s.attrs['style']:
+			s.attrs['class']="stdout"
+		elif has(s.attrs['style'],["rgb(125, 110, 70)","color:#7D6E46"]):
 			s.attrs['class']="archivo"
 		else:
 			s.unwrap()
 	for u in soup.findAll("u"):
-		if u.parent.name=="a":
-			u.unwrap()
+		u.unwrap()
 	for s in soup.findAll("b"):
 		s.name="strong"
 	for s in soup.findAll("strong"):
@@ -176,6 +188,11 @@ for f in htmls:
 				s.unwrap()
 			elif eqtxt(s,s2):
 				s2.unwrap()
+
+	for s in soup.findAll(["span","strong"], text=comandos):
+		if len(s.select(" > *"))==0:
+			s.name="span"
+			s.attrs['class']="comando"
 
 	tags=vacio(soup, ['strong', 'em' , 'i', 'span', 'u'])
 	for t in tags:
@@ -223,19 +240,6 @@ for f in htmls:
 	for t in soup.findAll(['table','tr']):
 		t.attrs.clear()
 
-	enlaces=soup.findAll("span", attrs={'class': "enlace"})
-	for e in enlaces:
-		us=e.findAll('u')
-		for u in us:
-			u.unwrap()
-		txt=sp.sub(" ",e.get_text()).strip()
-		if txt.startswith("html://www."):
-			txt=txt.replace("html://www.","http://www.")
-		if txt.startswith("http") and " " not in txt:
-			e.name="a"
-			e.attrs['href']=txt
-			del e.attrs['class']
-
 	for strong in soup.findAll("strong"):
 		txt=""
 		for c in strong.contents:
@@ -263,6 +267,12 @@ for f in htmls:
 			if len(archs)>0:
 				s.unwrap()
 				continue
+		sb=eqsibling(s)
+		for b in sb:
+			s.append(b)
+			if isinstance(b, bs4.Tag):
+				b.unwrap()
+	for s in soup.select("strong"):
 		sb=eqsibling(s)
 		for b in sb:
 			s.append(b)
@@ -335,7 +345,14 @@ for f in htmls:
 				if len(sclean(c))==0:
 					s.insert_after(c)
 				else:
-					break
+					if s.span:
+						nt=soup.new_tag(s.name)
+						if s.name=="span":
+							nt.attrs["class"]=s.attrs["class"]
+						nt.append(c)
+						s.insert_after(nt)
+					else:
+						break
 			elif c.name in ("span","br"):
 				s.insert_after(c)
 			else:
@@ -351,6 +368,7 @@ for f in htmls:
 				s.insert_before(c)
 			else:
 				break
+
 	for p in soup.findAll(["p","li"]):
 		hjs=reversed(p.contents)
 		for c in hjs:
@@ -413,7 +431,7 @@ for f in htmls:
 
 	for s in soup.findAll("span"):
 		cl=s.attrs["class"]
-		if cl!="stout":
+		if cl!="stdout":
 			txt=sclean(s.get_text())
 			c=txt[0]
 			if c=="$":
@@ -423,21 +441,41 @@ for f in htmls:
 				if cl!="archivo":
 					s.attrs["class"]="archivo"
 			elif ("root root" in s.get_text() or "/sbin/nologin" in s.get_text() or "Ethernet controller" in s.get_text()):
-				s.attrs["class"]="stout"
+				s.attrs["class"]="stdout"
 
 	for s in soup.findAll("span",text="#",attrs={'class': "comando"}):
 		if s.next_sibling and isinstance(s.next_sibling, bs4.Tag) and s.next_sibling.name=="span":
 			ss=s.next_sibling
-			if ss.attrs["class"]=="stout":
+			if ss.attrs["class"]=="stdout":
 				ss.insert(0," ")
 				ss.insert(0,s)
 				s.unwrap()
+
+	enlaces=soup.findAll("span", attrs={'class': "enlace"})
+	for e in enlaces:
+		txt=sp.sub(" ",e.get_text()).strip()
+		if txt.startswith("html://www."):
+			txt=txt.replace("html://www.","http://www.")
+		if txt.startswith("http") and " " not in txt:
+			e.name="a"
+			e.attrs['href']=txt
+			del e.attrs['class']
+
+	pcmd=get_spbr(soup)
+	while len(pcmd)>0:
+		for p in pcmd:
+			s=p.span
+			p.br.extract()
+			s.name="p"
+			p.insert_before(s)
+		pcmd=get_spbr(soup)
 
 	for s in soup.findAll("span"):
 		if s.parent.name=="p" and eqtxt(s,s.parent):
 			s.parent.attrs["class"]=s.attrs["class"]
 			s.unwrap()
 
+	'''
 	for p in soup.findAll("p"):
 		hjs=p.select(" > *")
 		if len(hjs)==3 and hjs[0].name=="span" and hjs[1].name=="br" and hjs[2].name=="span":
@@ -452,11 +490,10 @@ for f in htmls:
 				sp1.unwrap()
 				p.attrs["class"]=sp2.attrs["class"]
 				sp2.unwrap()
-
-
+	'''
 	ps=reversed(soup.findAll("p"))
 	for p in ps:
-		if "class" in p.attrs and p.attrs["class"] in ("stout","archivo","comando"):
+		if "class" in p.attrs and p.attrs["class"] in ("stdout","archivo","comando"):
 			if p.previous_sibling and isinstance(p.previous_sibling, bs4.Tag) and p.previous_sibling.name=="p":
 				pr=p.previous_sibling
 				if "class" in pr.attrs:
@@ -465,8 +502,15 @@ for f in htmls:
 						pr.append(p)
 						p.unwrap()
 
+	if len(soup.body.contents)==1:
+		p=soup.body.contents[0]
+		if len(p.contents)==1:
+			c=p.contents[0]
+			if isinstance(c, bs4.Tag):
+				c.unwrap()
+
 	'''
-	sts=soup.findAll("span", attrs={'class': "stout"})
+	sts=soup.findAll("span", attrs={'class': "stdout"})
 	for st in sts:
 		if st.previous_sibling and not (isinstance(st.previous_sibling, bs4.Tag) and st.previous_sibling.name=="br"):
 			print str(st.parent)
@@ -500,6 +544,7 @@ for f in htmls:
 	h=h=r.sub("<br/>",h)
 	r=re.compile("\s*<br/>", re.MULTILINE|re.DOTALL|re.UNICODE)
 	h=h=r.sub("<br/>",h)
+	h=h.replace("___ -","-")
 
 	with open(f, "wb") as file:
 		file.write(h.encode('utf8'))

@@ -71,20 +71,20 @@ td > p:first-child, th > p:first-child  {
 td > p:last-child, td > p:last-child {
 	margin-bottom:0;
 }
-.enlace, a {
+/*.enlace, a {
 	color: rgb(0, 150, 200);
-}
+}*/
 .comando {
 	color:rgb(0, 0, 255);
 }
-.stout {
+.stdout {
 	color:rgb(0, 200, 0);
 }
 .archivo {
 	color:rgb(125, 110, 70);
 }
-.archivo, .comando, .stout {
-	font-weight: bold;
+.archivo, .comando, .stdout {
+	/*font-weight: bold;*/
 	font-family: 'courier new', monospace;
 }
 h1 a, legend a {
