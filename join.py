@@ -424,13 +424,15 @@ h=h.replace("$for machines in node1 node2 node3</p><p class=\"stdout\">","$ for 
 h=h.replace("(Zona desmilitarizada)</p><p>","(Zona desmilitarizada)<br/>")
 h=h.replace("Se se produce","Si se produce")
 h=h.replace("intentar de reparar","intentar reparar")
+h=h.replace("n. El comando","n.</p><p>El comando")
+h=h.replace("apt-ge</strong>t","apt-get</strong>")
 
-r=re.compile("\s+DUMP: ", re.MULTILINE|re.DOTALL|re.UNICODE)
-h=h=r.sub("DUMP: ",h)
-r=re.compile("Shared libraries have the extension .*? where N is a major version number.", re.MULTILINE|re.DOTALL|re.UNICODE)
-h=h=r.sub("",h)
+r=re.compile("\s+(DUMP: )", re.MULTILINE|re.DOTALL|re.UNICODE)
+h=h=r.sub("\\1",h)
 r=re.compile(">\s\$ ", re.MULTILINE|re.DOTALL|re.UNICODE)
 h=h=r.sub(">$ ",h)
+r=re.compile("There are a variety of graphical desktop environments used in[^\.]+\.", re.MULTILINE|re.DOTALL|re.UNICODE)
+h=h=r.sub("",h)
 
 escribir(h,oht)
 
