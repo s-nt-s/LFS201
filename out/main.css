@@ -97,3 +97,13 @@ div.content > fieldset:first-child {
 div.content > fieldset:last-child {
 	margin-bottom:3px;
 }
+figure {
+	margin:0;
+	display: inline-block;
+    border-radius: 6px;
+    border: 1px solid black;
+}
+figure > figcaption {
+    border-bottom: 1px dashed black;
+    text-align: center;
+}

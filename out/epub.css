@@ -1,0 +1,53 @@
+body {
+    font-family: arial,sans serif;
+    font-size: 11pt;
+}
+table {
+	border-spacing: 0px;
+	border-collapse: collapse;
+}
+thead {
+	background-color: lightblue;
+}
+td, th {
+	border: 1px solid black;
+	padding-left: 5px;
+	padding-right: 5px;
+}
+table tbody tr:nth-child(even) {
+	background-color: #ddd;
+}
+td > p, th > p {
+	margin-top:7px;
+	margin-bottom:7px;
+}
+td > p:first-child, th > p:first-child  {
+	margin-top:0;
+}
+td > p:last-child, td > p:last-child {
+	margin-bottom:0;
+}
+.comando {
+	color:rgb(0, 0, 255);
+}
+.stdout {
+	color:rgb(0, 200, 0);
+}
+.archivo {
+	color:rgb(125, 110, 70);
+}
+.archivo, .comando, .stdout {
+	font-family: 'courier new', monospace;
+}
+figure {
+	margin:0;
+	display: inline-block;
+    border: 1px solid black;
+}
+figure > figcaption {
+    border-bottom: 1px dashed black;
+    text-align: center;
+}
+img {
+	max-width:100%;
+}

@@ -334,11 +334,11 @@ for d in soup.body.div.select(" > div"):
 				p.extract()
 		p=soup.new_tag("p")
 		p.string=preguntaVF
-		v1.append(p)
+		v1.div.append(p)
 		if len(uls)>0:
 			for u in uls:
-				v1.append(u)
-		v1.append(ul)
+				v1.div.append(u)
+		v1.div.append(ul)
 
 	fs=find_fld(d, cono, 5)
 	for f in fs:
@@ -389,6 +389,14 @@ for i in soup.findAll("img"):
 	src=i.attrs['src']
 	i.attrs['alt']="Imagen original en: "+src
 	i.attrs['src']="imgs"+src[src.rfind("/"):]
+	f=i.find_parent("fieldset")
+	i.attrs['title']=f.legend.get_text().strip()
+	f=i.find_parent("fieldset")
+	f.div.unwrap()
+	f.name="figure"
+	f.legend.name="figcaption"
+	del f.attrs['id']
+	del f.attrs['class']
 
 def ischar(ch):
 	c=unicodedata.category(ch)
@@ -426,6 +434,7 @@ h=h.replace("Se se produce","Si se produce")
 h=h.replace("intentar de reparar","intentar reparar")
 h=h.replace("n. El comando","n.</p><p>El comando")
 h=h.replace("apt-ge</strong>t","apt-get</strong>")
+h=h.replace("imgs/LVM_Components_large_Spanish%20(2).png","imgs/LVM_Components_large_Spanish.png")
 
 r=re.compile("\s+(DUMP: )", re.MULTILINE|re.DOTALL|re.UNICODE)
 h=h=r.sub("\\1",h)

@@ -4,7 +4,6 @@ import re
 html="out/LFS201.html"
 out="out/Objetivos.html"
 
-
 def get_soup(html):
 	html = open(html,"r+")
 	soup = bs4.BeautifulSoup(html,'html.parser')#"lxml")
@@ -29,6 +28,5 @@ for div in soup.body.div.select(" > div"):
 	div.unwrap()
 
 h=unicode(soup)
-#h=bk.sub("\\n<\\1>",h)
 with open(out, "wb") as file:
 	file.write(h.encode('utf8'))
