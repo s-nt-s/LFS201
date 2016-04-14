@@ -231,8 +231,7 @@ if len(ins)>0:
 	p.append(a)
 	p.append(" (")
 	p.append(get_lab("ready-for.sh","ready-for.sh"))
-	p.append(")")
-
+	p.append(").")
 
 nxs=re.compile("^\s*(\d+\.\d+).*$", re.UNICODE|re.MULTILINE|re.DOTALL)
 labfull=re.compile(u".*todos los ejercicios de laboratorio y soluciones.*", re.UNICODE|re.MULTILINE|re.DOTALL)
@@ -435,6 +434,7 @@ h=h.replace("intentar de reparar","intentar reparar")
 h=h.replace("n. El comando","n.</p><p>El comando")
 h=h.replace("apt-ge</strong>t","apt-get</strong>")
 h=h.replace("imgs/LVM_Components_large_Spanish%20(2).png","imgs/LVM_Components_large_Spanish.png")
+h=h.replace("strong> or <strong","strong> o <strong")
 
 r=re.compile("\s+(DUMP: )", re.MULTILINE|re.DOTALL|re.UNICODE)
 h=h=r.sub("\\1",h)
