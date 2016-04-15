@@ -406,7 +406,7 @@ for i in soup.findAll("img"):
 tb=soup.find(text=u"Haga click en el botón Información para ver algunos ejemplos acerca de cómo se utiliza systemctl")
 if tb:
 	p=tb.find_parent("p")
-	rp=get_soup("sub/00-SysVinit-Systemd.html")
+	rp=get_soup("fix/00-SysVinit-Systemd.html")
 	if rp and rp.body:
 		b=rp.body
 		p.replace_with(b)
