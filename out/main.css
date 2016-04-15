@@ -46,7 +46,12 @@ body > div {
 	background-color: #f0f0f0;
 	border-radius: 6px;
 }
+caption {
+    text-align: left;
+    margin-bottom: 14px;
+}
 table {
+	margin-top: 14px;
 	border-spacing: 0px;
 	border-collapse: collapse;
 }

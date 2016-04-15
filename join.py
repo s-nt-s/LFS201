@@ -6,6 +6,10 @@ import re
 import bs4
 import unicodedata
 
+abspath = os.path.abspath(__file__)
+dname = os.path.dirname(abspath)
+os.chdir(dname)
+
 cp=re.compile(".*?LFS201_(\d+)\..*$")
 pr=re.compile("(.*)¿(.*?)-(.*)")
 ck=re.compile("(Haga|Haz) click (en|sobre) (el|los|en)", re.UNICODE|re.MULTILINE|re.DOTALL)
@@ -51,6 +55,8 @@ def escribir(html,out):
 				tab=tab+"  "
 
 def get_soup(html):
+	if not os.path.isfile(html):
+		return
 	html = open(html,"r+")
 	soup = bs4.BeautifulSoup(html,'html.parser')#"lxml")
 	html.close()
@@ -396,6 +402,26 @@ for i in soup.findAll("img"):
 	f.legend.name="figcaption"
 	del f.attrs['id']
 	del f.attrs['class']
+
+tb=soup.find(text=u"Haga click en el botón Información para ver algunos ejemplos acerca de cómo se utiliza systemctl")
+if tb:
+	p=tb.find_parent("p")
+	rp=get_soup("sub/00-SysVinit-Systemd.html")
+	if rp and rp.body:
+		b=rp.body
+		p.replace_with(b)
+		b.unwrap()
+	else:
+		a=get_lab("Hoja de Apuntes de SysVinit a Systemd.pdf","Ejemplos acerca de cómo se utiliza systemctl")
+		p.clear()
+		p.append(a)
+
+for t in soup.findAll("table"):
+	if t.caption:
+		f=t.find_parent("fieldset")
+		if f.attrs["class"]=="n3":
+			f.legend.extract()
+			f.unwrap()
 
 def ischar(ch):
 	c=unicodedata.category(ch)

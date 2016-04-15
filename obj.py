@@ -1,6 +1,10 @@
 import bs4
 import re
 
+abspath = os.path.abspath(__file__)
+dname = os.path.dirname(abspath)
+os.chdir(dname)
+
 html="out/LFS201.html"
 out="out/Objetivos.html"
 

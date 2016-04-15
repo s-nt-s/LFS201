@@ -3,6 +3,10 @@ import re
 import os
 from subprocess import call
 
+abspath = os.path.abspath(__file__)
+dname = os.path.dirname(abspath)
+os.chdir(dname)
+
 html="out/LFS201.html"
 out="out/epub.html"
 
@@ -18,7 +22,7 @@ for h in soup.findAll(["h1","legend"]):
 	if h.a:
 		h.a.unwrap()
 
-for l in soup.findAll("legend",text=re.compile("\s*(\d+\.\d+\. Laboratorios|Objetivos de aprendizaje \(revisi.n\))\s*")):
+for l in soup.findAll("legend",text=re.compile("\s*(\d+\.\d+\. Laboratorios|Objetivos de aprendizaje \(revisi.n\)|Comprobaci.n de Conocimientos [\d\.]+)\s*")):
 	l.find_parent("fieldset").extract()
 
 intros=re.compile("^c(\d\d+|[2-9])f1$")

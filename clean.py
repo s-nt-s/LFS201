@@ -9,11 +9,15 @@ import nltk
 import string
 import unicodedata
 
+abspath = os.path.abspath(__file__)
+dname = os.path.dirname(abspath)
+os.chdir(dname)
+
 uni_remove=('Mn', 'Me','Z', 'C')
 
 tag_concat=['u','ul','ol','i','em','strong']
 tag_round=['u','i','em','span','strong', 'a']
-tag_trim=['li', 'th', 'td', 'div']
+tag_trim=['li', 'th', 'td', 'div','caption']
 tag_right=['p']
 hr=re.compile(".*ObjLayerActionGoTo.*?'(.*?)'.*")
 sp=re.compile("\s+", re.UNICODE)
@@ -515,6 +519,15 @@ for f in htmls:
 		if st.previous_sibling and not (isinstance(st.previous_sibling, bs4.Tag) and st.previous_sibling.name=="br"):
 			print str(st.parent)
 	'''
+
+	for t in soup.findAll("table"):
+		if t.previous_sibling and t.previous_sibling.name=="p":
+			p=t.previous_sibling
+			if p.get_text().strip().startswith("Tabla "):
+				t.insert(0,p)
+				p.name="caption"
+				for s in p.findAll("strong"):
+					s.unwrap();
 
 	h = unicode(soup)
 	h=filter(ischar , h)

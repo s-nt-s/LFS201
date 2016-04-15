@@ -1,6 +1,7 @@
 #!/bin/bash
 mkdir -p out/labs
 cd out/labs
+wget -nc "https://lms.360training.com/custom/12396/808239/Hoja%20de%20Apuntes%20de%20SysVinit%20a%20Systemd.pdf"
 wget -nc "https://training.linuxfoundation.org/system/files/lfp_welcome_doc/welcome.pdf"
 wget -nc "https://training.linuxfoundation.org/cm/prep/ready-for.sh"
 wget -nc "https://lms.360training.com/custom/12396/808239/Preparing%20Your%20Computer%20for%20LFS101x.pdf"
