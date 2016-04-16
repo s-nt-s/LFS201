@@ -3,4 +3,9 @@ html/clean/*
 out/*.html
 pdf/*
 out/imgs/*.png
+out/labs/*
+fix/*.html
+fix/*.md
+out/*epub
+.project
 

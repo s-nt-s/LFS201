@@ -443,7 +443,7 @@ if tb:
 		p.clear()
 		p.append(a)
 
-for f in soup.findAll(text=re.compile(u"(Estado de todos los servicios en el sistema|Archivos de configuración de upstart|Archivos y directorios en /etc)")):
+for f in soup.findAll(text=re.compile(u"(Estado de todos los servicios en el sistema|Archivos de configuración de upstart)")):
 	d=f.find_parent("fieldset").div
 	texts=d.find_all(text=True)
 	for t in texts:
