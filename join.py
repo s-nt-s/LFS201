@@ -125,6 +125,7 @@ def ischar(ch):
 	return c[0] not in ('M','C') and c not in ('Zl', 'Zp')
 
 soup = get_soup(tpt)
+
 soup.body.clear()
 div=soup.new_tag("div", **{"class":"content"})
 soup.body.append(div)
@@ -406,7 +407,7 @@ for t in soup.findAll("table"):
 			f.unwrap()
 # Erratas
 
-for t in soup.find_all(text=True):
+for t in soup.body.find_all(text=True):
 	flag=False
 	p=t.parent
 	while p and not flag:
@@ -454,6 +455,7 @@ if e and e.parent.name=="li":
 	e.parent.extract()
 
 h=unicode(soup)
+
 h=filter(ischar , h)
 
 h=h.replace("Objectivos de aprendizaje","Objetivos de aprendizaje") #7 11
@@ -488,7 +490,7 @@ h=h=r.sub("\\1",h)
 r=re.compile(">\s\$ ", re.MULTILINE|re.DOTALL|re.UNICODE)
 h=h=r.sub(">$ ",h)
 r=re.compile("There are a variety of graphical desktop environments used in[^\.]+\.", re.MULTILINE|re.DOTALL|re.UNICODE)
-h=h=r.sub("",h)
+h=r.sub("",h)
 
 escribir(h,oht)
 

@@ -37,9 +37,9 @@ for f in soup.findAll("fieldset", attrs={'class': re.compile(r".*\bn2\b.*")}):
 soup.body.div.unwrap()
 soup.head.link.attrs['href']="epub.css"
 
-h=unicode(soup)
+code=unicode(soup)
 with open(out, "wb") as file:
-	file.write(h.encode('utf8'))
+	file.write(code.encode('utf8'))
 
 os.chdir("out")
 call(["miebup", "epub.html", "LFS201.epub"])
