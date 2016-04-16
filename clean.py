@@ -75,6 +75,9 @@ def parrafos(soup):
 	prfs= soup.find_all(['li','table'])
 	ps = soup.find_all('p')
 	for p in ps:
+		if not p.span:
+			prfs.append(p)
+			continue
 		flag=False
 		for c in p.contents:
 			#(isinstance(c, bs4.Tag) and c.name=="a") or
@@ -204,17 +207,6 @@ for f in htmls:
 
 	for lb in soup.findAll("label"):
 		lb.unwrap()
-	'''
-	lbs=soup.findAll("label")
-	if len(lbs)>0:
-		ul=soup.new_tag("ul")
-		lbs[0].insert_before(ul)
-		for lb in soup.findAll("label"):
-			p=lb.p
-			p.name="li"
-			ul.append(p)
-			lb.extract()
-	'''
 
 	lis=soup.findAll("li")
 	for li in lis:
@@ -479,22 +471,6 @@ for f in htmls:
 			s.parent.attrs["class"]=s.attrs["class"]
 			s.unwrap()
 
-	'''
-	for p in soup.findAll("p"):
-		hjs=p.select(" > *")
-		if len(hjs)==3 and hjs[0].name=="span" and hjs[1].name=="br" and hjs[2].name=="span":
-			sp1=hjs[0]
-			sp2=hjs[2]
-			if sp2.attrs["class"]!=sp1.attrs["class"] and sclean(p.get_text())==(sclean(sp1.get_text())+sclean(sp2.get_text())):
-				hjs[1].extract()
-				pr=soup.new_tag("p")
-				p.insert_before(pr)
-				pr.append(sp1)
-				pr.attrs["class"]=sp1.attrs["class"]
-				sp1.unwrap()
-				p.attrs["class"]=sp2.attrs["class"]
-				sp2.unwrap()
-	'''
 	ps=reversed(soup.findAll("p"))
 	for p in ps:
 		if "class" in p.attrs and p.attrs["class"] in ("stdout","archivo","comando"):
@@ -512,13 +488,6 @@ for f in htmls:
 			c=p.contents[0]
 			if isinstance(c, bs4.Tag):
 				c.unwrap()
-
-	'''
-	sts=soup.findAll("span", attrs={'class': "stdout"})
-	for st in sts:
-		if st.previous_sibling and not (isinstance(st.previous_sibling, bs4.Tag) and st.previous_sibling.name=="br"):
-			print str(st.parent)
-	'''
 
 	for t in soup.findAll("table"):
 		if t.previous_sibling and t.previous_sibling.name=="p":

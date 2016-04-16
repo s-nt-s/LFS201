@@ -120,6 +120,10 @@ def get_lab(f,txt):
 	a.string=txt
 	return a
 
+def ischar(ch):
+	c=unicodedata.category(ch)
+	return c[0] not in ('M','C') and c not in ('Zl', 'Zp')
+
 soup = get_soup(tpt)
 soup.body.clear()
 div=soup.new_tag("div", **{"class":"content"})
@@ -190,15 +194,6 @@ flds=soup.findAll("fieldset", attrs={'class': re.compile(r".*\bn3\b.*")})
 for fld in flds:
 	if len(fld.parent.select(" > *"))==1:
 		fld.parent.replace_with(fld.div)
-	'''
-	else:
-		hjs=fld.div.select("> *")
-		if len(hjs)<3 and hjs[-1].name=="table":
-			print fld.legend.string
-			div=fld.div
-			fld.replace_with(fld.div)
-			div.unwrap()
-	'''
 
 ptabs=re.compile("(.*?)([^\.\?\s][^\.\?]+ 'tab' [^\.]+\.)(.*)", re.UNICODE|re.MULTILINE|re.DOTALL)
 for p in soup.findAll(text=re.compile(" 'tab' ")):
@@ -403,6 +398,37 @@ for i in soup.findAll("img"):
 	del f.attrs['id']
 	del f.attrs['class']
 
+for t in soup.findAll("table"):
+	if t.caption:
+		f=t.find_parent("fieldset")
+		if f.attrs["class"]=="n3":
+			f.legend.extract()
+			f.unwrap()
+# Erratas
+
+for t in soup.find_all(text=True):
+	flag=False
+	p=t.parent
+	while p and not flag:
+		if "class" in p.attrs:
+			c=p.attrs["class"]
+			if isinstance(c, basestring):
+				if c in ("stdout","archivo"):
+					flag=True
+			else:
+				for i in c:
+					if i in ("stdout","archivo"):
+						flag=True
+		p=p.parent
+	if not flag:
+		b=sp.sub(" ",t.string)
+		t.replace_with(b)
+
+for s in soup.findAll(text=re.compile("^\s+Personalities\s+:\s+\[raid1\].*", re.MULTILINE|re.DOTALL|re.UNICODE)):
+	for t in s.find_parent("p").find_all(text=True):
+		b=sp.sub(" ",t.string)
+		t.replace_with(b)
+
 tb=soup.find(text=u"Haga click en el botón Información para ver algunos ejemplos acerca de cómo se utiliza systemctl")
 if tb:
 	p=tb.find_parent("p")
@@ -416,16 +442,12 @@ if tb:
 		p.clear()
 		p.append(a)
 
-for t in soup.findAll("table"):
-	if t.caption:
-		f=t.find_parent("fieldset")
-		if f.attrs["class"]=="n3":
-			f.legend.extract()
-			f.unwrap()
-
-def ischar(ch):
-	c=unicodedata.category(ch)
-	return c[0] not in ('M','C') and c not in ('Zl', 'Zp')
+for f in soup.findAll(text=re.compile(u"(Estado de todos los servicios en el sistema|Archivos de configuración de upstart|Archivos y directorios en /etc)")):
+	d=f.find_parent("fieldset").div
+	texts=d.find_all(text=True)
+	for t in texts:
+		b=sp.sub(" ",t.string)
+		t.replace_with(b)
 
 e=soup.find("span", attrs={'class': "enlace"})
 if e and e.parent.name=="li":
@@ -434,7 +456,6 @@ if e and e.parent.name=="li":
 h=unicode(soup)
 h=filter(ischar , h)
 
-# Erratas
 h=h.replace("Objectivos de aprendizaje","Objetivos de aprendizaje") #7 11
 h=h.replace(">31</a></h1>",">31. zypper</a></h1>") #31
 h=h.replace(" del sisco "," del disco ")
