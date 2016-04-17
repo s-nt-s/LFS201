@@ -4,7 +4,7 @@ import os.path
 import glob
 import re
 import bs4
-import unicodedata
+import util
 
 abspath = os.path.abspath(__file__)
 dname = os.path.dirname(abspath)
@@ -26,50 +26,6 @@ tpt="out/LFS201.htm"
 oht="out/LFS201.html"
 html4="out/LFS201_4.html"
 
-def escribir(html,out):
-	tags_tab="html|head|ul|ol|div|fieldset|body|html|table|tbody|thead"
-	tags_ln=tags_tab+"|meta|link|title|p|li|h1|legend|div|tr"
-	bks1=re.compile("(<("+tags_ln+")[^>]*>)")
-	bks2=re.compile("(</("+tags_ln+")>)")
-	bks3=re.compile("(<(meta|link) [^>]+/>)")
-	begin_tag=re.compile("^<("+tags_tab+")[^>]*>$")
-	end_tag=re.compile("^</("+tags_tab+")>$")
-
-	html=bks1.sub("\n\\1",html)
-	html=bks2.sub("\\1\n",html)
-	html=bks3.sub("\\1\n",html)
-	lineas=html.split("\n")
-
-	with open(out, "wb") as file:
-		tab=""
-		for l in lineas:
-			cl=sp.sub("",l).strip()
-			if len(cl)==0:
-				continue
-			m1=end_tag.match(l)
-			if m1:
-				tab=tab[:-2]
-			file.write((tab+l+"\n").encode('utf8'))
-			m2=begin_tag.match(l)
-			if m2 and not m1 and not l.endswith("/>"):
-				tab=tab+"  "
-
-def get_soup(html):
-	if not os.path.isfile(html):
-		return
-	html = open(html,"r+")
-	soup = bs4.BeautifulSoup(html,'html.parser')#"lxml")
-	html.close()
-	return soup
-
-def find_text(soup,r):
-	rt=[]
-	ps=soup.findAll('p')
-	for p in ps:
-		if r.match(p.get_text()):
-			rt.append(p)
-	return rt
-
 def find_fld(soup,r,tipo=None,txt=None):
 	rt=[]
 	for l in soup.findAll('legend'):
@@ -80,7 +36,7 @@ def find_fld(soup,r,tipo=None,txt=None):
 			elif tipo==1 or tipo==4:
 				if f.div.find("p",text="Verdadero") and f.div.find("p",text="Falso"):
 					hjs=f.div.select(" > *")
-					if tipo==4 or (len(hjs)>2 and hjs[1].get_text().strip()=="Verdadero"):
+					if tipo==4 or (len(hjs)>2 and util.sclean(hjs[1])=="Verdadero"):
 						rt.append(f)
 			elif tipo==2:
 				hjs=f.div.select(" > *")
@@ -120,11 +76,7 @@ def get_lab(f,txt):
 	a.string=txt
 	return a
 
-def ischar(ch):
-	c=unicodedata.category(ch)
-	return c[0] not in ('M','C') and c not in ('Zl', 'Zp')
-
-soup = get_soup(tpt)
+soup = util.get_soup(tpt)
 
 soup.body.clear()
 div=soup.new_tag("div", **{"class":"content"})
@@ -135,7 +87,7 @@ divCp=None
 
 hts=sorted(glob.glob('html/clean/*.html'))
 for ht in hts:
-	soup2 = get_soup(ht)
+	soup2 = util.get_soup(ht)
 	t=soup2.title
 	b=soup2.body
 
@@ -178,9 +130,9 @@ for ht in hts:
 	if n==3:
 		cs=[]
 		if fg.match(fld.legend.string):
-			cs=find_text(fldB,fg)
+			cs=util.find_text(fldB,fg)
 		else:
-			cs=find_text(fldB,ck)
+			cs=util.find_text(fldB,ck)
 		if len(cs)>0:
 			c=cs[0]
 			c.replace_with(fld)
@@ -207,7 +159,7 @@ for p in soup.findAll(text=re.compile(" 'tab' ")):
 			txt=txt+" "
 		p.replace_with(txt)
 	else:
-		if p.parent.get_text().strip()==p.strip():
+		if util.eqtxt(p.parent,p):
 			p.parent.extract()
 		else:
 			p.extract()
@@ -243,7 +195,7 @@ for d in soup.body.div.select(" > div"):
 	a=d.h1.a
 	a.attrs['title']=a.attrs['title']+" de "+str(ca)
 
-	labos=find_text(d,lab)
+	labos=util.find_text(d,lab)
 	if len(labos)>0:
 		ul=soup.new_tag("ul")
 		primero=True
@@ -275,7 +227,7 @@ for d in soup.body.div.select(" > div"):
 				primero=False
 			else:
 				fld.extract()
-	labs=find_text(d, labfull)
+	labs=util.find_text(d, labfull)
 	if labs and len(labs)>0:
 		p=labs[0]
 		p.clear()
@@ -319,7 +271,7 @@ for d in soup.body.div.select(" > div"):
 		uls=[]
 		ul=soup.new_tag("ul")
 		for p in v1.findAll("p"):
-			if p.next_sibling and p.next_sibling.name=="p" and p.next_sibling.get_text().strip()=="Verdadero":
+			if p.next_sibling and p.next_sibling.name=="p" and util.sclean(p.next_sibling)=="Verdadero":
 				p.name="li"
 				c=p.contents[0]
 				if isinstance(c, bs4.NavigableString) or isinstance(c, unicode):
@@ -331,7 +283,7 @@ for d in soup.body.div.select(" > div"):
 							uls.append(ul)
 							ul=soup.new_tag("ul")
 				ul.append(p)
-			elif p.get_text().strip()=="Verdadero" or p.get_text().strip()=="Falso":
+			elif util.sclean(p)=="Verdadero" or util.sclean(p)=="Falso":
 				p.extract()
 		p=soup.new_tag("p")
 		p.string=preguntaVF
@@ -405,25 +357,8 @@ for t in soup.findAll("table"):
 		if f.attrs["class"]=="n3":
 			f.legend.extract()
 			f.unwrap()
-# Erratas
 
-for t in soup.body.find_all(text=True):
-	flag=False
-	p=t.parent
-	while p and not flag:
-		if "class" in p.attrs:
-			c=p.attrs["class"]
-			if isinstance(c, basestring):
-				if c in ("stdout","archivo"):
-					flag=True
-			else:
-				for i in c:
-					if i in ("stdout","archivo"):
-						flag=True
-		p=p.parent
-	if not flag:
-		b=sp.sub(" ",t.string)
-		t.replace_with(b)
+# Erratas
 
 for s in soup.findAll(text=re.compile("^\s+Personalities\s+:\s+\[raid1\].*", re.MULTILINE|re.DOTALL|re.UNICODE)):
 	for t in s.find_parent("p").find_all(text=True):
@@ -433,7 +368,7 @@ for s in soup.findAll(text=re.compile("^\s+Personalities\s+:\s+\[raid1\].*", re.
 tb=soup.find(text=u"Haga click en el botón Información para ver algunos ejemplos acerca de cómo se utiliza systemctl")
 if tb:
 	p=tb.find_parent("p")
-	rp=get_soup("fix/00-SysVinit-Systemd.html")
+	rp=util.get_soup("fix/00-SysVinit-Systemd.html")
 	if rp and rp.body:
 		b=rp.body
 		p.replace_with(b)
@@ -443,9 +378,8 @@ if tb:
 		p.clear()
 		p.append(a)
 
-for f in soup.findAll(text=re.compile(u"(Estado de todos los servicios en el sistema|Archivos de configuración de upstart)")):
-	d=f.find_parent("fieldset").div
-	texts=d.find_all(text=True)
+for f in soup.findAll(text=re.compile(u"(Estado de todos los servicios en el sistema|Archivos de configuración de upstart|Estado de un servicio en sistemas Red Hat)")):
+	texts=f.find_parent("fieldset").div.find_all(text=True)
 	for t in texts:
 		b=sp.sub(" ",t.string)
 		t.replace_with(b)
@@ -454,9 +388,7 @@ e=soup.find("span", attrs={'class': "enlace"})
 if e and e.parent.name=="li":
 	e.parent.extract()
 
-h=unicode(soup)
-
-h=filter(ischar , h)
+h=util.get_html(soup)
 
 h=h.replace("Objectivos de aprendizaje","Objetivos de aprendizaje") #7 11
 h=h.replace(">31</a></h1>",">31. zypper</a></h1>") #31
@@ -484,7 +416,6 @@ h=h.replace("n. El comando","n.</p><p>El comando")
 h=h.replace("apt-ge</strong>t","apt-get</strong>")
 h=h.replace("imgs/LVM_Components_large_Spanish%20(2).png","imgs/LVM_Components_large_Spanish.png")
 h=h.replace("strong> or <strong","strong> o <strong")
-
 r=re.compile("\s+(DUMP: )", re.MULTILINE|re.DOTALL|re.UNICODE)
 h=h=r.sub("\\1",h)
 r=re.compile(">\s\$ ", re.MULTILINE|re.DOTALL|re.UNICODE)
@@ -492,5 +423,5 @@ h=h=r.sub(">$ ",h)
 r=re.compile("There are a variety of graphical desktop environments used in[^\.]+\.", re.MULTILINE|re.DOTALL|re.UNICODE)
 h=r.sub("",h)
 
-escribir(h,oht)
+util.escribir(h,oht)
 

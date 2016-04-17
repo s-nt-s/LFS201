@@ -8,4 +8,6 @@ fix/*.html
 fix/*.md
 out/*epub
 .project
-
+.settings/*
+.pydevproject
+*.pyc
