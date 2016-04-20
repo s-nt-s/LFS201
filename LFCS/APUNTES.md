@@ -11,13 +11,103 @@ Gracias por adelantado a:
 * [leonelatencio.com](http://leonelatencio.com/notas-de-preparacion-para-el-examen-de-certificacion-de-linux-foundation/)
 * [daemons.cf](http://daemons.cf/cgit/apuntes-LFS201)
 
-Usare [**Ubuntu 14.04**](http://releases.ubuntu.com/14.04/) de 32bits
-instalada en [Virtual Box](https://www.virtualbox.org/), aunque el
-examen presupone la versión de 64bit no debería notarse la diferencia.
+# Instalación
+
+Tengo registrado el examen para hacerlo sobre Ubuntu, por lo tanto usare
+una maquina virtual de [Virtual Box](https://www.virtualbox.org/) con
+[**Lubuntu 14.04.4**](http://cdimage.ubuntu.com/lubuntu/releases/14.04/release/),
+en concreto la versión `32-bit PC (i386) desktop image`
+
+Para agilizar el uso de este entorno realizare las siguientes configuraciones:
+
+**1- Facilitar acceso por ssh**
+
+Primero, instalo ssh en lubuntu con `sudo apt-get install openssh-server`.
+
+Segundo, configuro Virtual Box para que redirija el puerto 2222 local al
+puerto 22 de la máquina virtual
+
+Propiedades máquina virtual -> Red -> Adaptador 1 -> Avanzadas ->
+Reenvio de puertos -> Nombre: ssh, Protocolo: TCP, Puerto anfritión: 2222
+Puerto invitado: 22
+
+Tercero, creo una clave publica/privada para entrar directamente
+(como es para esto me puedo permitir crearla sin contraseña)
+
+```console
+me@local ~ $ ssh-keygen -C vbox
+Generating public/private rsa key pair.
+Enter file in which to save the key (/home/me/.ssh/id_rsa): /home/me/.ssh/vbox
+Enter passphrase (empty for no passphrase):
+Enter same passphrase again:
+Your identification has been saved in /home/me/.ssh/vbox.
+Your public key has been saved in /home/me/.ssh/vbox.pub.
+...
+me@local ~ $ ssh-copy-id -i /home/me/.ssh/vbox.pub -p 2222 me@localhost
+```
+
+Cuarto, configuro `~/.ssh/config para` que todo se más facil aún:
+
+```
+Host lubuntu
+HostName 127.0.0.1
+IdentityFile /home/me/.ssh/vbox
+User me
+Port 2222
+```
+
+**2- Arranque en modo consola por defecto**
+
+`sudo nano /etc/default/grub` y cambio
+
+```
+GRUB_HIDDEN_TIMEOUT=0
+GRUB_CMDLINE_LINUX_DEFAULT=”quiet splash”
+GRUB_CMLDLINE_LINUX=""
+#GRUB_TERMINAL=console
+```
+
+por
+
+```
+#GRUB_HIDDEN_TIMEOUT=0
+#GRUB_CMDLINE_LINUX_DEFAULT=”quiet splash”
+GRUB_CMLDLINE_LINUX="text"
+GRUB_TERMINAL=console
+```
+
+\* De paso comento la linea de GRUB_HIDDEN_TIMEOUT para que aparezca
+el menú de grub ya que lo necesitare para algunas pruebas
+
+Guardo los cambios y actualizo con `sudo update-grub`
+
+**3- Autologin**
+
+`sudo nano /etc/init/tty1.conf` para añadir la linea:
+
+```
+exec /sbin/getty -8 38400 tty1 -a me
+```
+
+**4- Configuro sudo para que no pida contraseña**
+
+Hago `sudo visudo` para añadir la linea:
+
+```
+me ALL = NOPASSWD : ALL
+```
+
+
 
 # Essential Commands - 25%
 
 ## Log into graphical and text mode consoles
+
+Para ir del modo texto al modo grafico hay varias opciones:
+
+* `startx`
+* `runlevel 5`
+
 ## Search for files
 ## Evaluate and compare the basic file system features and options
 ## Compare, create and edit text files
