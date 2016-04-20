@@ -46,7 +46,7 @@ Your public key has been saved in /home/me/.ssh/vbox.pub.
 me@local ~ $ ssh-copy-id -i /home/me/.ssh/vbox.pub -p 2222 me@localhost
 ```
 
-Cuarto, configuro `~/.ssh/config para` que todo se más facil aún:
+Cuarto, configuro `~/.ssh/config` para que todo se más facil aún:
 
 ```
 Host lubuntu
