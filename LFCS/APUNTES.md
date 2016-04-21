@@ -97,7 +97,16 @@ Hago `sudo visudo` para añadir la linea:
 me ALL = NOPASSWD : ALL
 ```
 
+**5- Ejecuto  ready-for.sh **
 
+```console
+me@vbx:~$ cd /tmp
+me@vbx:/tmp$ wget -q https://training.linuxfoundation.org/cm/prep/ready-for.sh
+me@vbx:/tmp$ chmod +x ready-for.sh
+me@vbx:/tmp$ ./ready-for.sh --install LFS201
+Checking that this computer is suitable for LFS201: Essentials of System Administration
+...
+```
 
 # Essential Commands - 25%
 
