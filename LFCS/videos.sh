@@ -1,0 +1,34 @@
+youtube-dl https://www.youtube.com/watch?v=6xuLKf33yHo
+youtube-dl https://www.youtube.com/watch?v=cvs9h4YRSaU
+youtube-dl https://www.youtube.com/watch?v=T8DqHe2YgH0
+youtube-dl https://www.youtube.com/watch?v=O_-dZtaVS6k
+youtube-dl https://www.youtube.com/watch?v=AN9OloVi9K0
+youtube-dl https://www.youtube.com/watch?v=ZxVyhZEYEAU
+youtube-dl https://www.youtube.com/watch?v=IDqnoKQoI0o
+youtube-dl https://www.youtube.com/watch?v=KqDbChHNADs
+youtube-dl https://www.youtube.com/watch?v=y1AOMtRxzVU
+youtube-dl https://www.youtube.com/watch?v=KhTCzVnl0DU
+youtube-dl https://www.youtube.com/watch?v=lHAxBko5-28
+youtube-dl https://www.youtube.com/watch?v=2bHizCZM9nI
+youtube-dl https://www.youtube.com/watch?v=MYtYOfezCjc
+youtube-dl https://www.youtube.com/watch?v=iQFSXRGr2qw
+youtube-dl https://www.youtube.com/watch?v=feGwfIBaeps
+youtube-dl https://www.youtube.com/watch?v=8hZYVLaNk-Y
+youtube-dl https://www.youtube.com/watch?v=fizJPxjzqf4
+youtube-dl https://www.youtube.com/watch?v=t3bPXVvpN5U
+youtube-dl https://www.youtube.com/watch?v=wGKcodsOmZA
+youtube-dl https://www.youtube.com/watch?v=bPbaJ8AS8fo
+youtube-dl https://www.youtube.com/watch?v=gPDtE8Zdo7U
+youtube-dl https://www.youtube.com/watch?v=UtpEmPPY3c0
+youtube-dl https://www.youtube.com/watch?v=vZYlrOSz1Gs
+youtube-dl https://www.youtube.com/watch?v=DK9a70YFDDg
+youtube-dl https://www.youtube.com/watch?v=bi-ib8c-w4Y
+youtube-dl https://www.youtube.com/watch?v=A-isihEHTFI
+youtube-dl https://www.youtube.com/watch?v=oCqaiqU--uA
+youtube-dl https://www.youtube.com/watch?v=6R-CbEftfAU
+youtube-dl https://www.youtube.com/watch?v=qyk7Lh6S5KU
+youtube-dl https://www.youtube.com/watch?v=JDroFDsGTkY
+youtube-dl https://www.youtube.com/watch?v=p1suWyoSXyI
+youtube-dl https://www.youtube.com/watch?v=SJVKwGJ-CC0
+rename 's/  +/ /' *.mp4
+rename 's/ +- +LFCS Study Guide.*/.mp4/' *.mp4
