@@ -306,23 +306,41 @@ La configuración se hace modificando los ficheros de `/etc/grub.d` y
 `/etc/default/grub`, ejecutando tras esto `update-grub` para que se
 actualice el fichero `/boot/grub/grub.cfg` que no debemos tocar a mano.
 
+Ejemplo 1 de reparación:
+
 1. `sudo dd if=/dev/zero of=/dev/sda bs=446 count=1` eliminamos el MBR
-2. `sudo rm /etc/default/grub /etc/grub.d/*` eliminamos los ficheros de configuración
-3. Reiniciamos y peta
-4. Reiniciamos con un live cd
-5. `sudo mount /dev/sda1 /mnt` montamos el disco duro
-6. Asocciamos los directorios que necesitamos para tener internet:
-	* `sudo mount --bind /dev /mnt/dev`
-	* `sudo mount --bind /tmp /mnt/tmp`
-	* `sudo mount --bind /proc /mnt/proc`
-	* `sudo mount --bind /etc/resolv.conf /mnt/etc/resolv.conf`
-6. Asociamos los directorios que grub necesita:
+2. Reinicamos y peta
+3. Reinicamos con un live cd
+4. `sudo mount /dev/sda1 /mnt` montamos el disco duro
+5. Asociamos los directorios que grub necesita:
 	* `sudo mount --bind /dev /mnt/dev`
 	* `sudo mount --bind /dev/pts /mnt/dev/pts`
 	* `sudo mount --bind /proc /mnt/proc`
 	* `sudo mount --bind /sys /mnt/sys`
-7. `sudo chroot /mnt` cambiamos el directorio /
-8. `sudo apt-get --reinstall install` reinstalamos los paquetes grub
+6. `sudo chroot /mnt` cambiamos el directorio /
+7. `grub-install /dev/sda && grub-install --recheck /dev/sda && update-grub` instalamos grub
+8. Desmontamos todo:
+	* `exit`
+	* `sudo umount /mnt/sys`
+	* `sudo umount /mnt/proc`
+	* `sudo umount /mnt/dev/pts`
+	* `sudo umount /mnt/dev`
+	* `sudo umount /mnt`
+9. Reiniciamos
+
+Ejemplo 2 de reparación:
+
+1. `sudo rm /boot/grub/grub.cfg /etc/default/grub /etc/grub.d/*` eliminamos los ficheros de configuración
+2. Reinicamos y peta
+3. Reinicamos con un live cd
+4. `sudo mount /dev/sda1 /mnt` montamos el disco duro
+5. Asocciamos los directorios que necesitamos para tener internet:
+	* `sudo mount --bind /dev /mnt/dev`
+	* `sudo mount --bind /tmp /mnt/tmp`
+	* `sudo mount --bind /proc /mnt/proc`
+	* `sudo mount --bind /etc/resolv.conf /mnt/etc/resolv.conf`
+6. `sudo chroot /mnt` cambiamos el directorio /
+7. `sudo apt-get --reinstall install grub-common grub2-common grub-pc` reinstalamos los paquetes grub
 8. `grub-install /dev/sda && grub-install --recheck /dev/sda && update-grub` instalamos grub
 9. Desmontamos todo:
 	* `exit`
