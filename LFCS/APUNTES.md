@@ -183,6 +183,8 @@ Tambien podemos usar:
 * Salida estanadar = tipo 1
 * Error estandar = tipo 2
 
+Ejemplos:
+
 * `comando 2>&1` redirigir errores a salida estandar
 * `wc < archivo.txt` alimenta la entrada estandar de `wc` con `archivo.txt`
 * `comando 2> /dev/null` desecha la salida de errores
