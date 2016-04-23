@@ -328,7 +328,7 @@ Ejemplo 1 de reparación:
 	* `sudo umount /mnt/dev/pts`
 	* `sudo umount /mnt/dev`
 	* `sudo umount /mnt`
-9. Reiniciamos
+9. Reiniciamos y funciona
 
 Ejemplo 2 de reparación:
 
@@ -341,17 +341,27 @@ Ejemplo 2 de reparación:
 	* `sudo mount --bind /tmp /mnt/tmp`
 	* `sudo mount --bind /proc /mnt/proc`
 	* `sudo mount --bind /etc/resolv.conf /mnt/etc/resolv.conf`
-6. `sudo chroot /mnt` cambiamos el directorio /
-7. `sudo apt-get --reinstall install grub-common grub2-common grub-pc` reinstalamos los paquetes grub
-8. `grub-install /dev/sda && grub-install --recheck /dev/sda && update-grub` instalamos grub
-9. Desmontamos todo:
+6. Asociamos los directorios que grub necesita:
+	* `sudo mount --bind /dev/pts /mnt/dev/pts`
+	* `sudo mount --bind /sys /mnt/sys`
+7. Recuperamos los archivos perdidos:
+	* `sudo cp /etc/grub.d/* /mnt/etc/grub.d/`
+	* `sudo cp /boot/grub/grub.cfg /mnt/boot/grub`
+8. `sudo chroot /mnt` cambiamos el directorio /
+9. `dpkg --get-selections | grep "grub"` consultamos que paquetes de grub estan instalados
+10. `dpkg -V grub-common` comprobamos paquete a paquete cual es el que esta mal
+11. `apt --reinstall install grub-common` reinstalamos el paquete roto
+12. `update-grub` reconfiguramos grub
+13. Desmontamos todo:
 	* `exit`
 	* `sudo umount /mnt/sys`
 	* `sudo umount /mnt/proc`
 	* `sudo umount /mnt/dev/pts`
 	* `sudo umount /mnt/dev`
+	* `sudo umount /mnt/tmp`
+	* `sudo umount /mnt/etc/resolv.conf`
 	* `sudo umount /mnt`
-10. Reiniciamos
+14. Reiniciamos y funciona
 
 Más: [howtoubuntu.org](http://howtoubuntu.org/how-to-repair-restore-reinstall-grub-2-with-a-ubuntu-live-cd)
 [lukeplant.me.uk](http://lukeplant.me.uk/blog/posts/sharing-internet-connection-to-chroot/)
