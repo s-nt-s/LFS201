@@ -165,7 +165,7 @@ Tambien podemos usar:
 
 ### Evaluate and compare the basic file system features and options
 
-<<no tengo claro a que se refiere>>
+*no tengo claro a que se refiere*
 
 ### Compare, create and edit text files
 
@@ -301,7 +301,42 @@ Editamos la entrada de grub y en la linea de carga del kernel ponemos el número
 
 ### Install, configure and troubleshoot the bootloader
 
+`sudo grub-install /dev/sda` instala grub 2 en `/dev/sda`.
+La configuración se hace modificando los ficheros de `/etc/grub.d` y
+`/etc/default/grub`, ejecutando tras esto `update-grub` para que se
+actualice el fichero `/boot/grub/grub.cfg` que no debemos tocar a mano.
 
+1. `sudo dd if=/dev/zero of=/dev/sda bs=446 count=1` eliminamos el MBR
+2. `sudo rm /etc/default/grub /etc/grub.d/*` eliminamos los ficheros de configuración
+3. Reiniciamos y peta
+4. Reiniciamos con un live cd
+5. `sudo mount /dev/sda1 /mnt` montamos el disco duro
+6. Asocciamos los directorios que necesitamos para tener internet:
+	* `sudo mount --bind /dev /mnt/dev`
+	* `sudo mount --bind /tmp /mnt/tmp`
+	* `sudo mount --bind /proc /mnt/proc`
+	* `sudo mount --bind /etc/resolv.conf /mnt/etc/resolv.conf`
+6. Asociamos los directorios que grub necesita:
+	* `sudo mount --bind /dev /mnt/dev`
+	* `sudo mount --bind /dev/pts /mnt/dev/pts`
+	* `sudo mount --bind /proc /mnt/proc`
+	* `sudo mount --bind /sys /mnt/sys`
+7. `sudo chroot /mnt` cambiamos el directorio /
+8. `sudo apt-get --reinstall install` reinstalamos los paquetes grub
+8. `grub-install /dev/sda && grub-install --recheck /dev/sda && update-grub` instalamos grub
+9. Desmontamos todo:
+	* `exit`
+	* `sudo umount /mnt/sys`
+	* `sudo umount /mnt/proc`
+	* `sudo umount /mnt/dev/pts`
+	* `sudo umount /mnt/dev`
+	* `sudo umount /mnt`
+10. Reiniciamos
+
+Más: [howtoubuntu.org](http://howtoubuntu.org/how-to-repair-restore-reinstall-grub-2-with-a-ubuntu-live-cd)
+[lukeplant.me.uk](http://lukeplant.me.uk/blog/posts/sharing-internet-connection-to-chroot/)
+[ubuntuforums.org](http://ubuntuforums.org/showthread.php?t=1467147)
+[debian-handbook.info](https://debian-handbook.info/browse/es-ES/stable/sect.apt-get.html)
 
 ### Change the priority of a process
 ### Identify resource utilization by process
