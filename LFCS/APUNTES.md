@@ -254,11 +254,13 @@ Más: [rm-rf.es](http://rm-rf.es/diferencias-entre-soft-symbolic-y-hard-links/)
 * `chmod 755` pone los permisos a `-rwxr--r-x`
 * `chmod u+rwx,g+wx,o-rx` da los permisos indicados y no modifica los no indicados
 (es decir, el valor de lectura de grupo y el de escritura de otros se queda como estuvieran antes)
+* `chmod a+rwx` da los permisos indicados a todo el mundo (`a` de `all`)
 
 ### Read, and use system documentation
 
 * `man comando`
 * `comando --help`
+* `help comando`
 
 ### Manage access to the root account
 
@@ -369,7 +371,94 @@ Más: [howtoubuntu.org](http://howtoubuntu.org/how-to-repair-restore-reinstall-g
 [debian-handbook.info](https://debian-handbook.info/browse/es-ES/stable/sect.apt-get.html)
 
 ### Change the priority of a process
+
+`nice` es lo opuesto a la prioridad: un proceso con `nice` -20 tienen
+la máxima prioridad, y otro con `nice` 19 tienen la mínima prioridad.
+
+* `nice -n 5 cat` o `nice -5 cat` ejecuta cat con un valor `nice` incrementado en 5 unidades.
+* `nice cat` usa el valor 10 por defecto, por lo tanto es igual a `nice -n 10 cat` o `nice -10 cat`
+* `nice` nos da el valor `nice` actual
+
+```console
+me@lub ~ $ nice
+0
+me@lub ~ $ nice bash
+me@lub ~ $ nice
+10
+me@lub ~ $ nice -20 bash
+me@lub ~ $ nice
+19
+me@lub ~ $ exit
+exit
+me@lub ~ $ nice
+10
+me@lub ~ $ exit
+exit
+me@lub ~ $ nice
+0
+me@lub ~ $ nice -3 cat &
+[1] 1797
+me@lub ~ $ ps -l
+F S   UID   PID  PPID  C PRI  NI ADDR SZ WCHAN  TTY          TIME CMD
+0 S  1000  1740  1739  0  80   0 -  2110 wait   pts/1    00:00:00 bash
+0 T  1000  1797  1740  1  83   3 -  1369 signal pts/1    00:00:00 cat
+0 R  1000  1798  1740  0  80   0 -  1569 -      pts/1    00:00:00 ps
+```
+
+`renice` cambia el valor nice de un proceso en ejecución.
+Por defecto solo root puede disminuirlo, sin embargo editando
+`/etc/security/limits.conf` se puede determinar por usuario unos limites
+en los que dicho usuario si puede variar el valor `nice` de sus procesos.
+
+```console
+e@lub ~ $ cat &
+[1] 1813
+me@lub ~ $ renice -n 1 1813
+1813 (ID de proceso) prioridad antigua 0, prioridad nueva 1
+me@lub ~ $ renice -n 0 1813
+renice: fallo al establecer la prioridad para 1813 (ID de proceso): Permiso denegado
+me@lub ~ $ sudo renice -n 0 1813
+1813 (ID de proceso) prioridad antigua 1, prioridad nueva 0
+```
+
+Añado la línea `me - nice -20` en `/etc/security/limits.conf`, salgo y
+vuelvo a entrar con el usuario me
+
+```console
+me@lub ~ $ cat &
+[1] 1872
+me@lub ~ $ renice -n 1 1872
+1872 (ID de proceso) prioridad antigua 0, prioridad nueva 1
+me@lub ~ $ renice -n 0 1872
+1872 (ID de proceso) prioridad antigua 1, prioridad nueva 0
+```
+
 ### Identify resource utilization by process
+
+* `top` muestra la actividad de los procesos
+* `ps` da información detallada de cada proceso
+* `pstree` muestra un arbol de procesos y sus conexiones
+* `strace` da información de las llamadas a sistema de un proceos
+
+En `/proc` hay un directorio por cada proceso ( el cual se llama como
+el PID de su proceso) donde aparece información sobre él.
+
+```console
+me@lub ~ $ cat &
+[1] 2205
+me@lub ~ $ cat /proc/2205/cmdline
+cat
+me@lub ~ $ cat /proc/2205/status
+Name:	cat
+State:	T (stopped)
+Tgid:	2205
+Ngid:	0
+Pid:	2205
+...
+me@lub ~ $ realpath /proc/2205/cwd/
+/home/me
+```
+
 ### Locate and analyze system log files
 ### Schedule tasks to run at a set date and time
 ### Verify completion of scheduled jobs

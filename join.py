@@ -384,6 +384,11 @@ for f in soup.findAll(text=re.compile(u"(Estado de todos los servicios en el sis
 		b=sp.sub(" ",t.string)
 		t.replace_with(b)
 
+for f in soup.findAll("a",text=re.compile(u".*(Eventos de Linux Foundation).*")):
+	texts=f.find_parent("fieldset").div.ul.find_all("strong")
+	for t in texts:
+		t.unwrap()
+
 e=soup.find("span", attrs={'class': "enlace"})
 if e and e.parent.name=="li":
 	e.parent.extract()
@@ -416,6 +421,10 @@ h=h.replace("n. El comando","n.</p><p>El comando")
 h=h.replace("apt-ge</strong>t","apt-get</strong>")
 h=h.replace("imgs/LVM_Components_large_Spanish%20(2).png","imgs/LVM_Components_large_Spanish.png")
 h=h.replace("strong> or <strong","strong> o <strong")
+h=h.replace(" <strong>system</strong>d."," <strong>systemd</strong>.")
+h=h.replace(" archivos<strong>.service</strong>"," archivos <strong>.service</strong>")
+h=h.replace("La historia de las controversias y todo esto es muy complicado","La historia de las controversias y todo eso es muy complicado")
+
 r=re.compile("\s+(DUMP: )", re.MULTILINE|re.DOTALL|re.UNICODE)
 h=h=r.sub("\\1",h)
 r=re.compile(">\s\$ ", re.MULTILINE|re.DOTALL|re.UNICODE)
