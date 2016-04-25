@@ -459,9 +459,63 @@ me@lub ~ $ realpath /proc/2205/cwd/
 /home/me
 ```
 
+En `/proc/PID/fd/1` se puede ver la salida estanadar de haberla.
+
 ### Locate and analyze system log files
+
+* `/var/log/` contine los logs
+* `head` muestra el principio de un fichero
+* `tail` muestra el final de un fichero (con la opción `-f` actualiza la salida según se incrementa el fichero)
+* `dmesg` lista el buffer de mensajes del núcleo ( = `/var/log/dmesg`)
+* `zcat`, `zgrep`, etc sirve para usarse con ficheros `.gz` como si fuera de texto plano
+* `/var/log/cron` (`grep -i cron /var/log/syslog` si esta desactivad) para ver la actividad del `cron`
+* `/var/log/boot.log` mensajes de arranque del sistema
+* `last` da los accesos de cada usuario, `lastlog` da el último acceso de cada usuario y `lastb` los accesos fallidos
+* `/var/log/messages` mensajes principales del sistema
+* `/var/log/auth.log` información sobre el sistema de autorización de usuarios y permisos
+
+
+Más: [www.securityartwork.es](http://www.securityartwork.es/2012/05/30/analisis-forense-en-sistemas-linux-obteniendo-informacion-parte-2/)
+
 ### Schedule tasks to run at a set date and time
+
+* `/etc/crontab` y `/etc/cron.d/*` son ficheros crontab "multiusuario" (en cada linea se dice con que usuario se ejecuta la tarea)
+* `/etc/cron.hourly/` y similares son ficheros ejecutables que lanzara root en los periodos que indican el nombre de la carpeta
+* `contab -e` edita el fichero contrab del usuario
+
+Ejemplo
+
+```
+# Cada hora en horario laboral
+0 7-20 * * 1,2,3,4  /bin/bash ~/.owa/owa.sh
+0 7-18 * * 5  /bin/bash ~/.owa/owa.sh
+# Cada 4 horas fuera de horario laboral y entre semana
+0 23,3 * * 1,2,3,4  /bin/bash ~/.owa/owa.sh
+# Cada 8 horas en fin de semana
+0 */8 * 6,7 /bin/bash ~/.owa/owa.sh
+
+# Notificacion cada 2 o 3 horas entre semana de 7 a 20
+0 7,9,11,14,17,20 * * 1,2,3,4,5  /bin/bash ~/.owa/notif.sh
+# Notificacion cada 12 horas en fin de semana
+0 */12 * 6,7 /bin/bash ~/.owa/notif.sh
+
+@hourly /bin/bash /home/pi/wks/segundamano/run.sh
+@weekly /bin/bash ~/wks/emvs/mail.sh
+```
+
+Más: [www.alcancelibre.org](http://www.alcancelibre.org/staticpages/index.php/configuracion-uso-crond)
+
 ### Verify completion of scheduled jobs
+
+* `cron` manda un email a la dirección del campo `MAILTO` o al usuario
+que ejecuta el comando
+* Para que `cron` genere logs no debe estar activada la opción `-L 0` en `/etc/default/cron`
+* Si no sabemos en que log escribe lo podemos buscar con `sudo grep -icr CRON /var/log/* | grep -v :0`
+* En `ubuntu` probablemente nos interese `/var/log/syslog`
+
+Más: [bencane.com](http://bencane.com/2011/11/02/did-my-cronjob-run/)
+[help.ubuntu.com](https://help.ubuntu.com/community/CronHowto#Troubleshooting_and_Common_Problems)
+
 ### Update software to provide required functionality and security
 ### Verify the integrity and availability of resources
 ### Verify the integrity and availability of key processes
