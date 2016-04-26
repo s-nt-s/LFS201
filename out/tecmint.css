@@ -1,0 +1,101 @@
+body {
+    font-family: arial,sans serif;
+    font-size: 11pt;
+}
+
+fieldset > div > *:first-child {
+	margin-top:0;
+}
+fieldset > div > *:last-child {
+	margin-bottom:0;
+}
+h1 {
+	background-color: black;
+	border-radius: 6px;
+	color: white;
+	padding: 10px;
+	margin: 0;
+}
+h2 {
+	background-color: dimgray;
+	border-radius: 6px;
+	color: white;
+	padding: 10px;
+}
+h3 {
+	background-color: #f0f0f0;
+	border-radius: 6px;
+	padding: 5px;
+}
+div.entry-inner > h3:first-child {
+    border-color: red;
+    border-style: solid;
+}
+body {
+	background-color: #c0c0c0;
+}
+body > div {
+	max-width:800px;
+	margin: 0 auto;
+	padding: 10px;
+	background-color: white;
+	border-radius: 6px;
+}
+caption {
+    text-align: left;
+    margin-bottom: 14px;
+}
+table {
+	margin-top: 14px;
+	border-spacing: 0px;
+	border-collapse: collapse;
+}
+thead {
+	background-color: lightblue;
+}
+td, th {
+	border: 1px solid black;
+	padding-left: 5px;
+	padding-right: 5px;
+}
+table tbody tr:nth-child(even) {
+	background-color: #ddd;
+}
+td > p, th > p {
+	margin-top:7px;
+	margin-bottom:7px;
+}
+td > p:first-child, th > p:first-child  {
+	margin-top:0;
+}
+td > p:last-child, td > p:last-child {
+	margin-bottom:0;
+}
+
+h1 a, legend a {
+	text-decoration: none;
+	color: inherit;
+}
+div.content > fieldset:first-child {
+	margin-top:2px;
+}
+div.content > fieldset:last-child {
+	margin-bottom:3px;
+}
+figure {
+	margin:14px 0 0;
+	display: table;
+    border-radius: 6px;
+    border: 1px solid black;
+}
+figure > figcaption {
+    border-bottom: 1px dashed black;
+    text-align: center;
+}
+pre {
+    white-space: -moz-pre-wrap; /* Mozilla, supported since 1999 */
+    white-space: -pre-wrap; /* Opera */
+    white-space: -o-pre-wrap; /* Opera */
+    white-space: pre-wrap; /* CSS3 - Text module (Candidate Recommendation) http://www.w3.org/TR/css3-text/#white-space */
+    word-wrap: break-word; /* IE 5.5+ */
+}

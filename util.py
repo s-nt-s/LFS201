@@ -87,6 +87,11 @@ def escribir(html,out):
 
 printable = set(string.printable)
 
+def get_printable(txt):
+	txt=txt.strip()
+	txt=filter(lambda x: x in printable, txt)
+	return sp.sub(" ",txt).strip()
+
 def sclean(txt):
     if isinstance(txt, bs4.Tag):
         txt=txt.get_text()

@@ -163,6 +163,8 @@ Tambien podemos usar:
 * `which` busca ejecutables en el PATH
 * `locate` busca en base de datos del sistema de ficheros (que se puede actualizar con `sudo updatedb`)
 
+Más: [www.tecmint.com](http://www.tecmint.com/compress-files-and-finding-files-in-linux/)
+
 ### Evaluate and compare the basic file system features and options
 
 *no tengo claro a que se refiere*
@@ -172,6 +174,8 @@ Tambien podemos usar:
 * Crear fichero vacio: `touch fichero.txt`
 * Editar fichero: `nano fichero.txt`
 * Comparar ficheros: `diff fichero1.txt fichero2.txt`
+
+Más: [www.tecmint.com - vi](http://www.tecmint.com/vi-editor-usage/)
 
 ### Compare binary files
 
@@ -198,6 +202,8 @@ Más: [hipertextual.com](http://hipertextual.com/archivo/2014/07/redirecciones-y
 * `awk`
 * `sed`
 
+Más: [www.tecmint.com - part 1](http://www.tecmint.com/sed-command-to-create-edit-and-manipulate-files-in-linux/)
+
 ### Archive, backup, compress, unpack, and uncompress files
 
 * `tar cvf file.tar *` comprimir
@@ -209,6 +215,7 @@ Más: [hipertextual.com](http://hipertextual.com/archivo/2014/07/redirecciones-y
   * `j` para comprimir con `bz2`
   * `J` para comprimir con `xz`
 
+Más: [www.tecmint.com](http://www.tecmint.com/compress-files-and-finding-files-in-linux/)
 https://www.youtube.com/watch?v=ZxVyhZEYEAU
 
 ### Create, delete, copy, and move files and directories
@@ -261,6 +268,8 @@ Más: [rm-rf.es](http://rm-rf.es/diferencias-entre-soft-symbolic-y-hard-links/)
 * `man comando`
 * `comando --help`
 * `help comando`
+
+http://www.tecmint.com/explore-linux-installed-help-documentation-and-tools/
 
 ### Manage access to the root account
 
@@ -369,6 +378,7 @@ Más: [howtoubuntu.org](http://howtoubuntu.org/how-to-repair-restore-reinstall-g
 [lukeplant.me.uk](http://lukeplant.me.uk/blog/posts/sharing-internet-connection-to-chroot/)
 [ubuntuforums.org](http://ubuntuforums.org/showthread.php?t=1467147)
 [debian-handbook.info](https://debian-handbook.info/browse/es-ES/stable/sect.apt-get.html)
+http://www.tecmint.com/configure-and-troubleshoot-grub-boot-loader-linux/
 
 ### Change the priority of a process
 
@@ -433,6 +443,8 @@ me@lub ~ $ renice -n 0 1872
 1872 (ID de proceso) prioridad antigua 1, prioridad nueva 0
 ```
 
+http://www.tecmint.com/monitor-linux-processes-and-set-process-limits-per-user/
+
 ### Identify resource utilization by process
 
 * `top` muestra la actividad de los procesos
@@ -460,6 +472,8 @@ me@lub ~ $ realpath /proc/2205/cwd/
 ```
 
 En `/proc/PID/fd/1` se puede ver la salida estanadar de haberla.
+
+http://www.tecmint.com/monitor-linux-processes-and-set-process-limits-per-user/
 
 ### Locate and analyze system log files
 
@@ -517,11 +531,57 @@ Más: [bencane.com](http://bencane.com/2011/11/02/did-my-cronjob-run/)
 [help.ubuntu.com](https://help.ubuntu.com/community/CronHowto#Troubleshooting_and_Common_Problems)
 
 ### Update software to provide required functionality and security
+
+`sudo apt-get update` +:
+
+* `sudo apt-get upgrade` actualiza todo lo que se pueda actualizar sin tener que resolver conflictos (nunca eliminara paquetes)
+* `sudo apt-get dist-upgrade` actualiza intentando resolver conflictos si los hubiera (puede que elimine paquete)
+
+Más: http://www.tecmint.com/linux-package-management/
+http://www.tecmint.com/useful-basic-commands-of-apt-get-and-apt-cache-for-package-management/
+http://www.tecmint.com/dpkg-command-examples/
+
 ### Verify the integrity and availability of resources
+
+`dpkg -V` comprueba la integridad de todos los paquetes (o de alguno en concreto si se pasa como parametro).
+Solo ofrece salida cuando ha habido alguna información que mostrar.
+
+Los caracteres mostrados significan:
+
+* .: prueba pasada
+* ?: la prueba no se ha podido realizar
+* S: el tamaño de archivo difiere
+* M: los permisos del archivo y/o tipo difieren
+* 5: el checksum MD5 difiere
+* D: discrepancia entre los números mayor/menor
+* L: discrepancia de ruta de enlace simbólico
+* U: el usuario propietario difiere
+* G: el grupo propietario difiere
+* T: el tiempo de modificación difiere
+* P: las capacidades difieren
+* c: se trata de un fichero de configuración que ha sido modificado de forma legitima
+
+Un mensaje no siempre es un error (por ejemplo, un fichero de configuración modificado).
+
+*no tengo claro a que más se refiere*
+
 ### Verify the integrity and availability of key processes
+
+Más: [www.tecmint.com](http://www.tecmint.com/monitor-linux-processes-and-set-process-limits-per-user/)
+
 ### Change kernel runtime parameters, persistent and non-persistent
+
+http://www.tecmint.com/change-modify-linux-kernel-runtime-parameters/
+
 ### Use scripting to automate system maintenance tasks
+
+http://www.tecmint.com/linux-basic-shell-scripting-and-linux-filesystem-troubleshooting/
+
+
 ### Manage the startup process and services
+
+http://www.tecmint.com/linux-boot-process-and-manage-services/
+
 ### List and identify SELinux/AppArmor file and process contexts
 ### Configure and modify SELinux/AppArmor policies
 ### Install software from source
@@ -530,6 +590,9 @@ Más: [bencane.com](http://bencane.com/2011/11/02/did-my-cronjob-run/)
 
 ### Create, delete, and modify local user accounts
 ### Create, delete, and modify local groups and group memberships
+
+http://www.tecmint.com/manage-users-and-groups-in-linux/
+
 ### Manage system-wide environment profiles
 ### Manage template user environment
 ### Configure user resource limits
@@ -554,6 +617,9 @@ Más: [bencane.com](http://bencane.com/2011/11/02/did-my-cronjob-run/)
 ### Configure an FTP server
 ### Configure anonymous-only download on FTP servers
 ### Provide/configure network shares via NFS
+
+http://www.tecmint.com/mount-filesystem-in-linux/
+
 ### Provide/configure network shares via CIFS
 ### Configure email aliases
 ### Configure SSH servers and clients
@@ -578,14 +644,26 @@ Más: [bencane.com](http://bencane.com/2011/11/02/did-my-cronjob-run/)
 ## Storage Management - 10%
 
 ### List, create, delete, and modify storage partitions
+
+http://www.tecmint.com/create-partitions-and-filesystems-in-linux/
+
 ### Create, modify and delete Logical Volumes
+
+http://www.tecmint.com/manage-and-create-lvm-parition-using-vgcreate-lvcreate-and-lvextend/
+
 ### Extend existing Logical Volumes and filesystems
 ### Create and configure encrypted partitions
 ### Configure systems to mount file systems at or during boot
 ### Configure and manage swap space
 ### Add new partitions, and logical volumes
 ### Assemble partitions as RAID devices
+
+http://www.tecmint.com/creating-and-managing-raid-backups-in-linux/
+
 ### Configure systems to mount standard, encrypted, and network file systems on demand
 ### Create and manage filesystem Access Control Lists (ACLs)
+
+http://www.tecmint.com/set-access-control-lists-acls-and-disk-quotas-for-users-groups/
+
 ### Diagnose and correct file permission problems
 ### Setup user and group disk quotas for filesystems
