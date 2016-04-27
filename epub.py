@@ -2,21 +2,16 @@ import bs4
 import re
 import os
 from subprocess import call
+import util
 
 abspath = os.path.abspath(__file__)
 dname = os.path.dirname(abspath)
 os.chdir(dname)
 
-html="out/LFS201.html"
 out="out/epub.html"
 
-def get_soup(html):
-	html = open(html,"r+")
-	soup = bs4.BeautifulSoup(html,'html.parser')#"lxml")
-	html.close()
-	return soup
-
-soup=get_soup(html)
+soup=util.get_soup("out/LFS201.html")
+soup.head.link.attrs['href']="rec/epub.css"
 
 for h in soup.findAll(["h1","legend"]):
 	if h.a:
@@ -35,7 +30,6 @@ for f in soup.findAll("fieldset", attrs={'class': re.compile(r".*\bn2\b.*")}):
 	f.unwrap()
 
 soup.body.div.unwrap()
-soup.head.link.attrs['href']="epub.css"
 
 code=unicode(soup)
 with open(out, "wb") as file:

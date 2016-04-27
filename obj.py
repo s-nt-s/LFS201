@@ -1,20 +1,15 @@
 import bs4
 import re
+import util
+import os
 
 abspath = os.path.abspath(__file__)
 dname = os.path.dirname(abspath)
 os.chdir(dname)
 
-html="out/LFS201.html"
 out="out/Objetivos.html"
 
-def get_soup(html):
-	html = open(html,"r+")
-	soup = bs4.BeautifulSoup(html,'html.parser')#"lxml")
-	html.close()
-	return soup
-
-soup=get_soup(html)
+soup=util.get_soup("out/LFS201.html")
 soup.title.string=soup.title.string+": Objetivos"
 
 flds=soup.findAll("fieldset", attrs={'class': re.compile(r".*\bn2\b.*")})

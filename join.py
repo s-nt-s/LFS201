@@ -22,9 +22,7 @@ caB=0
 n=0
 f=0
 
-tpt="out/LFS201.htm"
 oht="out/LFS201.html"
-html4="out/LFS201_4.html"
 
 def find_fld(soup,r,tipo=None,txt=None):
 	rt=[]
@@ -76,11 +74,7 @@ def get_lab(f,txt):
 	a.string=txt
 	return a
 
-soup = util.get_soup(tpt)
-
-soup.body.clear()
-div=soup.new_tag("div", **{"class":"content"})
-soup.body.append(div)
+soup = util.get_tpt("LFS201","rec/main.css")
 
 fldB=None
 divCp=None
@@ -120,7 +114,6 @@ for ht in hts:
 	t.name="legend"
 	fld.append(t)
 	b.name="div"
-	fld.attrs['id']="c"+str(ca)+"f"+str(f)
 	fld.append(b)
 
 	ps=fld.div.select(" > *")
@@ -139,6 +132,7 @@ for ht in hts:
 		else:
 			fldB.append(fld)
 	else:
+		fld.attrs['id']="c"+str(ca)+"f"+str(f)
 		set_anchor(fld,ca)
 		divCp.append(fld)
 		fldB=fld
@@ -163,7 +157,6 @@ for p in soup.findAll(text=re.compile(" 'tab' ")):
 			p.parent.extract()
 		else:
 			p.extract()
-
 
 ins=find_fld(soup.body.div, re.compile(u".*Instalación: qué usar para este curso.*", re.UNICODE|re.MULTILINE|re.DOTALL))
 if len(ins)>0:
@@ -348,7 +341,7 @@ for i in soup.findAll("img"):
 	f.div.unwrap()
 	f.name="figure"
 	f.legend.name="figcaption"
-	del f.attrs['id']
+	#del f.attrs['id']
 	del f.attrs['class']
 
 for t in soup.findAll("table"):
@@ -424,6 +417,7 @@ h=h.replace("strong> or <strong","strong> o <strong")
 h=h.replace(" <strong>system</strong>d."," <strong>systemd</strong>.")
 h=h.replace(" archivos<strong>.service</strong>"," archivos <strong>.service</strong>")
 h=h.replace("La historia de las controversias y todo esto es muy complicado","La historia de las controversias y todo eso es muy complicado")
+h=h.replace("http://en.wikipedia.org/wiki/Reserved_ IP_addresses","http://en.wikipedia.org/wiki/Reserved_IP_addresses")
 
 r=re.compile("\s+(DUMP: )", re.MULTILINE|re.DOTALL|re.UNICODE)
 h=h=r.sub("\\1",h)

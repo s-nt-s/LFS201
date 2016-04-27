@@ -72,9 +72,12 @@ td > p:last-child, td > p:last-child {
 	margin-bottom:0;
 }
 
-h1 a, legend a {
+h2 a {
 	text-decoration: none;
 	color: inherit;
+}
+h2 span {
+	font-size:50%;
 }
 div.content > fieldset:first-child {
 	margin-top:2px;
@@ -98,4 +101,22 @@ pre {
     white-space: -o-pre-wrap; /* Opera */
     white-space: pre-wrap; /* CSS3 - Text module (Candidate Recommendation) http://www.w3.org/TR/css3-text/#white-space */
     word-wrap: break-word; /* IE 5.5+ */
+    border: 1px dotted black;
+    padding:5px;
+}
+div.content > fieldset:first-child {
+	margin-top:2px;
+}
+div.content > fieldset:last-child {
+	margin-bottom:3px;
+}
+figure {
+	margin:14px 0 0;
+	display: table;
+    border-radius: 6px;
+    border: 1px solid black;
+}
+figure > figcaption {
+    border-bottom: 1px dashed black;
+    text-align: center;
 }

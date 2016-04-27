@@ -7,8 +7,27 @@ import os
 tag_concat=['u','ul','ol','i','em','strong']
 tag_round=['u','i','em','span','strong', 'a']
 tag_trim=['li', 'th', 'td', 'div','caption']
-tag_right=['p']
+tag_right=['p','pre']
 sp=re.compile("\s+", re.UNICODE)
+
+def get_tpt(title,css):
+	soup=bs4.BeautifulSoup('''
+	<!DOCTYPE html>
+	<html>
+		<head>
+			<title></title>
+			<meta charset="utf-8"/>
+			<link href="" rel="stylesheet" type="text/css"/>
+		</head>
+		<body>
+			<div class="content">
+			</div>
+		</body>
+	</html>
+	''','lxml')
+	soup.head.title.string=title
+	soup.head.link.attrs["href"]=css
+	return soup
 
 def get_soup(html):
     if not os.path.isfile(html):
@@ -59,31 +78,44 @@ def get_html(soup):
 
 def escribir(html,out):
     tags_tab="html|head|ul|ol|div|fieldset|body|html|table|tbody|thead"
-    tags_ln=tags_tab+"|meta|link|title|p|li|h1|legend|div|tr"
-    bks1=re.compile("(<("+tags_ln+")[^>]*>)")
-    bks2=re.compile("(</("+tags_ln+")>)")
-    bks3=re.compile("(<(meta|link) [^>]+/>)")
-    begin_tag=re.compile("^<("+tags_tab+")[^>]*>$")
-    end_tag=re.compile("^</("+tags_tab+")>$")
+    tags_ln=tags_tab+"|meta|link|title|p|li|h[123456]|legend|tr|pre"
+    bks1=re.compile("(<("+tags_ln+")[^>]*>)",re.UNICODE)
+    bks2=re.compile("(</("+tags_ln+")>)",re.UNICODE)
+    bks3=re.compile("(<(meta|link) [^>]+/>)",re.UNICODE)
+    begin_tag=re.compile("^ *<("+tags_tab+")[^>]*> *$",re.UNICODE)
+    end_tag=re.compile("^ *</("+tags_tab+")> *$",re.UNICODE)
+    pre1=re.compile("^(<pre[^>]*>).*",re.UNICODE)
+    pre2=re.compile(".*(</pre>)$",re.UNICODE)
 
     html=bks1.sub("\n\\1",html)
     html=bks2.sub("\\1\n",html)
     html=bks3.sub("\\1\n",html)
     lineas=html.split("\n")
 
+    pre=0
     with open(out, "wb") as file:
         tab=""
         for l in lineas:
-            cl=sp.sub("",l).strip()
-            if len(cl)==0:
+            if len(sp.sub("",l).strip())==0:
                 continue
-            m1=end_tag.match(l)
-            if m1:
+            if pre==1:
+				pre=2
+            elif pre1.match(l):
+				pre=1
+            if end_tag.match(l):
                 tab=tab[:-2]
-            file.write((tab+l+"\n").encode('utf8'))
-            m2=begin_tag.match(l)
-            if m2 and not m1 and not l.endswith("/>"):
+                l=l.strip()
+            mt=begin_tag.match(l)
+            if mt:
+                l=l.strip()
+            if pre==2:
+                file.write((l+"\n").encode('utf8'))
+            else:
+                file.write((tab+l+"\n").encode('utf8'))
+            if mt:
                 tab=tab+"  "
+            if pre2.match(l):
+				pre=0
 
 printable = set(string.printable)
 

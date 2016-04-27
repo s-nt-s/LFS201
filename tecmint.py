@@ -90,30 +90,42 @@ def get_url(url):
 		print str(e)
 		return None
 
-tpt="out/tecmint.htm"
+def get_h(txt,url):
+	mrk=url.split("/")[-2]
+	h=out.new_tag("h2")
+	h.attrs["id"]=mrk
+	h.append(out.new_tag("a"))
+	h.a.string=txt
+	h.a.attrs["href"]="#"+mrk
+	h.append(" ")
+	h.append(out.new_tag("span"))
+	h.span.append(" (")
+	h.span.append(out.new_tag("a"))
+	h.span.a.string="source"
+	h.span.a.attrs["href"]=url
+	h.span.append(")")
+	return h
+
 oht="out/tecmint.html"
-out = util.get_soup(tpt)
-dv=out.new_tag("div")
-out.append(dv)
+
+out = util.get_tpt("Apuntes de tecmint.com","rec/tecmint.css")
 h1=out.new_tag("h1")
 h1.string="LFCS"
-dv.append(h1)
+out.body.div.append(h1)
 
 flag=1
-for u in urls:
-	soup=get_url(u)
+for url in urls:
+	soup=get_url(url)
 	tt=soup.head.title.get_text().strip()
 	if tt.startswith("LFCE: "):
 		h1=out.new_tag("h1")
 		h1.string="LFCE"
-		dv.append(h1)
+		out.body.div.append(h1)
 		tt=tt[6:]
 		flag=2
 	elif tt.startswith("LFCS: "):
 		tt=tt[6:]
-	h2=out.new_tag("h2")
-	h2.string=tt
-	h2.attrs["id"]=u.split("/")[-2]
+
 	div=soup.find("div", **{"class":"entry-inner"})
 
 	if flag==4:
@@ -121,7 +133,6 @@ for u in urls:
 		if not i:
 			i=div.find("img",**{"src":re.compile(".*/lfce-?\d+\.(png|jpeg)$")})
 		v=div.find("iframe",**{"src":"//www.youtube.com/embed/Y29qZ71Kicg"})
-
 		if i and v:
 			d1=i.find_parent("div")
 			d2=v.find_parent("div",**{"class":"post-format"})
@@ -144,8 +155,17 @@ for u in urls:
 			div.h3.previous_sibling.extract()
 		flag=4
 
+	for i in range(6,3,-1):
+		ha=div.findAll("h"+str(i))
+		hb=div.findAll("h"+str(i-1))
+		if len(ha)>0 and len(hb)==0:
+			for h in ha:
+				h.name="h"+str(i-1)
+
+	div.attrs.clear()
+	h2=get_h(tt,url)
 	div.insert(0,h2)
-	dv.append(div)
+	out.body.div.append(div)
 
 for n in out.findAll("noscript"):
 	a=n.find_parent("a")
@@ -161,6 +181,16 @@ for i in out.findAll("img"):
 		a=i.find_parent("a")
 		if a and "href" in a.attrs and a.attrs["href"]==i.attrs["src"]:
 			a.unwrap()
+	d=i.find_parent("div")
+	if d and "class" in d.attrs and "wp-caption" in d.attrs["class"]:
+		d.name="figure"
+		d.p.name="figcaption"
+	src=i.attrs["src"]
+	alt=i.attrs["alt"]
+	i.attrs.clear()
+	i.attrs["src"]=src
+	i.attrs["alt"]=alt
+
 for a in out.findAll(**{"class":"adsbygoogle"}):
 	a.parent.extract()
 for a in out.findAll(text="Become a Linux Certified System Administrator"):
@@ -168,9 +198,22 @@ for a in out.findAll(text="Become a Linux Certified System Administrator"):
 for a in out.findAll(text="Become a Linux Certified Engineer"):
 	a.find_parent("div").extract()
 for a in out.findAll("a"):
-	if "href" in a.attrs and a.attrs["href"] in urls:
+	if (not a.find_parent("h2")) and "href" in a.attrs and a.attrs["href"] in urls:
 		a.attrs["href"]="#"+a.attrs["href"].split("/")[-2]
+for a in out.findAll(["figure","figcaption","td","th","table"]):
+	if a.attrs:
+		a.attrs.clear()
+for a in out.findAll("colgroup"):
+	a.extract()
+for t in out.findAll("table"):
+	for s in t.findAll(["span","b"]):
+		s.unwrap()
+	if not t.thead:
+		t.insert(0,out.new_tag("thead"))
+		t.thead.append(t.tr)
+		for td in t.tr.findAll("th"):
+			td.name="th"
 
-h=unicode(out)
+h=util.get_html(out)
 util.escribir(h,oht)
 
