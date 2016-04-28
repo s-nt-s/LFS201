@@ -6,8 +6,8 @@ import os
 
 tag_concat=['u','ul','ol','i','em','strong']
 tag_round=['u','i','em','span','strong', 'a']
-tag_trim=['li', 'th', 'td', 'div','caption']
-tag_right=['p','pre']
+tag_trim=['li', 'th', 'td', 'div','caption','h[1-6]']
+tag_right=['p']
 sp=re.compile("\s+", re.UNICODE)
 
 def get_tpt(title,css):
@@ -41,12 +41,14 @@ def ischar(ch):
     c=unicodedata.category(ch)
     return c[0] not in ('M','C') and c not in ('Zl', 'Zp')
 
-def get_html(soup):
-    for t in get_textos(soup):
-        b=sp.sub(" ",t.string)
-        t.replace_with(b)
+def get_html(soup,multiline=False):
+    if not multiline:
+        for t in get_textos(soup):
+            b=sp.sub(" ",t.string)
+            t.replace_with(b)
     h=unicode(soup)
-    h=filter(ischar , h)
+    if not multiline:
+        h=filter(ischar , h)
     r=re.compile("(\s*\.\s*)</a>", re.MULTILINE|re.DOTALL|re.UNICODE)
     h=r.sub("</a>\\1",h)
     for t in tag_concat:
@@ -70,33 +72,38 @@ def get_html(soup):
         r=re.compile("(<"+t+">) +", re.MULTILINE|re.DOTALL|re.UNICODE)
         h=r.sub("\\1",h)
     r=re.compile("<br/>\s*<br/>", re.MULTILINE|re.DOTALL|re.UNICODE)
-    h=h=r.sub("<br/>",h)
+    h=r.sub("<br/>",h)
     r=re.compile("\s*<br/>", re.MULTILINE|re.DOTALL|re.UNICODE)
-    h=h=r.sub("<br/>",h)
+    h=r.sub("<br/>",h)
     h=h.replace("___ -","-")
     return h
 
 def escribir(html,out):
     tags_tab="html|head|ul|ol|div|fieldset|body|html|table|tbody|thead"
-    tags_ln=tags_tab+"|meta|link|title|p|li|h[123456]|legend|tr|pre"
-    bks1=re.compile("(<("+tags_ln+")[^>]*>)",re.UNICODE)
-    bks2=re.compile("(</("+tags_ln+")>)",re.UNICODE)
-    bks3=re.compile("(<(meta|link) [^>]+/>)",re.UNICODE)
-    begin_tag=re.compile("^ *<("+tags_tab+")[^>]*> *$",re.UNICODE)
-    end_tag=re.compile("^ *</("+tags_tab+")> *$",re.UNICODE)
+    tags_ln="title|p|li|h[123456]|legend|tr|pre"
+
+    r=re.compile("(<("+tags_tab+")[^>]*>)",re.UNICODE)
+    html=r.sub("\n\\1\n",html)
+    r=re.compile("(</("+tags_tab+")>)",re.UNICODE)
+    html=r.sub("\n\\1\n",html)
+    r=re.compile("(<(meta|link) [^>]+/>)",re.UNICODE)
+    html=r.sub("\n\\1\n",html)
+    r=re.compile("(<("+tags_ln+")[^>]*>)",re.UNICODE)
+    html=r.sub("\n\\1",html)
+    r=re.compile("(</("+tags_ln+")>)",re.UNICODE)
+    html=r.sub("\\1\n",html)
+    html=html.replace("\r","")
+
+    begin_tag=re.compile("^<("+tags_tab+")[^>]*>$",re.UNICODE)
+    end_tag=re.compile("^</("+tags_tab+")>$",re.UNICODE)
     pre1=re.compile("^(<pre[^>]*>).*",re.UNICODE)
     pre2=re.compile(".*(</pre>)$",re.UNICODE)
-
-    html=bks1.sub("\n\\1",html)
-    html=bks2.sub("\\1\n",html)
-    html=bks3.sub("\\1\n",html)
-    lineas=html.split("\n")
-
     pre=0
+    tab=""
+    lineas=html.split("\n")
     with open(out, "wb") as file:
-        tab=""
         for l in lineas:
-            if len(sp.sub("",l).strip())==0:
+            if pre!=2 and len(sp.sub("",l).strip())==0:
                 continue
             if pre==1:
 				pre=2
@@ -104,15 +111,11 @@ def escribir(html,out):
 				pre=1
             if end_tag.match(l):
                 tab=tab[:-2]
-                l=l.strip()
-            mt=begin_tag.match(l)
-            if mt:
-                l=l.strip()
             if pre==2:
                 file.write((l+"\n").encode('utf8'))
             else:
                 file.write((tab+l+"\n").encode('utf8'))
-            if mt:
+            if begin_tag.match(l):
                 tab=tab+"  "
             if pre2.match(l):
 				pre=0
@@ -185,6 +188,8 @@ def get_parrafos(soup):
 def get_textos(soup):
     r=[]
     for t in soup.body.find_all(text=True):
+        if t.find_parent("pre"):
+            continue
         s=t.find_parent("span")
         p=t.find_parent("p")
         if not s:

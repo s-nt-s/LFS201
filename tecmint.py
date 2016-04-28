@@ -6,6 +6,7 @@ import re
 import bs4
 import util
 import requests
+from html5print import HTMLBeautifier
 
 abspath = os.path.abspath(__file__)
 dname = os.path.dirname(abspath)
@@ -161,6 +162,15 @@ for url in urls:
 		if len(ha)>0 and len(hb)==0:
 			for h in ha:
 				h.name="h"+str(i-1)
+	ct=[]
+	for h in div.findAll(["h4","h5","h6"]):
+		c=int(h.name[1])
+		aux=[x for x in ct if x<c]
+		if len(aux)>0:
+			a=aux[-1]+1
+			if a<c:
+				h.name="h"+str(a)
+		ct.append(c)
 
 	div.attrs.clear()
 	h2=get_h(tt,url)
@@ -213,7 +223,14 @@ for t in out.findAll("table"):
 		t.thead.append(t.tr)
 		for td in t.tr.findAll("th"):
 			td.name="th"
+for h in out.findAll("h1"):
+	h.extract()
+for h in out.findAll(["h2", "h3", "h4","h5","h6"]):
+	h.name="h"+str(int(h.name[1])-1)
 
-h=util.get_html(out)
-util.escribir(h,oht)
+html = util.get_html(out,True)#
+util.escribir(html,oht)
 
+#out.prettify("utf-8",formatter="html")
+#with open(oht, "wb") as file:
+#	file.write(html)#.encode('utf8'))

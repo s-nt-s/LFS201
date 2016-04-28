@@ -2,34 +2,23 @@ body {
     font-family: arial,sans serif;
     font-size: 11pt;
 }
-
-fieldset > div > *:first-child {
-	margin-top:0;
-}
-fieldset > div > *:last-child {
-	margin-bottom:0;
-}
-h1 {
+/*h1 {
 	background-color: black;
 	border-radius: 6px;
 	color: white;
 	padding: 10px;
 	margin: 0;
-}
-h2 {
+}*/
+h1 {
 	background-color: dimgray;
 	border-radius: 6px;
 	color: white;
 	padding: 10px;
 }
-h3 {
+h2 {
 	background-color: #f0f0f0;
 	border-radius: 6px;
 	padding: 5px;
-}
-div.entry-inner > h3:first-child {
-    border-color: red;
-    border-style: solid;
 }
 body {
 	background-color: #c0c0c0;
@@ -72,28 +61,12 @@ td > p:last-child, td > p:last-child {
 	margin-bottom:0;
 }
 
-h2 a {
+h1 a, h2 a {
 	text-decoration: none;
 	color: inherit;
 }
-h2 span {
+h1 span, h2 span {
 	font-size:50%;
-}
-div.content > fieldset:first-child {
-	margin-top:2px;
-}
-div.content > fieldset:last-child {
-	margin-bottom:3px;
-}
-figure {
-	margin:14px 0 0;
-	display: table;
-    border-radius: 6px;
-    border: 1px solid black;
-}
-figure > figcaption {
-    border-bottom: 1px dashed black;
-    text-align: center;
 }
 pre {
     white-space: -moz-pre-wrap; /* Mozilla, supported since 1999 */
@@ -104,19 +77,23 @@ pre {
     border: 1px dotted black;
     padding:5px;
 }
-div.content > fieldset:first-child {
+div.content > div:first-child > *:first-child {
 	margin-top:2px;
 }
-div.content > fieldset:last-child {
+div.content > div:last-child > *:last-child {
 	margin-bottom:3px;
 }
 figure {
 	margin:14px 0 0;
-	display: table;
     border-radius: 6px;
     border: 1px solid black;
+    display: inline-block;
+	max-width: 100%;
 }
 figure > figcaption {
-    border-bottom: 1px dashed black;
+    border-top: 1px dashed black;
     text-align: center;
+}
+img {
+	max-width: 100%;
 }
