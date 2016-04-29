@@ -100,7 +100,7 @@ def get_h(txt,url):
 	h.a.attrs["href"]="#"+mrk
 	h.append(" ")
 	h.append(out.new_tag("span"))
-	h.span.append(" (")
+	h.span.append("(")
 	h.span.append(out.new_tag("a"))
 	h.span.a.string="source"
 	h.span.a.attrs["href"]=url
@@ -115,9 +115,10 @@ h1.string="LFCS"
 out.body.div.append(h1)
 
 flag=1
+part=re.compile(u"\s*[\-–—]\s*Part\s*\d+$", re.UNICODE | re.IGNORECASE)
 for url in urls:
 	soup=get_url(url)
-	tt=soup.head.title.get_text().strip()
+	tt=part.sub("",soup.head.title.get_text().strip())
 	if tt.startswith("LFCE: "):
 		h1=out.new_tag("h1")
 		h1.string="LFCE"
@@ -208,8 +209,13 @@ for a in out.findAll(text="Become a Linux Certified System Administrator"):
 for a in out.findAll(text="Become a Linux Certified Engineer"):
 	a.find_parent("div").extract()
 for a in out.findAll("a"):
-	if (not a.find_parent("h2")) and "href" in a.attrs and a.attrs["href"] in urls:
+	if a.find_parent("h2") or "href" not in a.attrs:
+		continue
+	if a.attrs["href"] in urls:
 		a.attrs["href"]="#"+a.attrs["href"].split("/")[-2]
+	else:
+		a.attrs["class"]="external"
+		a.attrs["target"]="_blank"
 for a in out.findAll(["figure","figcaption","td","th","table"]):
 	if a.attrs:
 		a.attrs.clear()
@@ -227,8 +233,17 @@ for h in out.findAll("h1"):
 	h.extract()
 for h in out.findAll(["h2", "h3", "h4","h5","h6"]):
 	h.name="h"+str(int(h.name[1])-1)
+for h in out.findAll("h4", text="Reference Links"):
+	ol=h.find_next_sibling("ol")
+	if ol:
+		ol.extract()
+		h.extract()
 
-html = util.get_html(out,True)#
+html = util.get_html(out,True)
+html=html.replace(u"–","-")
+html=html.replace(u"—","-")
+r=re.compile("([rwx])=2([210])")
+html=r.sub("\\1=2<sup>\\2</sup>",html)
 util.escribir(html,oht)
 
 #out.prettify("utf-8",formatter="html")
