@@ -107,9 +107,30 @@ def get_h(txt,url):
 	h.span.append(")")
 	return h
 
+def fix_h(div):
+	for i in range(6,3,-1):
+		ha=div.findAll("h"+str(i))
+		hb=div.findAll("h"+str(i-1))
+		if len(ha)>0 and len(hb)==0:
+			for h in ha:
+				h.name="h"+str(i-1)
+	flag=False
+	ct=[]
+	for h in div.findAll(["h2","h3","h4","h5","h6"]):
+		c=int(h.name[1])
+		aux=[x for x in ct if x<c]
+		if len(aux)>0:
+			a=aux[-1]+1
+			if a<c:
+				flag=True
+				h.name="h"+str(a)
+		ct.append(c)
+	if flag:
+		fix_h(div)
+
 oht="out/tecmint.html"
 
-out = util.get_tpt("Apuntes de tecmint.com","rec/tecmint.css")
+out = util.get_tpt("LFCS and LFCE by tecmint.com","rec/tecmint.css")
 h1=out.new_tag("h1")
 h1.string="LFCS"
 out.body.div.append(h1)
@@ -157,25 +178,10 @@ for url in urls:
 			div.h3.previous_sibling.extract()
 		flag=4
 
-	for i in range(6,3,-1):
-		ha=div.findAll("h"+str(i))
-		hb=div.findAll("h"+str(i-1))
-		if len(ha)>0 and len(hb)==0:
-			for h in ha:
-				h.name="h"+str(i-1)
-	ct=[]
-	for h in div.findAll(["h4","h5","h6"]):
-		c=int(h.name[1])
-		aux=[x for x in ct if x<c]
-		if len(aux)>0:
-			a=aux[-1]+1
-			if a<c:
-				h.name="h"+str(a)
-		ct.append(c)
-
 	div.attrs.clear()
 	h2=get_h(tt,url)
 	div.insert(0,h2)
+	fix_h(div)
 	out.body.div.append(div)
 
 for n in out.findAll("noscript"):
@@ -231,13 +237,21 @@ for t in out.findAll("table"):
 			td.name="th"
 for h in out.findAll("h1"):
 	h.extract()
-for h in out.findAll(["h2", "h3", "h4","h5","h6"]):
-	h.name="h"+str(int(h.name[1])-1)
-for h in out.findAll("h4", text="Reference Links"):
+for h in out.findAll(["h3", "h4","h5"], text="Reference Links"):
 	ol=h.find_next_sibling("ol")
 	if ol:
 		ol.extract()
 		h.extract()
+ct=1
+for h in out.findAll(["h2", "h3", "h4","h5","h6"]):
+	c=int(h.name[1])-1
+	h.name="h"+str(c)
+	if not h.a and c in (2,3,4):
+		util.h_to_a(out,h,ct)
+		ct=ct+1
+for ol in out.findAll("ol"):
+	if ol.parent and ol.parent.name=="ol":
+		ol.unwrap()
 
 html = util.get_html(out,True)
 html=html.replace(u"–","-")

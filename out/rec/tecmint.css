@@ -2,13 +2,6 @@ body {
     font-family: arial,sans serif;
     font-size: 11pt;
 }
-/*h1 {
-	background-color: black;
-	border-radius: 6px;
-	color: white;
-	padding: 10px;
-	margin: 0;
-}*/
 h1 {
 	background-color: dimgray;
 	border-radius: 6px;
@@ -16,9 +9,13 @@ h1 {
 	padding: 10px;
 }
 h2 {
-	background-color: #f0f0f0;
+	background-color: #cccccc;
 	border-radius: 6px;
 	padding: 5px;
+}
+h3 {
+    border-bottom: 1px solid black;
+    padding-bottom: 2px;
 }
 body {
 	background-color: #c0c0c0;
@@ -61,7 +58,7 @@ td > p:last-child, td > p:last-child {
 	margin-bottom:0;
 }
 
-h1 a, h2 a {
+h1 a, h2 a, h3 a, h4 a {
 	text-decoration: none;
 	color: inherit;
 }
@@ -69,10 +66,10 @@ h1 span, h2 span {
 	font-size:50%;
 }
 pre {
-	color: #fff;
+	#color: #fff;
 	font-size: 13px;
 	white-space: pre;
-	background-color: #051e30;
+	background-color: lavender;##051e30;
 	border-color: #289ff4;
 	border-style: solid;
 	border-width: 1px 1px 1px 4px;
@@ -89,8 +86,9 @@ div.content > div:last-child > *:last-child {
 	margin-bottom:3px;
 }
 figure {
-	margin:14px 0 0;
-    border-radius: 6px;
+	margin:0;
+	border-bottom-left-radius: 6px;
+	border-bottom-right-radius: 6px;
     border: 1px solid black;
     display: inline-block;
 	max-width: 100%;

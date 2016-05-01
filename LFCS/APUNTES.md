@@ -577,7 +577,6 @@ http://www.tecmint.com/change-modify-linux-kernel-runtime-parameters/
 
 http://www.tecmint.com/linux-basic-shell-scripting-and-linux-filesystem-troubleshooting/
 
-
 ### Manage the startup process and services
 
 http://www.tecmint.com/linux-boot-process-and-manage-services/
@@ -618,7 +617,13 @@ http://www.tecmint.com/manage-users-and-groups-in-linux/
 ### Configure anonymous-only download on FTP servers
 ### Provide/configure network shares via NFS
 
+```console
+sudo apt-get install nfs-common nfs-kernel-server
+sudo systemctl start nfs-kernel-server
+```
+
 http://www.tecmint.com/mount-filesystem-in-linux/
+https://help.ubuntu.com/community/SettingUpNFSHowTo
 
 ### Provide/configure network shares via CIFS
 ### Configure email aliases

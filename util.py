@@ -262,3 +262,15 @@ def find_text(soup,r):
         if r.match(p.get_text()):
             rt.append(p)
     return rt
+
+def h_to_a(soup,h,ct):
+	t=h.get_text().strip()
+	i=sp.sub("-",t).lower()
+	if ct:
+		i=i+"-"+str(ct)
+	a=soup.new_tag("a")
+	a.string=t
+	a.attrs["href"]="#"+i
+	h.attrs["id"]=i
+	h.clear()
+	h.append(a)
