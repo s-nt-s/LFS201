@@ -117,6 +117,13 @@ Adicionalmente, para algunos casos usare
 en otra maquina virtual y con una configuración similar a la ya
 detallada en los pasos anteriores
 
+**BONUS: Red interna**
+
+Para algunos ejercicios en los que quiero conectar varias maquinas
+virtuales entre si hago esto: https://www.youtube.com/watch?v=lhOY-KilEeE
+http://superuser.com/questions/119732/how-to-do-networking-between-virtual-machines-in-virtualbox
+(*con debian 8 no funcionaba, he tenido que hacerlo entre un ubuntu y un lubuntu*)
+
 # Temario
 
 Fuente: [training.linuxfoundation.org/certification/lfcs](https://training.linuxfoundation.org/certification/lfcs#examDetails)
@@ -617,13 +624,87 @@ http://www.tecmint.com/manage-users-and-groups-in-linux/
 ### Configure anonymous-only download on FTP servers
 ### Provide/configure network shares via NFS
 
+En el servidor:
+
 ```console
-sudo apt-get install nfs-common nfs-kernel-server
-sudo systemctl start nfs-kernel-server
+me@ubu ~ $ sudo apt-get install nfs-common nfs-kernel-server
+me@ubu ~ $ mkdir nfsshare
+me@ubu ~ $ sudo bash -c 'echo "/home/me/nfsshare 10.13.13.101(rw,sync,no_root_squash)" >> /etc/exports'
+me@ubu ~ $ sudo service nfs-kernel-server start
+```
+
+En el cliente:
+
+```console
+me@lub ~ $ sudo apt-get install nfs-common
+me@lub ~ $ showmount -e 10.13.13.102
+Export list for 10.13.13.102:
+/home/me/nfsshare 10.13.13.101
+me@lub ~ $ sudo mkdir /mnt/nfsshare
+me@lub ~ $ sudo mount -t nfs 10.13.13.102:/home/me/nfsshare /mnt/nfsshare
+me@lub ~ $ sudo bash -c 'echo "10.13.13.102:/home/me/nfsshare /mnt/nfsshare  nfs defaults 0 0" >> /etc/fstab'
+```
+
+BONUS: Samba
+
+En el servidor:
+
+```console
+me@ubu ~ $ sudo apt-get install samba-client samba-common cifs-utils
+me@ubu ~ $ sudo nano /etc/samba/smb.conf
+[share]
+    comment = Ubuntu File Server Share
+    path = /home/me/smb    
+    browsable = yes
+    guest ok = yes
+    read only = no
+    create mask = 0755
+me@ubu ~ $ mkdir smb
+me@ubu ~ $ sudo chown nobody:nogroup smb
+me@ubu ~ $ sudo service smbd restart
+smbd stop/waiting
+smbd start/running, process 4978
+me@ubu ~ $ sudo service nmbd restart
+nmbd stop/waiting
+nmbd start/running, process 5015
+```
+
+En el cliente
+
+```console
+me@lub ~ $ sudo apt-get install samba-client samba-common cifs-utils
+me@lub ~ $ smbclient -L 10.13.13.102
+me@lub ~ $ smbclient -L 10.13.13.102
+WARNING: The "syslog" option is deprecated
+Enter me's password: 
+Domain=[WORKGROUP] OS=[Windows 6.1] Server=[Samba 4.3.8-Ubuntu]
+
+	Sharename       Type      Comment
+	---------       ----      -------
+	print$          Disk      Printer Drivers
+	share           Disk      Ubuntu File Server Share
+	IPC$            IPC       IPC Service (ubu server (Samba, Ubuntu))
+Domain=[WORKGROUP] OS=[Windows 6.1] Server=[Samba 4.3.8-Ubuntu]
+
+	Server               Comment
+	---------            -------
+	UBU                  ubu server (Samba, Ubuntu)
+
+	Workgroup            Master
+	---------            -------
+	WORKGROUP            
+me@lub ~ $ sudo mkdir /mnt/samba
+me@lub ~ $ sudo chown me:me /mnt/samba
+me@lub ~ $ echo "username=samba_username" > /mnt/samba/.smbcredentials
+me@lub ~ $ echo "password=samba_password" >> /mnt/samba/.smbcredential
+me@lub ~ $ chmod 600 /mnt/samba/.smbcredentials
+me@lub ~ $ sudo bash -c 'echo "//10.13.13.102/share /mnt/samba cifs credentials=/mnt/samba/.smbcredentials,defaults 0 0" >> /etc/fstab'
+me@lub ~ $ sudo mount //10.13.13.102/share
 ```
 
 http://www.tecmint.com/mount-filesystem-in-linux/
 https://help.ubuntu.com/community/SettingUpNFSHowTo
+https://help.ubuntu.com/12.04/serverguide/samba-fileserver.html
 
 ### Provide/configure network shares via CIFS
 ### Configure email aliases
