@@ -744,6 +744,66 @@ http://www.tecmint.com/manage-and-create-lvm-parition-using-vgcreate-lvcreate-an
 ### Add new partitions, and logical volumes
 ### Assemble partitions as RAID devices
 
+Muy importante usar el tipo `fd` (ver abajo), sino el raid no se montara
+al iniciar el equipo aunque este configurado `/etc/fstab`
+
+```console
+me@lub ~ $ sudo fdisk /dev/sdb
+Orden (m para obtener ayuda): n
+Tipo de partición:
+   p primaria (0 primaria, 0 extendida, 4 libre)
+   e extendido
+Seleccione (predeterminado p): 
+Uso predeterminado de la respuesta p
+Número de partición (1-4, valor predeterminado 1): 
+Se está utilizando el valor predeterminado 1
+Primer sector (2048-20479, valor predeterminado 2048): 
+Se está utilizando el valor predeterminado 2048
+Último sector, +sectores o +tamaño{K,M,G} (2048-20479, valor predeterminado 20479): 
+Se está utilizando el valor predeterminado 20479
+
+Orden (m para obtener ayuda): t
+Se ha seleccionado la partición 1
+Código hexadecimal (escriba L para ver los códigos): fd
+Se ha cambiado el tipo de sistema de la partición 1 por fd (Linux raid autodetect)
+
+Orden (m para obtener ayuda): p
+
+Disco /dev/sdd: 10 MB, 10485760 bytes
+71 cabezas, 5 sectores/pista, 57 cilindros, 20480 sectores en total
+Unidades = sectores de 1 * 512 = 512 bytes
+Tamaño de sector (lógico / físico): 512 bytes / 512 bytes
+Tamaño E/S (mínimo/óptimo): 512 bytes / 512 bytes
+Identificador del disco: 0x391538bc
+
+Dispositivo Inicio    Comienzo      Fin      Bloques  Id  Sistema
+/dev/sdd1            2048       20479        9216   fd  Linux raid autodetect
+
+Orden (m para obtener ayuda): w
+¡Se ha modificado la tabla de particiones!
+
+Llamando a ioctl() para volver a leer la tabla de particiones.
+Se están sincronizando los discos.
+
+me@lub ~ $ sudo fdisk /dev/sdc
+...
+me@lub ~ $ sudo mdadm --create /dev/md0 --level=1 --raid-disks=2 /dev/sdb1 /dev/sdc1
+me@lub ~ $ sudo mkfs.ext4 /dev/md0
+me@lub ~ $ sudo mdadm --detail --scan
+ARRAY /dev/md0 metadata=1.2 name=lub:0 UUID=d57fb9f6:0eb21ac7:d23f8d55:f4e810e3
+me@lub ~ $ sudo bash -c "mdadm --detail --scan >> /etc/mdadm/mdadm.conf"
+me@lub ~ $ sudo mkdir /myraid
+me@lub ~ $ sudo bash -c "echo '/dev/md0 /myraid ext4 defaults 0 2' >> /etc/fstab"
+```
+
+Si un disco tiene problemas (por ejemplo `sdc1`):
+
+1. Añadimos un disco de reserva `sudo mdadm /dev/md0 --add /dev/sdd1`
+2. Marcamos el disco defectuoso `sudo mdadm /dev/md0 --fail /dev/sdc1`
+3. Eliminamos el disco defectuoso `sudo mdadm /dev/md0 --remove /dev/sdc1`
+
+Esto hará que el disco de reserva (`sdd1`) pase a ocupar el puesto del defectuoso (`sdc1`).
+
 http://www.tecmint.com/creating-and-managing-raid-backups-in-linux/
 
 ### Configure systems to mount standard, encrypted, and network file systems on demand
