@@ -29,6 +29,10 @@ urls=[
 	"http://www.tecmint.com/monitor-linux-processes-and-set-process-limits-per-user/",
 	"http://www.tecmint.com/change-modify-linux-kernel-runtime-parameters/",
 	"http://www.tecmint.com/set-access-control-lists-acls-and-disk-quotas-for-users-groups/",
+	"http://www.tecmint.com/install-cygwin-to-run-linux-commands-on-windows-system/",
+	"http://www.tecmint.com/setup-ftp-anonymous-logins-in-linux/",
+	"http://www.tecmint.com/setup-recursive-caching-dns-server-and-configure-dns-zones/",
+	"http://www.tecmint.com/mandatory-access-control-with-selinux-or-apparmor-linux/",
 
 	"http://www.tecmint.com/installing-network-services-and-configuring-services-at-system-boot/",
 	"http://www.tecmint.com/configure-nfs-server/",
@@ -150,6 +154,13 @@ for url in urls:
 		tt=tt[6:]
 
 	div=soup.find("div", **{"class":"entry-inner"})
+	mas=soup.find("a", **{"class":"nextpostslink"})
+	while mas:
+		soup2=get_url(mas.attrs["href"])
+		mas=soup2.find("a", **{"class":"nextpostslink"})
+		div2=soup2.find("div", **{"class":"entry-inner"})
+		div.append(div2)
+		div2.unwrap()
 
 	if flag==4:
 		i=div.find("p",text=re.compile("\s*Linux Foundation Certified Engineer . Part \d+\s*"))
