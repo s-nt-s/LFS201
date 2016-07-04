@@ -230,6 +230,8 @@ for a in out.findAll("a"):
 		continue
 	if a.attrs["href"] in urls:
 		a.attrs["href"]="#"+a.attrs["href"].split("/")[-2]
+		if "target" in a.attrs:
+			del a.attrs["target"]
 	else:
 		a.attrs["class"]="external"
 		a.attrs["target"]="_blank"
@@ -263,6 +265,11 @@ for h in out.findAll(["h2", "h3", "h4","h5","h6"]):
 for ol in out.findAll("ol"):
 	if ol.parent and ol.parent.name=="ol":
 		ol.unwrap()
+for p in out.findAll("pre"):
+	for s in p.findAll("strong"):
+		if "style" in s.attrs and "class" not in s.attrs:
+			del s.attrs["style"]
+			s.attrs["class"]="resaltar"
 
 html = util.get_html(out,True)
 html=html.replace(u"–","-")

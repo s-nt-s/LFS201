@@ -190,7 +190,7 @@ Más: [www.tecmint.com - vi](http://www.tecmint.com/vi-editor-usage/)
 
 ### Use input-output redirection (e.g. >, >>, |, 2>)
 
-* Entraada estanadar = tipo 0
+* Entrada estanadar = tipo 0
 * Salida estanadar = tipo 1
 * Error estandar = tipo 2
 
@@ -302,6 +302,7 @@ otros ejemplos:
 
 Más: [www.linuxtotal.com.mx](http://www.linuxtotal.com.mx/?cont=info_admon_014)
 y [www.formandome.es](http://www.formandome.es/linux/configuracion-fichero-sudoers-en-ubuntu/)
+http://www.tecmint.com/su-vs-sudo-and-how-to-configure-sudo-in-linux/
 
 ## Operation of Running Systems - 20%
 
@@ -530,7 +531,8 @@ Más: [www.alcancelibre.org](http://www.alcancelibre.org/staticpages/index.php/c
 
 * `cron` manda un email a la dirección del campo `MAILTO` o al usuario
 que ejecuta el comando
-* Para que `cron` genere logs no debe estar activada la opción `-L 0` en `/etc/default/cron`
+* La linea `EXTRA_OPTS="-L 0"` en `/etc/default/cron` define el nivel de log: 
+siendo 0 nada de log, 1 log normal y 2 log detallado
 * Si no sabemos en que log escribe lo podemos buscar con `sudo grep -icr CRON /var/log/* | grep -v :0`
 * En `ubuntu` probablemente nos interese `/var/log/syslog`
 
@@ -542,7 +544,7 @@ Más: [bencane.com](http://bencane.com/2011/11/02/did-my-cronjob-run/)
 `sudo apt-get update` +:
 
 * `sudo apt-get upgrade` actualiza todo lo que se pueda actualizar sin tener que resolver conflictos (nunca eliminara paquetes)
-* `sudo apt-get dist-upgrade` actualiza intentando resolver conflictos si los hubiera (puede que elimine paquete)
+* `sudo apt-get dist-upgrade` actualiza intentando resolver conflictos si los hubiera (puede que elimine algún paquete)
 
 Más: http://www.tecmint.com/linux-package-management/
 http://www.tecmint.com/useful-basic-commands-of-apt-get-and-apt-cache-for-package-management/
@@ -574,13 +576,35 @@ Un mensaje no siempre es un error (por ejemplo, un fichero de configuración mod
 
 ### Verify the integrity and availability of key processes
 
+* `mpstat` muestra el uso de los procesadores. Ejemplo: `mpstat -P ALL -u 2 3`
+* `ps` da información detallada de cada proceso. Elmplo `ps -eo pid,ppid,cmd,%cpu,%mem --sort=-%cpu`
+* `kill` y `pkill` para matar procesos
+* `pgrep` para buscar procesos al estilo de `pkill` pero sin matarlos
+
 Más: [www.tecmint.com](http://www.tecmint.com/monitor-linux-processes-and-set-process-limits-per-user/)
 
 ### Change kernel runtime parameters, persistent and non-persistent
 
+`/proc/sys` y `sysctl` muestran y permiten editar opciones del sistema
+
+* `sysctl dev.cdrom.autoclose` = `cat /proc/sys/dev/cdrom/autoclose`
+* `echo 0 > /proc/sys/net/ipv4/ip_forward` = `sysctl -w net.ipv4.ip_forward=0`
+* Para que el cambio sea persistente añadir la linea `net.ipv4.ip_forward=0` en `/etc/sysctl.conf`
+(o usar ficheros .conf en `/etc/sysctl.d`)
+* `sysctl -p` aplica los valores de `/etc/sysctl.conf`
+
+`sudo modprobe -a ip_tables` carga iptables de manera no persistente.
+Para hacerlo persistente añadir una linea que diga `ip_tables` en el
+fichero `/etc/modules`
+
 http://www.tecmint.com/change-modify-linux-kernel-runtime-parameters/
 
 ### Use scripting to automate system maintenance tasks
+
+* `shebang` es la primera linea de un script, la cual empieza por `#!`, 
+que indica el interprete con que ejecutar dicho script. Ejemplo: `#!/bin/bash`
+* `chmod 755 myscript.sh` para que el script sea ejecutable
+* `$?` da el código de salida del último comando ejecutado (0 = OK)
 
 http://www.tecmint.com/linux-basic-shell-scripting-and-linux-filesystem-troubleshooting/
 
@@ -708,6 +732,12 @@ https://help.ubuntu.com/12.04/serverguide/samba-fileserver.html
 
 ### Provide/configure network shares via CIFS
 ### Configure email aliases
+
+* `/etc/aliases` + `newaliases`, o
+* `/etc/postfix/aliases` + `postalias /etc/postfix/aliases`
+
+La 1º opción si me funciono, la seguna no.
+
 ### Configure SSH servers and clients
 ### Configure SSH-based remote access using public/private key pairs
 ### Restrict access to the HTTP proxy server

@@ -106,3 +106,6 @@ a.external {
     background-repeat: no-repeat;
     padding-right: 15px;
 }
+pre .resaltar {
+	color:red;
+}
