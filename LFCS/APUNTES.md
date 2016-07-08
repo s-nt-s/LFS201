@@ -610,9 +610,48 @@ http://www.tecmint.com/linux-basic-shell-scripting-and-linux-filesystem-troubles
 
 ### Manage the startup process and services
 
+MBR:
+
+* Backup `dd if=/dev/sda of=mbr.bkp bs=512 count=1`
+* Restaurar `dd if=mbr.bkp of=/dev/sda bs=512 count=1`
+
+GRUB:
+
+* Editar `/etc/default/grub`
+* Actualizar `update-grub`
+
+SysVinit:
+
+* Runleves de 0 a 5
+* Runlevel por defecto en `/etc/inittab`
+* Scripts ejecutacos en cada runlevel `ls /etc/rc*.d` (`S` de start y `K` de kill)
+* Configurar con `chkconfig` o `sysv-rc-conf`
+* `service [servicio] start|stop|status` arranca, para y muestra estado de un servicio
+
+systemd:
+
+* `systemctl` sin parametros lista los servicios y cia. (unidades)
+* `systemctl status [unit]` muestra el estado de una unidad
+* `systemctl start [unit]` arranca una unidad
+* `systemctl stop [unit]` para una unidad
+* `systemctl restart [unit]` reinicia una unidad
+* `systemctl enable [unit]` deshabilita una unidad (se arrancara al inicio de sistema)
+* `systemctl disable [unit]` habilita una unidad (no se arrancara al inicio del sistema)
+* `systemctl is-enabled [unit]` muestra si esta habilitado para arrancar al inicio del sistema
+
+Upstart:
+
+* Ficheros de configuración (.conf) en `/etc/init`
+* `initctl reload-configuration` recarga la configuración
+* `sudo start [servicio]`  arranca un servicio
+
 http://www.tecmint.com/linux-boot-process-and-manage-services/
 
 ### List and identify SELinux/AppArmor file and process contexts
+
+
+http://www.tecmint.com/mandatory-access-control-with-selinux-or-apparmor-linux/
+
 ### Configure and modify SELinux/AppArmor policies
 ### Install software from source
 
