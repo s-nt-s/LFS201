@@ -647,13 +647,144 @@ Upstart:
 
 http://www.tecmint.com/linux-boot-process-and-manage-services/
 
-### List and identify SELinux/AppArmor file and process contexts
+### List and identify SELinux/AppArmor file and process contexts<br/>Configure and modify SELinux/AppArmor policies
 
+AppArmor y SELinux no pueden estar arrancados a la vez.
+
+**SELinux**:
+
+Instalar SELinux con `sudo apt-get install policycoreutils selinux-utils auditd` 
+y para habilitarlo ejecutar `sudo selinux-activate`
+
+SELinux tiene tres modos:
+
+* Disabled: no hace nada
+* `setenforce 1` Enforcing: Deniega el acceso si no se cumplen las reglas
+* `setenforce 0` Permissive: No deniega el acceso si no se cumplen las reglas, simplemente genera un log
+
+`setenforce` no es persistente, para que el cambio sea permanente hay
+que editar `/etc/selinux/config` poniendo por ejemplo `SELINUX=enforcing`
+
+Los logs se pueden leer con `grep AVC /var/log/audit/audit.log`
+
+SELinux usa tres concetos fundamentales:
+
+* Contextos: Son etiquetas a archivos, procesos y puertos. Ejemplos de contextos son usuarios de SELinux, rol y tipo.
+* Reglas: Describe el control de acceso en términos de contextos, procesos, archivos, puertos, usuarios, etc.
+* Políticas: Son un conjunto de reglas que describen las decisiones de control de acceso aplicables a todo el sistema, las que deberían ser aplicadas por SELinux.
+
+El parametro `Z` en `ps axZ` y `ls -Z` muestra los contextos.
+
+`sudo semanage boolean -l` muestra los booleanos de las políticas y 
+`setsebool` cambia dichos booleanos, por defecto de manera no persistente
+y con el parametro `-P` de manera persistente.
+
+```console
+me@deb ~ $ getsebool ssh_chroot_rw_homedirs
+ssh_chroot_rw_homedirs --> off
+me@deb ~ $ sudo setsebool ssh_chroot_rw_homedirs on
+me@deb ~ $ getsebool ssh_chroot_rw_homedirs
+ssh_chroot_rw_homedirs --> on
+```
+
+Habilitar el puerto 9999 para ssh:
+
+```console
+me@deb ~ $ sudo semanage port -l | grep ssh
+ssh_port_t               tcp       22
+me@deb ~ $ sudo semanage port -m -t ssh_port_t -p tcp 9999
+jboss_management_port_t  tcp       4712, 4447, 7600, 9123, 9990, 9999, 18001
+me@deb ~ $ sudo semanage port -lC
+SELinux Prot Type         Proto    Port Number
+
+ssh_port_t                tcp      9999
+me@deb ~ $ sudo semanage port -l | grep ssh
+ssh_port_t                tcp      9999, 22
+```
+
+Habilitar DocumentRoot fuera de `/var/www/html/`:
+
+```console
+me@deb ~ $ sudo semanage fcontext -a -t httpd_sys_content_t "/websrv/sites/gabriel/public_html(/.*)?"
+me@deb ~ $ sudo restorecon -R -v /websrv/sites/gabriel/public_html
+```
+
+**AppArmor**:
+
+Instalar AppArmor con `sudo apt-get install apparmor apparmor-utils`
+
+AppArmor se basa en perfiles y cada uno de ellos puede estar en dos estados:
+
+* Enforcing: Deniega el acceso si no se cumplen las reglas
+* Complain: No deniega el acceso si no se cumplen las reglas, simplemente genera un log
+
+Para trabajar con los perfiles tenemos:
+
+* `sudo apparmor_status` muestra el estado de AppArmor
+* Los perfiles se guardan en `/etc/apparmor.d`
+* Los perfiles con un enlace blando en `/etc/apparmor.d/disabled` estan deshabilitados
+* Se pueden conseguir más perfiles con `sudo apt-get install apparmor-profiles`
+* `sudo aa-complain /path/to/file` pasa un perfil a complain mode
+* `sudo aa-enforce /path/to/file` pasa un perfil a enforce mode
+
+Para deshabilitar AppArmor:
+
+* `sudo systemctl stop apparmor.service` o
+* `sudo update-rc.d -f apparmor remove`
+
+editar `/etc/default/grub` para poner `apparmor=0` en `GRUB_CMDLINE_LINUX` 
+y ejecutar `sudo update-grub`
 
 http://www.tecmint.com/mandatory-access-control-with-selinux-or-apparmor-linux/
+https://wiki.debian.org/SELinux/Notes
+https://wiki.archlinux.org/index.php/AppArmor
 
-### Configure and modify SELinux/AppArmor policies
 ### Install software from source
+
+Ejemplo con pidgin:
+
+```console
+me@lub /tmp $ sudo apt-get install build-essential
+...
+me@lub /tmp $ wget http://downloads.sourceforge.net/project/pidgin/Pidgin/2.11.0/pidgin-2.11.0.tar.bz2
+...
+me@lub /tmp $ tar -xjvf pidgin-2.11.0.tar.bz2
+me@lub /tmp $ cd pidgin-2.11.0/
+me@lub /tmp/pidgin-2.11.0 $ ./configure 
+...
+checking whether NLS is requested... yes
+./configure: line 14338: intltool-update: command not found
+checking for intltool-update... no
+checking for intltool-merge... no
+checking for intltool-extract... no
+configure: error: The intltool scripts were not found. Please install intltool.
+me@lub /tmp/pidgin-2.11.0 $ sudo apt-get install intltool
+...
+me@lub /tmp/pidgin-2.11.0 $ ./configure
+...
+configure: error: 
+
+You must have GLib 2.16.0 or newer development headers installed to build.
+
+If you have these installed already you may need to install pkg-config so
+I can find them.
+me@lub /tmp/pidgin-2.11.0 $ sudo apt-get install pkg-config libglib2.0-dev libgtk2.0-dev libgtkspell-dev libavahi-client-dev libavahi-glib-dev libdbus-glib-1-dev libgstreamer0.10-dev tk8.4-dev tcl8.4-dev libperl-dev network-manager-dev libmeanwhile-dev libidn11-dev libnss3-dev
+...
+me@lub /tmp/pidgin-2.11.0 $ ./configure --disable-screensaver --disable-vv
+...
+Pidgin will be installed in /usr/local/bin.
+configure complete, now type 'make'
+
+me@lub /tmp/pidgin-2.11.0 $ sudo make
+...
+me@lub /tmp/pidgin-2.11.0 $ sudo make install
+...
+me@lub /tmp/pidgin-2.11.0 $ pidgin --version
+Pidgin 2.11.0 (libpurple 2.10.9)
+
+```
+
+http://www.howtogeek.com/105413/how-to-compile-and-install-from-source-on-ubuntu/
 
 ## User and Group Management - 15%
 
