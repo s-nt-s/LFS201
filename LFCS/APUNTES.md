@@ -788,8 +788,34 @@ http://www.howtogeek.com/105413/how-to-compile-and-install-from-source-on-ubuntu
 
 ## User and Group Management - 15%
 
-### Create, delete, and modify local user accounts
-### Create, delete, and modify local groups and group memberships
+### Create, delete, and modify local user accounts<br/>Create, delete, and modify local groups and group memberships
+
+* `userad` para añadir un usuario
+* `usermod` modifica un usuario
+* `userdel` borrar usuario
+* `groupdel` borrar grupo
+* `groupadd` para añadir un grupo
+* `gropmod` modifica un grupo
+
+Por cada usuario y grupo se crea una linea en `/etc/passwd` y ` /etc/group` respectivamente
+
+Ejemplos:
+
+* `useradd -s /bin/csh -m -k /etc/skel -c "Bullwinkle J Moose" bmoose`
+* `usermod --expiredate 2014-10-30 tecmint`
+* `usermod --append --groups root,users tecmint`
+* `usermod --home /tmp tecmint`
+* `usermod --shell /bin/sh tecmint`
+* `usermod --lock tecmint`
+* `usermod --unlock tecmint`
+* `chage -E 2014-09-11 isabelle`
+* `sudo passwd kevin`
+* `chage -l me`
+* `useradd -m -s /bin/bash miusuario`
+* `usermod -Ga sudo miusuario`
+
+Sustituir la contraseña por `!` en `/etc/shadow` bloquea el usuario, el cual
+podemos editar usando `sudo vipw`
 
 http://www.tecmint.com/manage-users-and-groups-in-linux/
 
