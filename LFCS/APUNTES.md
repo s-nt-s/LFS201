@@ -820,6 +820,62 @@ podemos editar usando `sudo vipw`
 http://www.tecmint.com/manage-users-and-groups-in-linux/
 
 ### Manage system-wide environment profiles
+
+En `/etc/environment` vienen definidas variables que afectan a todo el sistema, 
+como por ejemplo PATH
+
+Otras variables de entorno:
+
+* HOME = home del usuario actual
+* USER = nick del usuario actual
+* SHELL = shell actual
+* PS1 = Define como se ve el prompt de la shell actual
+* EDITOR = editor de texto preferido
+* LD_LIBRARY_PATH = Directorios donde se encuentran las librerias
+* ? = código de salida del último comando ejecutado
+
+Escribir en la shell algo como `VARIABLE=valor` no crea una varible de entorno
+si no una variable shell ya que solo afectara a la shell actual.
+Para que esta varaible shell se convierta en una variable de entorno es necesario
+exportarla.
+Podemos usar `echo` para ver el contenido de una variable.
+
+
+```console
+me@lub ~ $ EDITOR=nano
+me@lub ~ $ export EDITOR
+me@lub ~ $ echo $EDITOR
+nano
+```
+
+* `printenv` muestra todas las variables de entorno y su contenido.
+* `env VAR=xxx programa`o `LANGUAGE=he FOO=bar gedit` ejecuta un programa modificando las variables de entorno
+que va a usar.
+* `unset VAR` elimina una variable
+* `export -n VAR` "desexporta" una variable, es decir, deja de ser variable de entorno pero sigue siendo variable shell
+
+Al se arranca la shell bash de un usuario procesa:
+
+* `/etc/profile` para leer los valores definidos para todos los usuarios
+* Adicionalmente `/etc/profile.d/*.sh` seran ejecutados en cualquier login
+* `~/.bash_profile`, ~/.bash_login` y `~/.profile`, para leer los valores definidos para ese usuario en concreto
+
+Otros ficheros a tener en cuenta:
+
+`/etc/bash.bashrc` valido para programas ejecutados desde la shell, pero puede 
+no surtir efecto con programas ejecutados desde el entorno gráfico-
+
+Los comando ejecutados con `sudo` tienen sus propias variables de entorno, indicadas
+en `/etc/sudoers`. Si se quiere que no se sobreescriba o pierda alguna variable
+hay que editar dicho fichero para añadir una linea de este tipo:
+
+```
+Defaults env_keep += "http_proxy SOMEOTHERVARIABLES ANOTHERVARIABLE ETC"
+```
+
+https://wiki.debian.org/EnvironmentVariables
+https://help.ubuntu.com/community/EnvironmentVariables
+
 ### Manage template user environment
 ### Configure user resource limits
 ### Manage user processes
