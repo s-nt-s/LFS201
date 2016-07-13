@@ -580,6 +580,7 @@ Un mensaje no siempre es un error (por ejemplo, un fichero de configuración mod
 * `ps` da información detallada de cada proceso. Elmplo `ps -eo pid,ppid,cmd,%cpu,%mem --sort=-%cpu`
 * `kill` y `pkill` para matar procesos
 * `pgrep` para buscar procesos al estilo de `pkill` pero sin matarlos
+* `sar` da estadisticas del sistema
 
 Más: [www.tecmint.com](http://www.tecmint.com/monitor-linux-processes-and-set-process-limits-per-user/)
 
@@ -877,9 +878,22 @@ https://wiki.debian.org/EnvironmentVariables
 https://help.ubuntu.com/community/EnvironmentVariables
 
 ### Manage template user environment
+
+*no tengo claro a que se refiere*
+
 ### Configure user resource limits
+
+Podemos definir los limites por usuario en `/etc/security/limits.conf`
+
+http://www.tecmint.com/monitor-linux-processes-and-set-process-limits-per-user/ -> Setting Resource Limits on a Per-User Basis in Linux
+
 ### Manage user processes
+
+*creo que se repite con otros apartados sobre `ps`, `kill`, `nice`, etc*
+
 ### Configure PAM
+
+http://www.tecmint.com/manage-users-and-groups-in-linux/ -> PAM (Pluggable Authentication Modules)
 
 ## Networking - 15%
 
