@@ -1148,7 +1148,7 @@ http://www.tecmint.com/setup-linux-as-router/
 
 `quagga` sirve para ruteo dinamico.
 
-Router: Debian Wheezy 7.7 eth0: Public IP, router getaway 192.168.0.1, eth1: 10.0.0.15/24
+Router: Debian Wheezy 7.7 eth0: Public IP, router getaway 192.168.0.1, eth1: 10.0.0.15/24  
 Client: openSUSE 13.2 enp0s3: 10.0.0.18/24
 
 En `/etc/quagga/daemons`:
@@ -1177,9 +1177,9 @@ password    	contraseña
 
 Ejecutamos `service quagga restart`
 
-Teniendo dos maquinas:
-dev2: 192.168.0.15, 10.0.0.15
-dev3: 192.168.1.1,  10.0.0.16
+Teniendo dos maquinas:  
+dev2: 192.168.0.15, 10.0.0.15  
+dev3: 192.168.1.1,  10.0.0.16  
 
 En cada una de ellas:
 
