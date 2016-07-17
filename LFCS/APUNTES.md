@@ -893,17 +893,351 @@ http://www.tecmint.com/monitor-linux-processes-and-set-process-limits-per-user/ 
 
 ### Configure PAM
 
+Los ficheros de configuración estan en `/etc/pam.d/`.
+
+Cada línea de uno de estos ficheros tiene la estructura:
+
+```
+type control module-path module-arguments
+```
+
+donde, `type` especifica el grupo de gestión al que el módulo estará asociado:
+
+* auth: Le indica a la aplicación que debe pedir la identificación del usuario (nombre de usuario, contraseña, etc). Puede configurar las credenciales y otorgar privilegios.
+* account: Verifica aspectos de la cuenta del usuario, tales como envejecimiento de la contraseña, control de acceso, etc.
+* password: Es responsable de actualizar el token de autenticación del usuario, generalmente una contraseña.
+* session: Se usa para proveer funciones antes y después de que se establece la sesión (tales como la configuración del ambiente, inicio de sesión, etc).
+
+` control` controla cómo el éxito o fracaso de un módulo afecta el proceso general de autenticación:
+
+* required: Debe devolver éxito para que el servicio se otorgue. Si es parte de un conjunto, el resto de módulos serán ejecutados. No se le informa a la aplicación qué módulo o módulos fallaron.
+* requisite: Igual a required, con la excepción de que una falla en cualquier módulo termina el stack (conjunto de módulos) y devuelve un estado, el cual se envía a la aplicación.
+* optional: El módulo no es requerido. Si este es el único módulo, el estado que se envía a la aplicación puede causar una falla.
+* sufficient: Si este módulo termina con éxito no hay módulos subsecuentes a ser ejecutados. Si este falla, no causa una falla general en el resto de módulos, a menos de que sea el único módulo del stack.
+* include: significa que las lineas dadas por el type deben ser leidas de otro archivo
+substack: similar a includes pero los fallos o exitos del fichero incluido no provocan la salida del modulo, solo del substack.
+
 http://www.tecmint.com/manage-users-and-groups-in-linux/ -> PAM (Pluggable Authentication Modules)
 
 ## Networking - 15%
 
 ### Configure networking and hostname resolution statically or dynamically
+
+* Resolución de nombres estaticamente: `/etc/hosts
+* Resolución de nombres dinamicamente: DNS
+
+http://www.tecmint.com/setup-recursive-caching-dns-server-and-configure-dns-zones/
+
 ### Configure network services to start automatically at boot
-### Implement packet filtering
-### Configure firewall settings
+
+`sysv-rc-conf` o `update-rc.d servicio defaults` p `chkconfig --level runlevel servicio on`
+
+http://www.tecmint.com/installing-network-services-and-configuring-services-at-system-boot/
+
+### Implement packet filtering<br/>Configure firewall settings
+
+`firewalld` o `iptables`, pero no se debe usar los dos a la vez.
+
+**iptables**
+
+* Tiene la configuración en `/etc/iptables/rules.v*`
+* `iptables -L` lista todas las reglas habitlitadas
+* Las cadenas son: INPUT, OUTPUT, FORWARD
+* Las politicas son: ACCEPT, DROP, REJECT
+* `iptables -P FORWARD DROP` define la politica DROP para la cadena FORWARD, es decir, los paquetes que no cumplan ninguna regla de FORWARD se les aplicara la politica DROP
+* `iptables -F INPUT` elimina todas las reglas de INPUT
+* Añadir regla: `iptables -A cadena criterio -j politica`:
+  
+
+Ejemplo 1: Permitir entrada y salida de trafico web
+
+```console
+me@ubu ~ $ sudo iptables -A INPUT -i enp0s3 -p tcp --dport 80 -m state --state NEW,ESTABLISHED -j ACCEPT
+me@ubu ~ $ sudo iptables -A OUTPUT -o enp0s3 -p tcp --sport 80 -m state --state ESTABLISHED -j ACCEPT
+me@ubu ~ $ sudo iptables -A INPUT -i enp0s3 -p tcp --dport 443 -m state --state NEW,ESTABLISHED -j ACCEPT
+me@ubu ~ $ sudo iptables -A OUTPUT -o enp0s3 -p tcp --sport 443 -m state --state ESTABLISHED -j ACCEPT
+```
+
+Ejemplo 2: Bloquear trafico entrante desde una red espeficica
+
+DROP todo el trafico que venga desde 192.168.1.0/24:
+
+```console
+me@ubu ~ $ sudo iptables -I INPUT -s 192.168.1.0/24 -j DROP
+```
+
+DROP solo el trafico que venga de 192.168.1.0/24 por el puerto 22:
+
+```console
+me@ubu ~ $ iptables -A INPUT -s 192.168.1.0/24 --dport 22 -j ACCEPT
+```
+
+Ejemplo 3: Redirigir trafico entrate a otro destino
+
+1. Editamos `/etc/sysctl.conf` para poner `net.ipv4.ip_forward = 1`
+2. Refrescamos la configuración con `sysctl -p /etc/sysctl.conf`
+3. Redirigimos el trafico entrante por el purto 631 a 192.168.0.10:631
+
+```console
+me@ubu ~ $ sudo iptables -t nat -A PREROUTING -i enp0s3 -p tcp --dport 631 -j DNAT --to 192.168.0.10:631
+```
+
+Ejemplo 4: Bloquear ping entrante
+
+```console
+me@ubu ~ $ sudo iptables -A INPUT --protocol icmp --in-interface eth0 -j DROP
+```
+
+Ejemplo 5: Deshabilitar/rehabilitar ssh logins desde dev2 a dev1
+
+```console
+me@ubu ~ $ sudo iptables -A OUTPUT --protocol tcp --destination-port 22 --out-interface eth0 --jump REJECT
+```
+
+Ejemplo 6: Permitir/prohibir a clientes NFS (de 192.168.0.0/24) motar unidades NFS4 compartidas
+
+```console
+me@ubu ~ $ sudo iptables -A INPUT -i eth0 -s 0/0 -p tcp --dport 2049 -j REJECT
+me@ubu ~ $ sudo iptables -A INPUT -i eth0 -s 0/0 -p tcp --dport 111 -j REJECT
+```
+
+Otros ejemplos:
+
+* Insertar en la posición 2 de INPUT: `iptables -I INPUT 2 -p tcp --dport 80 -j ACCEPT`
+* BORRAR la regla 1 de INPUT: `iptables -D INPUT 1`
+* Mostrar las reglas con número de linea: `iptables -nL -v --line-number`
+* Remplaza la regla 2 de INPUT: `iptables -R INPUT 2 -i eth0 -s 0/0 -p tcp --dport 2049 -j REJECT`
+* `iptables-save > /etc/iptables/rules.v4` guardar las reglas para que se cargen al reiniciar (si iptables-persistent esta instalado)
+* Cargar manualmente las reglas guardadas `iptables-restore < /etc/iptables/rules.v4`
+
+**FirewallD**
+
+Tiene la configuración en `/usr/lib/firewalld/` y `/etc/firewalld/`.
+
+`firewall-cmd --get-active-zones` nos da las zonas activas, es decir, las zonas a las que se les ha asociado "algo"
+
+```console
+me@deb ~ $ sudo firewall-cmd --get-active-zones 
+me@deb ~ $ sudo firewall-cmd --zone=internal --change-interface=eth0
+success
+me@deb ~ $ sudo firewall-cmd --zone=external --change-interface=eth1
+success
+me@deb ~ $ sudo firewall-cmd --get-active-zones 
+internal
+  interfaces: eth0
+external
+  interfaces: eth1
+me@deb ~ $ sudo firewall-cmd --zone=internal --remove-interface=eth0
+success
+me@deb ~ $ sudo firewall-cmd --zone=external --remove-interface=eth1
+success
+me@deb ~ $ sudo firewall-cmd --get-active-zones
+me@deb ~ $
+```
+
+Ejemplo 1: Permitir servicios a traves del firewall
+
+```console
+me@ubu ~ $ sudo firewall-cmd --get-services
+...
+me@ubu ~ $ sudo firewall-cmd --zone=MyZone --add-service=http
+me@ubu ~ $ sudo firewall-cmd --zone=MyZone --permanent --add-service=http
+me@ubu ~ $ sudo firewall-cmd --zone=MyZone --add-service=https
+me@ubu ~ $ sudo firewall-cmd --zone=MyZone --permanent --add-service=https
+me@ubu ~ $ sudo firewall-cmd --reload
+```
+
+Ejemplo 2: Redirigir IP/Puerto
+
+```console
+me@ubu ~ $ sudo firewall-cmd --zone=MyZone --query-masquerade
+no
+me@ubu ~ $ sudo firewall-cmd --zone=MyZone --add-masquerade
+me@ubu ~ $ sudo firewall-cmd --zone=MyZone --add-forward-port=port=631:proto=tcp:toport=631:toaddr=192.168.0.10
+me@ubu ~ $ sudo firewall-cmd --reload
+```
+
+http://www.tecmint.com/configure-iptables-firewall/
+http://www.tecmint.com/firewalld-vs-iptables-and-control-network-traffic-in-firewall/
+
 ### Start, stop, and check the status of network services
+
+* `sudo netstat -atup | grep LISTEN` ver network services arrancados
+* `sudo service servicio (start | stop | status)`
+* `sudo systemctl (start | stop | status) servicio`
+
 ### Statically route IP traffic
+
+El comando básico es `ip objeto comando` donde el objeto puede ser:
+
+* link: dispositivo network
+* addr: dirección del dispositivo (IP o IPv6)
+* route: entrada en la tabla de ruta
+* rule: regla de la base de datos de politicas de rutas
+
+y el comando es uno de los que podemos ver, por ejemplo, haciendo `ip link help`
+
+Ejemplos:
+
+```console
+root@lub:~# ip link show
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN mode DEFAULT group default 
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state UP mode DEFAULT group default qlen 1000
+    link/ether 08:00:27:06:7e:79 brd ff:ff:ff:ff:ff:ff
+root@lub:~# ip link set eth0 down
+root@lub:~# ip link show
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN mode DEFAULT group default 
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+2: eth0: <BROADCAST,MULTICAST> mtu 1500 qdisc pfifo_fast state DOWN mode DEFAULT group default qlen 1000
+    link/ether 08:00:27:06:7e:79 brd ff:ff:ff:ff:ff:ff
+root@lub:~# ip link set eth0 up
+root@lub:~# ip link show eth0
+2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state UP mode DEFAULT group default qlen 1000
+    link/ether 08:00:27:06:7e:79 brd ff:ff:ff:ff:ff:ff
+
+```
+
+Ejemplo 1: Rutear paquetes de una red privada a otra
+
+Cliente 1: CentOS 7 enp0s3: 192.168.0.17/24
+Router: Debian Wheezy 7.7 eth0: 192.168.0.15/24, eth1: 10.0.0.15/24
+Cliente 2: openSUSE 13.2 enp0s3: 10.0.0.18/24
+
+```console
+root@rtr:~# echo 1 > /proc/sys/net/ipv4/ip_forward
+```
+
+```console
+root@cl1:~# ip route add 10.0.0.0/24 via 192.168.0.15 dev enp0s3
+root@cl1:~# ping 10.0.0.18
+```
+
+```console
+root@cl2:~# ip route add 192.168.0.0/24 via 10.0.0.15 dev enp0s3
+root@cl2:~# ping 192.168.0.17
+```
+
+En openSUSE `/etc/sysconfig/network-scripts/ifcfg-enp0s3`:
+
+```
+BOOTPROTO=static
+BROADCAST=10.0.0.255
+IPADDR=10.0.0.18
+NETMASK=255.255.255.0
+GATEWAY=10.0.0.15
+NAME=enp0s3
+NETWORK=10.0.0.0
+ONBOOT=yes
+```
+
+Ejemplo 1: Enrutar paquetes entre red interna e internet
+
+Router: Debian Wheezy 7.7 eth0: Public IP, eth1: 10.0.0.15/24
+Client: openSUSE 13.2 enp0s3: 10.0.0.18/24
+
+```console
+root@cl1:~# iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+root@cl1:~# iptables -A FORWARD -i eth0 -o eth1 -m state --state RELATED,ESTABLISHED -j ACCEPT
+root@cl1:~# iptables -A FORWARD -i eth1 -o eth0 -j ACCEPT
+```
+
+http://www.tecmint.com/setup-linux-as-router/
+
 ### Dynamically route IP traffic
+
+`quagga` sirve para ruteo dinamico.
+
+Router: Debian Wheezy 7.7 eth0: Public IP, router getaway 192.168.0.1, eth1: 10.0.0.15/24
+Client: openSUSE 13.2 enp0s3: 10.0.0.18/24
+
+En `/etc/quagga/daemons`:
+
+```
+zebra=1
+ripd=1
+```
+
+Crear ficheros de configuración
+
+``console
+root@rtr:~# touch /etc/quagga/zebra.conf
+root@rtr:~# touch /etc/quagga/ripd.conf
+root@rtr:~# chown quagga:quaggavty /etc/quagga/*.conf
+root@rtr:~# chmod 640 /etc/quagga/*.conf 
+```
+
+Rellenarlos con:
+
+``
+service quagga restart
+hostname    	usuario
+password    	contraseña
+```
+
+Ejecutamos `service quagga restart`
+
+Teniendo dos maquinas:
+dev2: 192.168.0.15, 10.0.0.15
+dev3: 192.168.1.1,  10.0.0.16
+
+En cada una de ellas:
+
+Conectamos a zebra:
+
+```console
+root@dev2:~# telnet localhost 2601
+...
+DebianRouter> enable
+DebianRouter# configure terminal
+DebianRouter(config)# inter eth0
+DebianRouter(config-if)# ip addr 192.168.0.15/24
+DebianRouter(config-if)# inter eth1
+DebianRouter(config-if)# ip addr 10.0.0.15/24
+DebianRouter(config-if)# exit
+DebianRouter(config)# exit
+DebianRouter# write
+Configuration saved to /etc/quagga/zebra.conf
+```
+
+Conectamos a RIP:
+
+```console
+root@dev2:~# telnet localhost 2602
+...
+DebianRouter> enable
+DebianRouter# configure terminal
+DebianRouter(config)# router rip
+DebianRouter(config-router)# version 2
+DebianRouter(config-router)# network 192.168.0.0/24
+There is a same network configuration 192.168.0.0/24
+DebianRouter(config-router)# network 10.0.0.0/24
+DebianRouter(config-router)# exit
+DebianRouter(config)# exit
+DebianRouter# write
+Configuration saved to /etc/quagga/rip.conf
+```
+
+Al volver a conectar a zebra veremos que los routers han aprendido la ruta de una a otro
+
+```console
+root@dev2:~# telnet localhost 2601
+...
+dev2> **show ip route**
+Codes: K - kernel route, C - connected, S - static, **R - RIP**
+       O - OSPF, I - IS-IS, B - BGP, A - Babel,
+       \> - selected route, * - FIB route
+
+K>* 0.0.0.0/0 via 192.168.0.1, eth0
+C>* 10.0.0.0/24 is directly connected, eth1
+C>* 127.0.0.0/8 is directly connected, lo
+C>* 192.168.0.0/24 is directly connected, eth0
+R>* **192.168.1.10/24 [120/2] via 10.0.0.16, eth1, 00:00:20**
+```
+
+
+http://www.tecmint.com/setup-linux-as-router/
+
 ### Synchronize time using other network peers
 
 ## Service Configuration - 10%
