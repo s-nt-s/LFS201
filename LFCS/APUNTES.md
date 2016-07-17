@@ -1291,7 +1291,105 @@ http://www.pool.ntp.org/es/use.html
 ```console
 me@lub ~ $ sudo apt-get install bind9 bind9utils
 ...
-me@lub ~ $ sudo cp /etc/bind/named.conf /etc/bind/named.conf.orig
+me@lub ~ $ sudo cp /etc/bind/named.conf.options /etc/bind/named.conf.options.orig
+me@lub ~ $ sudo cp /etc/bind/named.conf.local /etc/bind/named.conf.local.orig
+```
+
+Siendo 10.13.13.101 la ip en la red que comparte con otras máquinas, editamos `/etc/bind/named.conf.options`:
+
+```
+options {
+..
+  listen-on port 53 { 127.0.0.1; 10.13.13.101;};
+  allow-query 	{ localhost; 10.13.13.0/24; };
+  recursion yes;
+  forwarders {
+    8.8.8.8;
+    8.8.4.4;
+  };
+...
+}
+```
+
+Luego editamos `/etc/bind/named.conf.local`:
+
+```
+  zone "sales.me.com." IN {
+    type master;
+    file "/var/named/sales.me.com.zone";
+  };
+  zone "13.13.10.in-addr.arpa" IN {
+    type master;
+    file "/var/named/13.13.10.in-addr.arpa.zone";
+  };
+```
+
+Chekeamos errores con `sudo named-checkconf /etc/bind/named.conf`
+
+Siendo `/var/named/sales.me.com.zone`:
+
+```
+$TTL    604800
+@       IN      SOA     sales.me.com. root.sales.me.com. (
+2016051101 ; Serial
+10800 ; Refresh
+3600  ; Retry
+604800 ; Expire
+604800) ; Negative TTL
+;
+@       IN      NS      dns.sales.me.com.
+dns     IN      A       10.13.13.101
+web1    IN      A       10.13.13.104
+www.web1        IN      CNAME   web1
+```
+
+y `/var/named/13.13.10.in-addr.arpa.zone`:
+
+```
+$TTL    604800
+@       IN      SOA     sales.me.com. root.sales.me.com. (
+2016051101 ; Serial
+10800 ; Refresh
+3600  ; Retry
+604800 ; Expire
+604800) ; Minimun TTL
+;
+@       IN      NS      dns.sales.me.com.
+104     IN      PTR     web1.sales.me.com.
+```
+
+Chequeamos los ficheros
+
+```
+me@lub ~ $ sudo named-checkzone sales.me.com /var/named/sales.me.com.zone
+zone sales.me.com/IN: loaded serial 2016051101
+OK
+me@lub ~ $ sudo named-checkzone 0.168.192.in-addr.arpa /var/named/13.13.10.in-addr.arpa.zone 
+zone 0.168.192.in-addr.arpa/IN: loaded serial 2016051101
+OK
+```
+
+Reiniciamos el servicio con `sudo service bind9 restart`
+
+Editamos `/etc/network/interfaces` para añadir la linea `dns-nameservers 10.13.13.101`
+
+```
+auto eth1
+iface eth1 inet dhcp
+dns-nameservers 10.13.13.101
+```
+
+Reiniciamos la red con `sudo restart network-manager` (en realidad tuve que reiniciar), 
+y comprobamos que funciona
+
+```
+me@lub ~ $ host web1.sales.me.com
+web1.sales.me.com has address 10.13.13.104
+me@lub ~ $ host 10.13.13.104
+104.13.13.10.in-addr.arpa domain name pointer web1.sales.me.com.
+me@lub ~ $ host www.web1.sales.me.com
+www.web1.sales.me.com is an alias for web1.sales.me.com.
+web1.sales.me.com has address 10.13.13.104
 ```
 
 http://www.tecmint.com/setup-recursive-caching-dns-server-and-configure-dns-zones/ -> Installing and Configuring a DNS Server
