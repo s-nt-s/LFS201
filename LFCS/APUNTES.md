@@ -1223,10 +1223,10 @@ Al volver a conectar a zebra veremos que los routers han aprendido la ruta de un
 ```console
 root@dev2:~# telnet localhost 2601
 ...
-dev2> **show ip route**
+dev2> <strong>show ip route</strong>
 Codes: K - kernel route, C - connected, S - static, **R - RIP**
        O - OSPF, I - IS-IS, B - BGP, A - Babel,
-       \> - selected route, * - FIB route
+       > - selected route, * - FIB route
 
 K>* 0.0.0.0/0 via 192.168.0.1, eth0
 C>* 10.0.0.0/24 is directly connected, eth1
