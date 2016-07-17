@@ -1235,6 +1235,21 @@ C>* 192.168.0.0/24 is directly connected, eth0
 R>* 192.168.1.10/24 [120/2] via 10.0.0.16, eth1, 00:00:20
 ```
 
+```console
+root@dev3:~# telnet localhost 2601
+...
+dev2> show ip route
+Codes: K - kernel route, C - connected, S - static, R - RIP
+       O - OSPF, I - IS-IS, B - BGP, A - Babel,
+       > - selected route, * - FIB route
+
+K>* 0.0.0.0/0 via 10.0.0.15, eth0
+C>* 10.0.0.0/24 is directly connected, eth0
+C>* 127.0.0.0/8 is directly connected, lo
+K>* 169.254.0.0/16 is directly connected eth1
+C>* 192.168.0.0/24 [120/2] via 10.0.0.15, eth0, 00:36:09
+R>* 192.168.1.10/24 is directly connected eth1
+```
 
 http://www.tecmint.com/setup-linux-as-router/
 
