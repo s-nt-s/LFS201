@@ -1394,8 +1394,100 @@ web1.sales.me.com has address 10.13.13.104
 
 http://www.tecmint.com/setup-recursive-caching-dns-server-and-configure-dns-zones/ -> Installing and Configuring a DNS Server
 
-### Configure an FTP server
-### Configure anonymous-only download on FTP servers
+### Configure an FTP server<br/>Configure anonymous-only download on FTP servers
+
+Instalamos con `sudo apt-get install vsftpd ftp`.  
+La configuración esta en `/etc/vsftpd.conf`, el cual editamos para habilitar
+el acceso anonimo de solo lectura
+
+```
+anonymous_enable=YES
+no_anon_password=YES
+anon_root=/var/ftp/
+write_enable=NO
+anon_max_rate=10240
+max_per_ip=5
+```
+
+```console
+me@lub ~ $ sudo mkdir /var/ftp
+me@lub ~ $ sudo chmod 555 /var/ftp
+me@lub ~ $ man -t vsftpd.conf | sudo ps2pdf - /var/ftp/vstpd.conf.pdf
+me@lub ~ $ sudo service vsftpd restart
+vsftpd stop/waiting
+vsftpd start/running, process 4188
+me@lub ~ $ ftp localhost
+Connected to localhost.
+220 (vsFTPd 3.0.2)
+Name (localhost:me): anonymous
+230 Login successful.
+Remote system type is UNIX.
+Using binary mode to transfer files.
+ftp> ls
+200 PORT command successful. Consider using PASV.
+150 Here comes the directory listing.
+-rw-rw-rw-    1 0        0           39599 Jul 17 20:35 vstpd.conf.pdf
+226 Directory send OK.
+ftp> get vstpd.conf.pdf
+local: vstpd.conf.pdf remote: vstpd.conf.pdf
+200 PORT command successful. Consider using PASV.
+150 Opening BINARY mode data connection for vstpd.conf.pdf (39599 bytes).
+226 Transfer complete.
+39599 bytes received in 0.01 secs (2598.2 kB/s)
+ftp> exit
+221 Goodbye.
+me@lub ~ $ ls vstpd.conf.pdf 
+vstpd.conf.pdf
+```
+
+Si en vez de eso queremos dar acceso a home a los usuarios del sistema haremos:
+
+```
+anonymous_enable=NO
+local_enable=YES
+chroot_local_user=YES
+chroot_list_enable=YES
+chroot_list_file=/etc/vsftpd.chroot_list
+local_max_rate=20480
+max_per_ip=5
+```
+
+Donde `/etc/vsftpd.chroot_list` es un fichero donde estan los nombres de los usuarios que queremos que si puedan salir de su home, por lo tanto en principio estará vacio.  
+Y si se usa SELinux ejecutar `setsebool -P ftp_home_dir 1`
+
+Podemos añadir la linea `allow_writeable_chroot=YES` a la configuración para que
+no nos de problemas del tipo `500 OOPS: vsftpd: refusing to run with writable root inside chroot()`
+
+```console
+me@lub ~ $ sudo touch ../walterwhite/walterwhite.txt
+me@lub ~ $ ftp localhost
+Connected to localhost.
+220 (vsFTPd 3.0.2)
+Name (localhost:me): walterwhite
+331 Please specify the password.
+Password:
+230 Login successful.
+Remote system type is UNIX.
+Using binary mode to transfer files.
+ftp> ls
+200 PORT command successful. Consider using PASV.
+150 Here comes the directory listing.
+-rw-r--r--    1 0        0               0 Jul 17 21:02 walterwhite.txt
+226 Directory send OK.
+ftp> get walterwhite.txt
+local: walterwhite.txt remote: walterwhite.txt
+200 PORT command successful. Consider using PASV.
+150 Opening BINARY mode data connection for walterwhite.txt (0 bytes).
+226 Transfer complete.
+ftp> quit
+221 Goodbye.
+me@lub ~ $ ls walterwhite.txt 
+walterwhite.txt
+```
+
+http://www.tecmint.com/setup-ftp-anonymous-logins-in-linux/
+https://www.benscobie.com/fixing-500-oops-vsftpd-refusing-to-run-with-writable-root-inside-chroot/
+
 ### Provide/configure network shares via NFS
 
 En el servidor:
@@ -1419,7 +1511,11 @@ me@lub ~ $ sudo mount -t nfs 10.13.13.102:/home/me/nfsshare /mnt/nfsshare
 me@lub ~ $ sudo bash -c 'echo "10.13.13.102:/home/me/nfsshare /mnt/nfsshare  nfs defaults 0 0" >> /etc/fstab'
 ```
 
-BONUS: Samba
+
+http://www.tecmint.com/mount-filesystem-in-linux/ -> Mounting a NFS share on Linux
+https://help.ubuntu.com/community/SettingUpNFSHowTo
+
+### Provide/configure network shares via CIFS
 
 En el servidor:
 
@@ -1476,11 +1572,9 @@ me@lub ~ $ sudo bash -c 'echo "//10.13.13.102/share /mnt/samba cifs credentials=
 me@lub ~ $ sudo mount //10.13.13.102/share
 ```
 
-http://www.tecmint.com/mount-filesystem-in-linux/
-https://help.ubuntu.com/community/SettingUpNFSHowTo
+http://www.tecmint.com/mount-filesystem-in-linux/ -> Mounting a Samba share on Linux
 https://help.ubuntu.com/12.04/serverguide/samba-fileserver.html
 
-### Provide/configure network shares via CIFS
 ### Configure email aliases
 
 * `/etc/aliases` + `newaliases`, o
