@@ -1255,10 +1255,47 @@ http://www.tecmint.com/setup-linux-as-router/
 
 ### Synchronize time using other network peers
 
+```console
+me@deb ~ $ sudo apt-get install ntp ntpdate
+...
+me@deb ~ $ sudo service ntp status
+● ntp.service - LSB: Start NTP daemon
+   Loaded: loaded (/etc/init.d/ntp)
+   Active: active (running) since dom 2016-07-17 13:48:50 CEST; 26s ago
+   CGroup: /system.slice/ntp.service
+           └─4357 /usr/sbin/ntpd -p /var/run/ntpd.pid -g -u 121:130
+...
+me@deb ~ $ sudo ntpq -p
+     remote           refid      st t when poll reach   delay   offset  jitter
+==============================================================================
++static-21.herco 158.227.98.15    2 u   21   64    1  181.480   66.936  42.859
+*i2t15.i2t.ehu.e .GPS.            1 u   20   64    1  160.858   70.449  39.383
++ntp.redimadrid. 193.147.107.33   2 u   21   64    1  131.977   63.068  32.831
+ masip.celingest .STEP.          16 u  726   64    0    0.000    0.000   0.000
+```
+
+* La configuración esta en `/etc/ntp.conf`
+* Los logs se pueden ver con `grep ntp /var/log/syslog`
+* Las opciones con las que se arranca el demonio `ntpd` estan en `/etc/default/ntp`
+
+Sin necesidad de tener `ntpd` se puede actualizar la feca con `ntpdate pool.ntp.org` (añadir -u si se tiene isntalado `ntpd`)
+
+http://www.tecmint.com/how-to-synchronize-time-with-ntp-server-in-ubuntu-linux-mint-xubuntu-debian/  
+http://www.tecmint.com/install-and-configure-ntp-server-client-in-debian/
+http://www.pool.ntp.org/es/use.html
+
 ## Service Configuration - 10%
 
-### Configure a basic DNS server
-### Maintain a DNS zone
+### Configure a basic DNS server<br/>Maintain a DNS zone
+
+```console
+me@lub ~ $ sudo apt-get install bind9 bind9utils
+...
+me@lub ~ $ sudo cp /etc/bind/named.conf /etc/bind/named.conf.orig
+```
+
+http://www.tecmint.com/setup-recursive-caching-dns-server-and-configure-dns-zones/ -> Installing and Configuring a DNS Server
+
 ### Configure an FTP server
 ### Configure anonymous-only download on FTP servers
 ### Provide/configure network shares via NFS
