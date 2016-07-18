@@ -1582,20 +1582,114 @@ https://help.ubuntu.com/12.04/serverguide/samba-fileserver.html
 
 La 1º opción si me funciono, la seguna no.
 
-### Configure SSH servers and clients
-### Configure SSH-based remote access using public/private key pairs
+### Configure SSH servers and clients<br/>Configure SSH-based remote access using public/private key pairs
+
+* `/etc/ssh/sshd_config` condigura sshd
+* `/etc/default/ssh` permite añadir parametros para el arranque de sshd
+* `ssh-keygen` genera una clave privada y pública para usar con ssh
+* `~/.ssh/authorized_keys` tiene las claves publicas autorizadas
+* `ssh-copy-id` manda una clave publica a la maquina a la que queremos conectar
+* `~/.ssh/config` configura las conexiones ssh.
+
+```console
+me@lub ~ $ mkdir .ssh
+me@lub ~ $ touch .ssh/config
+me@lub ~ $ chmod 700 .ssh
+me@lub ~ $ chmod 600 ~/.ssh/*
+me@lub ~ $ ssh-keygen
+Generating public/private rsa key pair.
+Enter file in which to save the key (/home/me/.ssh/id_rsa): /home/me/.ssh/ubuntu
+Enter passphrase (empty for no passphrase): 
+Enter same passphrase again: 
+Your identification has been saved in /home/me/.ssh/ubuntu.
+Your public key has been saved in /home/me/.ssh/ubuntu.pub.
+The key fingerprint is:
+1e:10:a5:fd:d4:e4:91:0e:63:49:7d:db:b0:bf:81:94 me@lub
+The key's randomart image is:
++--[ RSA 2048]----+
+|      .....oo.   |
+|       +  =+o.o  |
+|      o ...+o..= |
+|       . o  .Eo .|
+|        S . . .. |
+|       . .   . ..|
+|        .       o|
+|               . |
+|                 |
++-----------------+
+me@lub ~ $ ssh-copy-id -i .ssh/ubuntu.pub me@10.13.13.102
+/usr/bin/ssh-copy-id: INFO: attempting to log in with the new key(s), to filter out any that are already installed
+/usr/bin/ssh-copy-id: INFO: 1 key(s) remain to be installed -- if you are prompted now it is to install the new keys
+me@10.13.13.102's password: 
+
+Number of key(s) added: 1
+
+Now try logging into the machine, with:   "ssh 'me@10.13.13.102'"
+and check to make sure that only the key(s) you wanted were added.
+
+me@lub ~ $ nano .ssh/config
+Host ubuntu
+HostName 10.13.13.102
+IdentityFile /home/me/.ssh/ubuntu
+User me
+Port 22
+me@lub ~ $ ssh ubuntu
+Enter passphrase for key '/home/me/.ssh/ubuntu': 
+Welcome to Ubuntu 14.04.4 LTS (GNU/Linux 4.2.0-27-generic i686)
+Last login: Mon Jul 18 20:49:36 2016 from 10.13.13.101
+me@ubu ~ $ ls .ssh
+authorized_keys
+me@ubu ~ $ exit
+me@lub ~ $ eval "$(ssh-agent -s)"
+Agent pid 4986
+me@lub ~ $ ssh-add ~/.ssh/ubuntu
+me@lub ~ $ ssh-add ~/.ssh/ubuntu
+Enter passphrase for /home/me/.ssh/ubuntu: 
+Identity added: /home/me/.ssh/ubuntu (/home/me/.ssh/ubuntu)
+me@lub ~ $ ssh ubuntu
+Welcome to Ubuntu 14.04.4 LTS (GNU/Linux 4.2.0-27-generic i686)
+Last login: Mon Jul 18 22:14:01 2016 from 10.13.13.101
+me@ubu ~ $ exit
+
+```
+
 ### Restrict access to the HTTP proxy server
+
+`sudo apt-get install install squid3 squidguard`
+
+http://www.tecmint.com/onfigure-squid-server-in-linux
+http://www.tecmint.com/configure-squidguard-for-squid-proxy/
+
 ### Configure an IMAP and IMAPS service
+
+http://www.tecmint.com/setting-up-email-services-smtp-and-restricting-access-to-smtp/
+
 ### Query and modify the behavior of system services at various run levels
-### Configure an HTTP server
-### Configure HTTP server log files
+
+*no tengo claro a que se refiere*
+
+### Configure an HTTP server<br/>Configure HTTP server log files
+
+http://www.tecmint.com/setup-apache-with-name-based-virtual-hosting-with-ssl-certificate/
+
 ### Restrict access to a web page
+
+http://www.tecmint.com/apache-htaccess-tricks
+https://www.cs.cmu.edu/~help/web_publishing/htaccess.html
+
 ### Diagnose routine SELinux/AppArmor policy violations
+
+
+
 ### Configure database server
 
 ## Virtualization - 5%
 
 ### Configure a hypervisor to host virtual guests
+
+http://www.tecmint.com/install-and-configure-kvm-in-linux/
+https://help.ubuntu.com/community/KVM/Installation
+
 ### Access a VM console
 ### Configure systems to launch virtual machines at boot
 ### Evaluate memory usage of virtual machines
@@ -1612,6 +1706,9 @@ http://www.tecmint.com/create-partitions-and-filesystems-in-linux/
 http://www.tecmint.com/manage-and-create-lvm-parition-using-vgcreate-lvcreate-and-lvextend/
 
 ### Extend existing Logical Volumes and filesystems
+
+
+
 ### Create and configure encrypted partitions
 ### Configure systems to mount file systems at or during boot
 ### Configure and manage swap space
