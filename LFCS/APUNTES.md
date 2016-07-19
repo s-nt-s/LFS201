@@ -1683,6 +1683,15 @@ https://www.cs.cmu.edu/~help/web_publishing/htaccess.html
 
 ### Configure database server
 
+* Instalamos con `sudo apt-get install mariadb-server`
+* Nos conectamos con `mysql -u root -p`
+* Securizamos con `mysql_secure_installation`
+* Configuramos editando `/etc/mysql/my.cnf`, `/etc/my.cnf`, `~/.my.cnf`
+* Reiniciamos con `sudo service mysql restart`
+
+http://www.tecmint.com/install-mariadb-in-linux/
+http://www.tecmint.com/install-secure-performance-tuning-mariadb-database-server/
+
 ## Virtualization - 5%
 
 ### Configure a hypervisor to host virtual guests
@@ -1699,20 +1708,265 @@ https://help.ubuntu.com/community/KVM/Installation
 
 ### List, create, delete, and modify storage partitions
 
+* `fdisk` crea, lista, borra y modifica particiones
+* `mkfs` y derivados formatean particiones
+* `mkswap` formatea particiones swap (se recomienda que sean del doble de la memoria ran si esta es menor de 2GB, e igual en caso contrario)
+* ´/etc/fstab´ tiene la información necesaria para que estas particiones se carguen al reiniciar.
+
 http://www.tecmint.com/create-partitions-and-filesystems-in-linux/
 
-### Create, modify and delete Logical Volumes
+### Create, modify and delete Logical Volumes<br/>Extend existing Logical Volumes and filesystems<br/>Add new partitions, and logical volumes
+
+Uno o más disco (`/dev/sdb`) o una o más particiones te tipo 8e (`/dev/sdb1`)
+forman un volumen fisico, los cuales se agrupan en grupos de volumenes (`vg`), 
+el cual se divide en uno o varios volumenes lógicos (`mylvm`)
+
+```console
+me@lub ~ $ sudo pvcreate /dev/sdb1
+me@lub ~ $ sudo pvcreate /dev/sdc1
+me@lub ~ $ sudo vgcreate -s 16M vg /dev/sdb1
+me@lub ~ $ sudo vgextend vg /dev/sdc1
+me@lub ~ $ sudo lvcreate -L 50G -n mylvm vg
+me@lub ~ $ sudo mkfs -t ext4 /dev/vg/mylvm
+me@lub ~ $ mkdir /mylvm
+me@lub ~ $ sudo mount /dev/vg/mylvm /mylvm
+```
+
+Mostrar información:
+
+* Volumnes fisicos: `pvs`, `pvsdisplay` o `pvsdisplay /dev/sdX`
+* Grupos de volumenes: `vgs`, `vgdisplay` o `vgdisplay /dev/vg00`
+* Volumnes lógicos: `lvs`, `lvdisplay` o `lvdisplay /dev/vg00/mylvm`
+
+Crear movidas:
+
+* Volumnes fisicos: `ppvcreate /dev/sdX`
+* Grupos de volumenes: `vgcreate vg00 /dev/sdb /dev/sdc`
+* Volumnes lógicos:
+  * `lvcreate -n vol_projects -L 10G vg00`
+  * `lvcreate -n vol_backups -l 100%FREE vg00`
+  * `lvcreate -l 128 -s -n mysnap /dev/vg/mylvm`
+
+Extender volumen lógico:
+
+```console
+me@lub ~ $ sudo lvextend -L +500M /dev/vg/mylvm
+me@lub ~ $ sudo resize2fs /dev/vg/mylvm
+```
+
+Reducir un grupo de volumenes:
+
+```console
+me@lub ~ $ sudo pvdisplay 
+  --- Physical volume ---
+  PV Name               /dev/sdf
+  VG Name               vg00
+  PV Size               10,00 MiB / not usable 2,00 MiB
+  Allocatable           yes (but full)
+  PE Size               4,00 MiB
+  Total PE              2
+  Free PE               0
+  Allocated PE          2
+  PV UUID               aZnPnF-QFFg-M1Wb-wvLq-9Ku1-dWB3-2zY4c7
+   
+  --- Physical volume ---
+  PV Name               /dev/sdh
+  VG Name               vg00
+  PV Size               10,00 MiB / not usable 2,00 MiB
+  Allocatable           yes (but full)
+  PE Size               4,00 MiB
+  Total PE              2
+  Free PE               0
+  Allocated PE          2
+  PV UUID               uWEcvk-n2DU-6Nbq-RfUy-4fe8-1Ofo-BeDUDu
+   
+  --- Physical volume ---
+  PV Name               /dev/sdg
+  VG Name               vg00
+  PV Size               10,00 MiB / not usable 2,00 MiB
+  Allocatable           yes 
+  PE Size               4,00 MiB
+  Total PE              2
+  Free PE               1
+  Allocated PE          1
+  PV UUID               DdPUP0-nYAz-aKzz-vhpo-Rtt1-el3C-kz53AM
+me@lub ~ $ sudo pvcreate /dev/sdk
+  Physical volume "/dev/sdk" successfully created
+me@lub ~ $ sudo vgextend vg00 /dev/sdk
+  Volume group "vg00" successfully extended
+me@lub ~ $ sudo pvmove /dev/sdg --alloc anywhere
+  /dev/sdg: Moved: 100,0%
+me@lub ~ $ sudo vgreduce vg00 /dev/sdg
+  Removed "/dev/sdg" from volume group "vg00"
+me@lub ~ $ sudo vgdisplay 
+  --- Volume group ---
+  VG Name               vg00
+  System ID             
+  Format                lvm2
+  Metadata Areas        3
+  Metadata Sequence No  29
+  VG Access             read/write
+  VG Status             resizable
+  MAX LV                0
+  Cur LV                2
+  Open LV               2
+  Max PV                0
+  Cur PV                3
+  Act PV                3
+  VG Size               112,00 MiB
+  PE Size               4,00 MiB
+  Total PE              28
+  Alloc PE / Size       5 / 20,00 MiB
+  Free  PE / Size       23 / 92,00 MiB
+  VG UUID               TndQtC-yVoV-ati9-Y76w-UApW-jGb5-o6vYJk
+   
+me@lub ~ $ sudo pvdisplay 
+  --- Physical volume ---
+  PV Name               /dev/sdf
+  VG Name               vg00
+  PV Size               10,00 MiB / not usable 2,00 MiB
+  Allocatable           yes (but full)
+  PE Size               4,00 MiB
+  Total PE              2
+  Free PE               0
+  Allocated PE          2
+  PV UUID               aZnPnF-QFFg-M1Wb-wvLq-9Ku1-dWB3-2zY4c7
+   
+  --- Physical volume ---
+  PV Name               /dev/sdh
+  VG Name               vg00
+  PV Size               10,00 MiB / not usable 2,00 MiB
+  Allocatable           yes (but full)
+  PE Size               4,00 MiB
+  Total PE              2
+  Free PE               0
+  Allocated PE          2
+  PV UUID               uWEcvk-n2DU-6Nbq-RfUy-4fe8-1Ofo-BeDUDu
+   
+  --- Physical volume ---
+  PV Name               /dev/sdk
+  VG Name               vg00
+  PV Size               100,00 MiB / not usable 4,00 MiB
+  Allocatable           yes 
+  PE Size               4,00 MiB
+  Total PE              24
+  Free PE               23
+  Allocated PE          1
+  PV UUID               wUahgs-13gr-gNhq-qVmG-lrJV-Yfsy-3PMwWG
+   
+  "/dev/sdg" is a new physical volume of "10,00 MiB"
+  --- NEW Physical volume ---
+  PV Name               /dev/sdg
+  VG Name               
+  PV Size               10,00 MiB
+  Allocatable           NO
+  PE Size               0   
+  Total PE              0
+  Free PE               0
+  Allocated PE          0
+  PV UUID               DdPUP0-nYAz-aKzz-vhpo-Rtt1-el3C-kz53AM
+```
+
+Extender volumen logico
+
+```console
+me@lub ~ $ sudo lvextend -r -L +50M /dev/vg00/vol_dos
+  Rounding size to boundary between physical extents: 52,00 MiB
+  Extending logical volume vol_dos to 68,00 MiB
+  Logical volume vol_dos successfully resized
+resize2fs 1.42.9 (4-Feb-2014)
+Filesystem at /dev/mapper/vg00-vol_dos is mounted on /home/me/vol_dos; on-line resizing required
+old_desc_blocks = 1, new_desc_blocks = 1
+The filesystem on /dev/mapper/vg00-vol_dos is now 69632 blocks long.
+me@lub ~ $ sudo lvdisplay 
+  --- Logical volume ---
+  LV Path                /dev/vg00/vol_uno
+  LV Name                vol_uno
+  VG Name                vg00
+  LV UUID                kgAVDg-II7h-MoRM-394R-ZFox-ti7r-vhYCbb
+  LV Write Access        read/write
+  LV Creation host, time lub, 2016-05-22 20:51:21 +0200
+  LV Status              available
+  # open                 1
+  LV Size                8,00 MiB
+  Current LE             2
+  Segments               1
+  Allocation             inherit
+  Read ahead sectors     auto
+  - currently set to     256
+  Block device           252:0
+   
+  --- Logical volume ---
+  LV Path                /dev/vg00/vol_dos
+  LV Name                vol_dos
+  VG Name                vg00
+  LV UUID                ltBKDO-11vk-2oNN-rj1w-0RNa-ptYo-pi6FUe
+  LV Write Access        read/write
+  LV Creation host, time lub, 2016-05-22 20:51:35 +0200
+  LV Status              available
+  # open                 1
+  LV Size                68,00 MiB
+  Current LE             17
+  Segments               3
+  Allocation             inherit
+  Read ahead sectors     auto
+  - currently set to     256
+  Block device           252:1
+```
+
+Reducir volumen logico
+
+```console
+me@lub ~ $ sudo lvreduce -r -L -50M /dev/vg00/vol_dos
+  Rounding size to boundary between physical extents: 48,00 MiB
+Do you want to unmount "/home/me/vol_dos"? [Y|n] y
+fsck de util-linux 2.20.1
+/dev/mapper/vg00-vol_dos: 11/9216 files (9.1% non-contiguous), 2294/69632 blocks
+resize2fs 1.42.9 (4-Feb-2014)
+Resizing the filesystem on /dev/mapper/vg00-vol_dos to 20480 (1k) blocks.
+The filesystem on /dev/mapper/vg00-vol_dos is now 20480 blocks long.
+
+  Reducing logical volume vol_dos to 20,00 MiB
+  Logical volume vol_dos successfully resized
+```
+
+Crear una nueva partición:
+
+```console
+me@lub ~ $ sudo lvcreate -n vol_tres -L 10M vg00
+  Rounding up size to full physical extent 12,00 MiB
+  Logical volume "vol_tres" created
+me@lub ~ $ sudo lvcreate -n vol_cuatro -l 100%FREE vg00
+  Logical volume "vol_cuatro" created
+me@lub ~ $ sudo mkfs.ext4 /dev/vg00/vol_tres
+...
+```
+
+Montar:
+
+```console
+me@lub ~ $ mkdir vol_tres
+me@lub ~ $ sudo blkid | grep vg00
+/dev/mapper/vg00-vol_uno: UUID="ea692853-a0cc-49d1-904a-a72be6162312" TYPE="ext4" 
+/dev/mapper/vg00-vol_dos: UUID="be2350c7-e4ed-45a0-8ebf-9aeb2f4eb774" TYPE="ext4" 
+/dev/mapper/vg00-vol_tres: UUID="f026ffd3-0910-437e-aac5-fce9195ee60c" TYPE="ext4" 
+/dev/mapper/vg00-vol_cuatro: UUID="cb76d1aa-5ea9-4130-b19c-bc375d90fa28" TYPE="ext4" 
+me@lub ~ $ sudo bash -c "echo 'UUID=\"f026ffd3-0910-437e-aac5-fce9195ee60c\"  /home/me/vol_tres ext4 defaults 0 2' >> /etc/fstab"
+me@lub ~ $ sudo mount /home/me/vol_tres
+me@lub ~ $ ls vol_tres/
+lost+found
+```
+
 
 http://www.tecmint.com/manage-and-create-lvm-parition-using-vgcreate-lvcreate-and-lvextend/
-
-### Extend existing Logical Volumes and filesystems
-
-
+http://blog.timmattison.com/archives/2009/11/01/how-to-fix-lvm2s-no-extents-available-for-allocation-errors-when-using-pvmove/
 
 ### Create and configure encrypted partitions
 ### Configure systems to mount file systems at or during boot
+
+`/etc/fstab`
+
 ### Configure and manage swap space
-### Add new partitions, and logical volumes
 ### Assemble partitions as RAID devices
 
 Muy importante usar el tipo `fd` (ver abajo), sino el raid no se montara
