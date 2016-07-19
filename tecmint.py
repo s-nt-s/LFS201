@@ -28,6 +28,7 @@ urls=[]
 oris=[
 	"http://www.tecmint.com/sed-command-to-create-edit-and-manipulate-files-in-linux/",
 	"http://www.tecmint.com/installing-network-services-and-configuring-services-at-system-boot/",
+	"http://www.tecmint.com/create-lvm-storage-in-linux/",
 	"http://www.tecmint.com/install-and-configure-kvm-in-linux/"
 ]
 extra=[
@@ -130,7 +131,7 @@ out.body.div.append(h1)
 
 index=True
 flag=0
-part=re.compile(u"\s*[\-–—]\s*Part\s*\d+$", re.UNICODE | re.IGNORECASE)
+part=re.compile(u"\s*[\-–—]\s*Part\s+\w+$", re.UNICODE | re.IGNORECASE)
 for url in urls:
 	if url in oris:
 		index=True
@@ -182,12 +183,12 @@ for url in urls:
 	if flag==2 and index and div.h3 and div.h3.previous_sibling:
 		while div.h3.previous_sibling:
 			div.h3.previous_sibling.extract()
-	if flag==3:
+	if flag==4:
 		div.img.find_parent("div").extract()
-		if index:
-			cp=soup.findAll('div',**{"id":"exam_announcement"})
-			for c in cp:
-				c.extract()
+	if index:
+		cp=soup.findAll('div',**{"id":"exam_announcement"})
+		for c in cp:
+			c.extract()
 
 	div.attrs.clear()
 	h2=get_h(tt,url)
