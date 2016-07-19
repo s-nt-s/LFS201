@@ -1957,9 +1957,26 @@ me@lub ~ $ ls vol_tres/
 lost+found
 ```
 
+Snapshots:
+
+Un Snapshot se va llenando con los datos originales que han sido cambiados
+en el volumen original, de manera que posteriormente si se quiere se podra
+revertir todos los cambios que se hicieron desde que se creo el Snapshots
+
+```console
+me@lub ~ $ sudo lvcreate -l 128 -s -n mysnap /dev/vg/mylvm
+me@lub ~ $ mkdir /mysnap
+me@lub ~ $ sudo mount -o ro /dev/vg/mysnap /mysnap
+me@lub ~ $ sudo umount /mysnap
+me@lub ~ $ sudo umount /mnt/vgmount/
+me@lub ~ $ lvconvert --merge /dev/vg/mysnap
+```
+El snapshot se autoborra tras el merge.
+Si lo queremos borrar sin hacer el merge podemos hacer `sudo lvremove /dev/vg/mysnap`
 
 http://www.tecmint.com/manage-and-create-lvm-parition-using-vgcreate-lvcreate-and-lvextend/
 http://blog.timmattison.com/archives/2009/11/01/how-to-fix-lvm2s-no-extents-available-for-allocation-errors-when-using-pvmove/
+http://www.tecmint.com/create-lvm-storage-in-linux/
 
 ### Create and configure encrypted partitions
 ### Configure systems to mount file systems at or during boot
