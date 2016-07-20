@@ -1650,7 +1650,6 @@ me@lub ~ $ ssh ubuntu
 Welcome to Ubuntu 14.04.4 LTS (GNU/Linux 4.2.0-27-generic i686)
 Last login: Mon Jul 18 22:14:01 2016 from 10.13.13.101
 me@ubu ~ $ exit
-
 ```
 
 ### Restrict access to the HTTP proxy server
@@ -1661,6 +1660,8 @@ http://www.tecmint.com/onfigure-squid-server-in-linux
 http://www.tecmint.com/configure-squidguard-for-squid-proxy/
 
 ### Configure an IMAP and IMAPS service
+
+`
 
 http://www.tecmint.com/setting-up-email-services-smtp-and-restricting-access-to-smtp/
 
@@ -1979,11 +1980,136 @@ http://blog.timmattison.com/archives/2009/11/01/how-to-fix-lvm2s-no-extents-avai
 http://www.tecmint.com/create-lvm-storage-in-linux/
 
 ### Create and configure encrypted partitions
+
+* `dd if=/dev/urandom of=/dev/sdb bs=4096` sobreescribe el disco /dev/sdb
+* `grep -i config_dm_crypt /boot/config-$(uname -r)` comprueba el kernel tiene capacidad de encriptad
+* `lsmod | grep dm_crypt` comprueba si el modulo de encriptación esta cargado
+* `sudo modprobe dm_crypt` carga el modulo de encriptación
+* Añadir la linea `dm_crypt` en `/etc/modules` para que se cargue el modulo al reiniciar
+* `sudo apt-get install cryptsetup` instala las herramientas necesarias
+
+```consoleme@lub ~ $ sudo cryptsetup -y luksFormat /dev/sdg1
+
+WARNING!
+========
+Sobrescribirá los datos en /dev/sdg1 de forma irrevocable.
+
+Are you sure? (Type uppercase yes): YES
+Introduzca frase contraseña: 
+Verify passphrase: 
+me@lub ~ $ sudo cryptsetup luksOpen /dev/sdg1 sdg1crypt
+Introduzca una contraseña para /dev/sdg1: 
+me@lub ~ $ sudo mkfs.ext4 /dev/mapper/sdg1crypt 
+mke2fs 1.42.9 (4-Feb-2014)
+Etiqueta del sistema de ficheros=
+OS type: Linux
+Tamaño del bloque=1024 (bitácora=0)
+Tamaño del fragmento=1024 (bitácora=0)
+Stride=0 blocks, Stripe width=0 blocks
+1792 inodes, 7168 blocks
+358 blocks (4.99%) reserved for the super user
+Primer bloque de datos=1
+Número máximo de bloques del sistema de ficheros=7340032
+1 bloque de grupo
+8192 bloques por grupo, 8192 fragmentos por grupo
+1792 nodos-i por grupo
+
+Allocating group tables: hecho                           
+Escribiendo las tablas de nodos-i: hecho                           
+Creating journal (1024 blocks): hecho
+Escribiendo superbloques y la información contable del sistema de ficheros: hecho
+
+me@lub ~ $ sudo mkdir /mnt/sdg1cryp
+me@lub ~ $ sudo mount /dev/mapper/sdg1crypt /mnt/sdg1cryp/
+me@lub ~ $ ls /mnt/sdg1cryp/
+lost+found
+me@lub ~ $ sudo umount /mnt/sdg1cryp
+me@lub ~ $ sudo cryptsetup luksClose sdg1crypt
+me@lub ~ $ sudo mount /dev/sdg1 /mnt/sdg1cryp/
+mount: tipo de sistema de ficheros 'crypto_LUKS' desconocido
+```
+
+Añadir fichero de clave para que automonte en el reinicio:
+
+```console
+me@lub ~ $  sudo dd if=/dev/urandom of=/root/keyfile bs=1024 count=4
+4+0 registros leídos
+4+0 registros escritos
+4096 bytes (4,1 kB) copiados, 0,0406153 s, 101 kB/s
+me@lub ~ $ sudo chmod 0400 /root/keyfile
+me@lub ~ $ sudo cryptsetup luksAddKey /dev/sdi1 /root/keyfile 
+Introduzca cualquier contraseña: 
+me@lub ~ $ sudo nano /etc/crypttab 
+# <target name>	<source device>		<key file>	<options>
+secret		/dev/sdi1		/root/keyfile		luks
+me@lub ~ $ sudo nano /etc/fstab 
+/dev/mapper/secret	/mnt/mycrypt	ext4	defaults 0 0
+me@lub ~ $ sudo cryptdisks_start secret
+ * Starting crypto disk...
+ * secret (starting)..
+ * secret (started)...                                             [ OK ]
+me@lub ~ $ sudo mount -a
+me@lub ~ $ ls /mnt/mycrypt/
+ejemplo.txt  lost+found
+
+```
+
+Sin fichero de clave (pondriamos `none` en su lugar en `/etc/crypttab`)
+se nos preguntaria la clave en el inicio.
+
+Encryptado de swap:
+
+Hacerlo con `sudo ecryptfs-setup-swap` o manualmente:
+
+```console
+me@lub ~ $ sudo swapon -s
+Filename				Type		Size	Used	Priority
+/dev/sda5                               partition	783356	0	-1
+me@lub ~ $ sudo swapoff -a
+me@lub ~ $ sudo swapon -s
+Filename				Type		Size	Used	Priority
+me@lub ~ $ sudo nano /etc/crypttab 
+cswap           /dev/sda5               /dev/urandom    swap,cipher=aes-cbc-essiv:sha256
+me@lub ~ $ sudo /etc/fstab
+#/dev/sda5              none            swap    sw              0       0
+/dev/mapper/cswap       none            swap    sw              0       0
+me@lub ~ $ sudo cryptdisks_start cswap 
+ * Starting crypto disk...                                                                                                                                               * cswap (starting)..
+ * cswap (started)...                                                                                                                                            [ OK ] 
+me@lub ~ $ sudo swapon -a
+me@lub ~ $ sudo swapon -s
+Filename				Type		Size	Used	Priority
+/dev/mapper/cswap                       partition	783356	0	-1
+me@lub ~ $ sudo reboot
+...
+me@lub ~ $ sudo swapon -s
+Filename				Type		Size	Used	Priority
+/dev/mapper/cswap                       partition	783356	0	-1
+me@lub ~ $ sudo cryptsetup status cswap
+/dev/mapper/cswap is active and is in use.
+  type:    PLAIN
+  cipher:  aes-cbc-essiv:sha256
+  keysize: 256 bits
+  device:  /dev/sda5
+  offset:  0 sectors
+  size:    1566720 sectors
+  mode:    read/write
+```
+
+http://www.tecmint.com/disk-encryption-in-linux/
+https://www.howtoforge.com/automatically-unlock-luks-encrypted-drives-with-a-keyfile
+https://www.debian.org/doc/manuals/debian-reference/ch09
+
 ### Configure systems to mount file systems at or during boot
 
 `/etc/fstab`
 
 ### Configure and manage swap space
+
+* `swapon -s` = `cat /proc/swaps`, es decir, swaps montados
+* `swapon -a`, `swapoff -a`, montar y desmotar todos
+* `mkswap` dar formato swap
+
 ### Assemble partitions as RAID devices
 
 Muy importante usar el tipo `fd` (ver abajo), sino el raid no se montara

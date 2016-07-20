@@ -35,16 +35,19 @@ extra=[
 	"http://www.tecmint.com/how-to-synchronize-time-with-ntp-server-in-ubuntu-linux-mint-xubuntu-debian/",
 	"http://www.tecmint.com/install-and-configure-ntp-server-client-in-debian/"
 ]
+excluir=[
+	"http://www.tecmint.com/install-cygwin-to-run-linux-commands-on-windows-system/"
+]
 
 for ori in oris:
-	if ori not in urls:
+	if ori not in urls and ori not in excluir:
 		urls.append(ori)
 		soup=get_url(ori)
 		cp=soup.findAll('div',**{"id":"exam_announcement"})
 		for c in cp:
 			if c.a and c.get_text().strip().startswith("Part "):
 				url=c.a.attrs["href"]
-				if url not in urls:
+				if url not in urls and url not in excluir:
 					urls.append(url)
 for ext in extra:
 	if ext not in urls:
