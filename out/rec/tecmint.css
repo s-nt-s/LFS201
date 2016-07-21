@@ -109,3 +109,22 @@ a.external {
 pre .resaltar {
 	color:red;
 }
+
+div.menu {
+    background-color: transparent;
+    border: none;
+    padding: 0;
+    position: fixed;
+    right: 0;
+    top: 0;
+    margin:0;
+}
+div.menu select {
+	width: 8px;
+    background-image: none;
+	border: none;
+    width: 14px;
+}
+div.menu select:focus {
+	width: auto;
+}

@@ -275,6 +275,8 @@ for p in out.findAll("pre"):
 			del s.attrs["style"]
 			s.attrs["class"]="resaltar"
 
+util.set_menu(out)
+
 html = util.get_html(out,True)
 html=html.replace(u"–","-")
 html=html.replace(u"—","-")

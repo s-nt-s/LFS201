@@ -67,6 +67,7 @@ def set_anchor(i,ca):
 		i=i.legend
 	a.string=i.string
 	i.string=""
+	i.attrs["class"]="item"
 	i.append(a)
 
 def get_lab(f,txt):
@@ -386,10 +387,14 @@ e=soup.find("span", attrs={'class': "enlace"})
 if e and e.parent.name=="li":
 	e.parent.extract()
 
+util.set_menu(soup)
+
+
 h=util.get_html(soup)
 
 h=h.replace("Objectivos de aprendizaje","Objetivos de aprendizaje") #7 11
 h=h.replace(">31</a></h1>",">31. zypper</a></h1>") #31
+h=h.replace(">31</option>",">31. zypper</option>") #31
 h=h.replace(" del sisco "," del disco ")
 h=h.replace("miltihebra","multihebra")
 h=h.replace("el ajusta de E/S","el ajuste de E/S")

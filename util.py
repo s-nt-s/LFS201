@@ -29,6 +29,33 @@ def get_tpt(title,css):
 	soup.head.link.attrs["href"]=css
 	return soup
 
+def set_menu(out):
+	sel=out.new_tag("select")
+	sel.attrs["onchange"]="window.location.href=this.value"
+	for h in out.findAll("h1"):
+		o=out.new_tag("option")
+		o.string=h.a.get_text().strip()
+		o.attrs["value"]=h.a.attrs["href"]
+		sel.append(o)
+	div=out.new_tag("div")
+	div.attrs["class"]="menu"
+	div.append(sel)
+	out.append(div)
+	return div
+
+	'''
+	ul=out.new_tag("ul")
+	div.append(ul)
+	level=1
+	for i in out.findAll(**{"class":"item"}):
+		li=out.new_tag("li")
+		a=out.new_tag("a")
+		a.attrs["href"]=i.a.attrs["href"]
+		a.string=i.a.string
+		if i.name[0]=="h":
+	'''
+			
+
 def get_soup(html):
     if not os.path.isfile(html):
         return None
@@ -273,4 +300,5 @@ def h_to_a(soup,h,ct):
 	a.attrs["href"]="#"+i
 	h.attrs["id"]=i
 	h.clear()
+	h.attrs["class"]="item"
 	h.append(a)
