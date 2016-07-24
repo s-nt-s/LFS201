@@ -78,3 +78,10 @@ div.menu select option {
 div.menu select option:nth-child(n+10) {
 	padding-left: 0;
 }
+
+hr {
+    background-color: red;
+    border: medium none;
+    color: red;
+    height: 10px;
+}

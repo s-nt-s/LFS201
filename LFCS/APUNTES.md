@@ -2057,7 +2057,7 @@ me@lub ~ $ sudo swapon -s
 Filename				Type		Size	Used	Priority
 me@lub ~ $ sudo nano /etc/crypttab 
 cswap           /dev/sda5               /dev/urandom    swap,cipher=aes-cbc-essiv:sha256
-me@lub ~ $ sudo /etc/fstab
+me@lub ~ $ sudo nano /etc/fstab
 #/dev/sda5              none            swap    sw              0       0
 /dev/mapper/cswap       none            swap    sw              0       0
 me@lub ~ $ sudo cryptdisks_start cswap 
@@ -2083,8 +2083,8 @@ me@lub ~ $ sudo cryptsetup status cswap
   mode:    read/write
 ```
 
-http://www.tecmint.com/disk-encryption-in-linux/
-https://www.howtoforge.com/automatically-unlock-luks-encrypted-drives-with-a-keyfile
+http://www.tecmint.com/disk-encryption-in-linux/  
+https://www.howtoforge.com/automatically-unlock-luks-encrypted-drives-with-a-keyfile  
 https://www.debian.org/doc/manuals/debian-reference/ch09
 
 ### Configure systems to mount file systems at or during boot
@@ -2099,7 +2099,7 @@ https://www.debian.org/doc/manuals/debian-reference/ch09
 
 ### Assemble partitions as RAID devices
 
-Muy importante usar el tipo `fd` (ver abajo), sino el raid no se montara
+Muy importante usar el tipo `fd` (ver abajo), si no el raid no se montara
 al iniciar el equipo aunque este configurado `/etc/fstab`
 
 ```console
@@ -2214,14 +2214,14 @@ me@lub ~ $ tail -n 1 /etc/auto.master
 Siendo `/etc/auto.luks` une script `sh` ejecutable que monta dispositiovos
 encriptados.
 
-http://www.tecmint.com/configure-nfs-server/ -> Mounting exported network shares using autofs
-https://help.ubuntu.com/community/Autofs
+http://www.tecmint.com/configure-nfs-server/ -> Mounting exported network shares using autofs  
+https://help.ubuntu.com/community/Autofs  
 https://debian-administration.org/article/127/Automounting_card_readers_and_USB_keys_using_autofs
 
 ### Create and manage filesystem Access Control Lists (ACLs)
 
 Con `tune2fs -l /dev/sda1 | grep "Default mount options:"` vemos si `/dev/sda1`
-tiene habilitado las `acl`. Si no tiene acl puede ser porque en `/etc/fstab`
+tiene habilitado las `acl`. Si no tiene acl puede ser que en `/etc/fstab`
 use la opción noacl.
 
 ```console

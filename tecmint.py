@@ -32,8 +32,12 @@ oris=[
 	"http://www.tecmint.com/install-and-configure-kvm-in-linux/"
 ]
 extra=[
+	None, #Agrega un <hr/>
 	"http://www.tecmint.com/how-to-synchronize-time-with-ntp-server-in-ubuntu-linux-mint-xubuntu-debian/",
-	"http://www.tecmint.com/install-and-configure-ntp-server-client-in-debian/"
+	"http://www.tecmint.com/install-and-configure-ntp-server-client-in-debian/",
+	None, #Agrega un <hr/>
+	"http://www.tecmint.com/install-secure-performance-tuning-mariadb-database-server/",
+	"http://www.tecmint.com/mysql-mariadb-performance-tuning-and-optimization/"
 ]
 excluir=[
 	"http://www.tecmint.com/install-cygwin-to-run-linux-commands-on-windows-system/"
@@ -50,7 +54,7 @@ for ori in oris:
 				if url not in urls and url not in excluir:
 					urls.append(url)
 for ext in extra:
-	if ext not in urls:
+	if ext==None or (ext not in urls):
 		urls.append(ext)
 
 ini1=[
@@ -144,6 +148,12 @@ for url in urls:
 	else:
 		index=False
 
+	if url==None or (index and flag>1):
+		hr=out.new_tag("hr")
+		out.body.div.append(hr)
+		if url==None:
+			continue
+	
 	soup=get_url(url)
 	title=soup.head.title.get_text().strip()
 	tt=part.sub("",title)
