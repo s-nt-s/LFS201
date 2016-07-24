@@ -1521,8 +1521,9 @@ me@lub ~ $ sudo bash -c 'echo "10.13.13.102:/home/me/nfsshare /mnt/nfsshare  nfs
 ```
 
 
-http://www.tecmint.com/mount-filesystem-in-linux/ -> Mounting a NFS share on Linux
-https://help.ubuntu.com/community/SettingUpNFSHowTo
+http://www.tecmint.com/mount-filesystem-in-linux/ -> Mounting a NFS share on Linux  
+https://help.ubuntu.com/community/SettingUpNFSHowTo  
+http://systemadmin.es/2012/05/no_root_squash-vs-root_squash-de-nfs
 
 ### Provide/configure network shares via CIFS
 
@@ -1552,7 +1553,6 @@ En el cliente
 
 ```console
 me@lub ~ $ sudo apt-get install samba-client samba-common cifs-utils
-me@lub ~ $ smbclient -L 10.13.13.102
 me@lub ~ $ smbclient -L 10.13.13.102
 WARNING: The "syslog" option is deprecated
 Enter me's password: 
@@ -1670,8 +1670,6 @@ http://www.tecmint.com/configure-squidguard-for-squid-proxy/
 
 ### Configure an IMAP and IMAPS service
 
-`
-
 http://www.tecmint.com/setting-up-email-services-smtp-and-restricting-access-to-smtp/
 
 ### Query and modify the behavior of system services at various run levels
@@ -1699,14 +1697,15 @@ https://www.cs.cmu.edu/~help/web_publishing/htaccess.html
 * Configuramos editando `/etc/mysql/my.cnf`, `/etc/my.cnf`, `~/.my.cnf`
 * Reiniciamos con `sudo service mysql restart`
 
-http://www.tecmint.com/install-mariadb-in-linux/
-http://www.tecmint.com/install-secure-performance-tuning-mariadb-database-server/
+http://www.tecmint.com/install-mariadb-in-linux/  
+http://www.tecmint.com/install-secure-performance-tuning-mariadb-database-server/  
+http://www.tecmint.com/mysql-mariadb-performance-tuning-and-optimization/
 
 ## Virtualization - 5%
 
 ### Configure a hypervisor to host virtual guests
 
-http://www.tecmint.com/install-and-configure-kvm-in-linux/
+http://www.tecmint.com/install-and-configure-kvm-in-linux/  
 https://help.ubuntu.com/community/KVM/Installation
 
 ### Access a VM console
@@ -1721,7 +1720,7 @@ https://help.ubuntu.com/community/KVM/Installation
 * `fdisk` crea, lista, borra y modifica particiones
 * `mkfs` y derivados formatean particiones
 * `mkswap` formatea particiones swap (se recomienda que sean del doble de la memoria ran si esta es menor de 2GB, e igual en caso contrario)
-* ´/etc/fstab´ tiene la información necesaria para que estas particiones se carguen al reiniciar.
+* `/etc/fstab` tiene la información necesaria para que estas particiones se carguen al reiniciar.
 
 http://www.tecmint.com/create-partitions-and-filesystems-in-linux/
 
@@ -1808,28 +1807,6 @@ me@lub ~ $ sudo pvmove /dev/sdg --alloc anywhere
   /dev/sdg: Moved: 100,0%
 me@lub ~ $ sudo vgreduce vg00 /dev/sdg
   Removed "/dev/sdg" from volume group "vg00"
-me@lub ~ $ sudo vgdisplay 
-  --- Volume group ---
-  VG Name               vg00
-  System ID             
-  Format                lvm2
-  Metadata Areas        3
-  Metadata Sequence No  29
-  VG Access             read/write
-  VG Status             resizable
-  MAX LV                0
-  Cur LV                2
-  Open LV               2
-  Max PV                0
-  Cur PV                3
-  Act PV                3
-  VG Size               112,00 MiB
-  PE Size               4,00 MiB
-  Total PE              28
-  Alloc PE / Size       5 / 20,00 MiB
-  Free  PE / Size       23 / 92,00 MiB
-  VG UUID               TndQtC-yVoV-ati9-Y76w-UApW-jGb5-o6vYJk
-   
 me@lub ~ $ sudo pvdisplay 
   --- Physical volume ---
   PV Name               /dev/sdf
@@ -1984,8 +1961,8 @@ me@lub ~ $ lvconvert --merge /dev/vg/mysnap
 El snapshot se autoborra tras el merge.
 Si lo queremos borrar sin hacer el merge podemos hacer `sudo lvremove /dev/vg/mysnap`
 
-http://www.tecmint.com/manage-and-create-lvm-parition-using-vgcreate-lvcreate-and-lvextend/
-http://blog.timmattison.com/archives/2009/11/01/how-to-fix-lvm2s-no-extents-available-for-allocation-errors-when-using-pvmove/
+http://www.tecmint.com/manage-and-create-lvm-parition-using-vgcreate-lvcreate-and-lvextend/  
+http://blog.timmattison.com/archives/2009/11/01/how-to-fix-lvm2s-no-extents-available-for-allocation-errors-when-using-pvmove/  
 http://www.tecmint.com/create-lvm-storage-in-linux/
 
 ### Create and configure encrypted partitions
@@ -1997,7 +1974,8 @@ http://www.tecmint.com/create-lvm-storage-in-linux/
 * Añadir la linea `dm_crypt` en `/etc/modules` para que se cargue el modulo al reiniciar
 * `sudo apt-get install cryptsetup` instala las herramientas necesarias
 
-```consoleme@lub ~ $ sudo cryptsetup -y luksFormat /dev/sdg1
+```console
+me@lub ~ $ sudo cryptsetup -y luksFormat /dev/sdg1
 
 WARNING!
 ========
