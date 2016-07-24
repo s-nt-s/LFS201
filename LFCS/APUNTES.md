@@ -1178,7 +1178,7 @@ root@rtr:~# chmod 640 /etc/quagga/*.conf
 
 Rellenarlos con:
 
-``
+```
 service quagga restart
 hostname    	usuario
 password    	contraseña
