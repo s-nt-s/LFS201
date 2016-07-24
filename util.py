@@ -17,6 +17,7 @@ def get_tpt(title,css):
 		<head>
 			<title></title>
 			<meta charset="utf-8"/>
+			<link href="rec/main.css" rel="stylesheet" type="text/css"/>
 			<link href="" rel="stylesheet" type="text/css"/>
 		</head>
 		<body>
@@ -26,7 +27,7 @@ def get_tpt(title,css):
 	</html>
 	''','lxml')
 	soup.head.title.string=title
-	soup.head.link.attrs["href"]=css
+	soup.findAll("link")[-1].attrs["href"]=css
 	return soup
 
 def set_menu(out):

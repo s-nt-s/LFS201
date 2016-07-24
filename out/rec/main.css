@@ -2,54 +2,46 @@ body {
     font-family: arial,sans serif;
     font-size: 11pt;
 }
-fieldset {
-    margin-top: 1em;
-    margin-bottom: 1em;
-    border-radius: 6px;
-    background-color: white;
-}
-legend {
-    padding-left: 5px;
-    padding-right: 5px;
-	margin-bottom: 5px;
-}
-fieldset.n3 {
-	border: 1px solid #c0c0c0;
-}
-fieldset.n2 > legend {
-    background-color: black;
-    color: white;
-    padding: 5px;
-    font-size: 110%;
-    border-radius: 6px;
-}
-fieldset > div > *:first-child {
-	margin-top:0;
-}
-fieldset > div > *:last-child {
-	margin-bottom:0;
-}
-h1 {
-	background-color: dimgray;
-	border-radius: 6px;
-	color: white;
-	padding: 10px;
-	margin: 0;
-}
 body {
 	background-color: #c0c0c0;
 }
+
 body > div {
 	max-width:800px;
 	margin: 0 auto;
 	padding: 10px;
-	background-color: #f0f0f0;
 	border-radius: 6px;
 }
-caption {
-    text-align: left;
-    margin-bottom: 14px;
+
+div.menu {
+	background-color: white;
+	border: medium none;
+	border-radius: 0;
+	margin: 0;
+	padding: 0;
+	position: fixed;
+	right: 0;
+	top: 0;
 }
+
+div.menu select {
+	-webkit-appearance: none;
+	-moz-appearance: none;
+	appearance: none;
+	-moz-appearance: none;
+	background: transparent url("menu-icon.svg") no-repeat scroll right 3px center;
+	border: medium none;
+	height: 27px;
+	padding-right: 32px;
+	width: 32px;
+	direction: rtl;
+	text-align: left;
+	outline: none;
+}
+div.menu select option {
+	direction: ltr;
+}
+
 table {
 	margin-top: 14px;
 	border-spacing: 0px;
@@ -76,67 +68,14 @@ td > p:first-child, th > p:first-child  {
 td > p:last-child, td > p:last-child {
 	margin-bottom:0;
 }
-/*.enlace, a {
-	color: rgb(0, 150, 200);
-}*/
-.comando {
-	color:rgb(0, 0, 255);
-}
-.stdout {
-	color:rgb(0, 200, 0);
-}
-.archivo {
-	color:rgb(125, 110, 70);
-}
-.archivo, .comando, .stdout {
-	/*font-weight: bold;*/
-	font-family: 'courier new', monospace;
-}
-h1 a, legend a {
-	text-decoration: none;
-	color: inherit;
-}
-div.content > fieldset:first-child {
-	margin-top:2px;
-}
-div.content > fieldset:last-child {
-	margin-bottom:3px;
-}
-figure {
-	margin:14px 0 0;
-	display: table;
-    border-radius: 6px;
-    border: 1px solid black;
-}
-figure > figcaption {
-    border-bottom: 1px dashed black;
-    text-align: center;
+
+
+caption {
+    text-align: left;
+    margin-bottom: 14px;
 }
 
-div.menu {
-    background-color: transparent;
-    border: none;
-    padding: 0;
-    position: fixed;
-    right: 0;
-    top: 0;
-    margin:0;
-}
-div.menu {
-    background-color: transparent;
-    border: none;
-    padding: 0;
-    position: fixed;
-    right: 0;
-    top: 0;
-    margin:0;
-}
-div.menu select {
-	width: 8px;
-    background-image: none;
-	border: none;
-    width: 14px;
-}
-div.menu select:focus {
-	width: auto;
+h1 a, h2 a, h3 a, h4 a, legend a {
+	text-decoration: none;
+	color: inherit;
 }

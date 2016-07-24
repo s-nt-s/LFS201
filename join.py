@@ -75,7 +75,7 @@ def get_lab(f,txt):
 	a.string=txt
 	return a
 
-soup = util.get_tpt("LFS201","rec/main.css")
+soup = util.get_tpt("LFS201","rec/lfs201.css")
 
 fldB=None
 divCp=None

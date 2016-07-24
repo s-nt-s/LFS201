@@ -88,7 +88,7 @@ def first_starts_in(div):
 		txt=f.string
 	return not starts_in(txt,ini1)
 
-def get_h(txt,url):
+def get_h(txt,url,title):
 	mrk=url.split("/")[-2]
 	h=out.new_tag("h2")
 	h.attrs["id"]=mrk
@@ -101,6 +101,8 @@ def get_h(txt,url):
 	h.span.append(out.new_tag("a"))
 	h.span.a.string="source"
 	h.span.a.attrs["href"]=url
+	h.span.a.attrs["title"]=title
+	h.span.a.attrs["target"]="_blank"
 	h.span.append(")")
 	return h
 
@@ -143,7 +145,8 @@ for url in urls:
 		index=False
 
 	soup=get_url(url)
-	tt=part.sub("",soup.head.title.get_text().strip())
+	title=soup.head.title.get_text().strip()
+	tt=part.sub("",title)
 	if tt.startswith("LFCE: "):
 		h1=out.new_tag("h1")
 		h1.string="LFCE"
@@ -151,6 +154,9 @@ for url in urls:
 		tt=tt[6:]
 	elif tt.startswith("LFCS: "):
 		tt=tt[6:]
+	tt=tt.strip()
+	if tt[0:7].lower()=="how to ":
+		tt=tt[7:].strip().capitalize()
 
 	div=soup.find("div", **{"class":"entry-inner"})
 	mas=soup.find("a", **{"class":"nextpostslink"})
@@ -194,7 +200,7 @@ for url in urls:
 			c.extract()
 
 	div.attrs.clear()
-	h2=get_h(tt,url)
+	h2=get_h(tt,url,title)
 	div.insert(0,h2)
 	fix_h(div)
 	out.body.div.append(div)

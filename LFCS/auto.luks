@@ -1,0 +1,44 @@
+#!/bin/bash
+
+# This is the path beneath this map's root that autofs is looking for
+key="$1"
+
+# The cryptsetup tool from the package of the same name
+CRYPTSETUP=/sbin/cryptsetup
+
+#secret		/dev/sdi1		/root/keyfile		luks
+
+# This is the raw device that we will mount
+mount_device="/dev/$key"
+
+# This is the encryption key file
+key_file="/root/$key.keyfile"
+
+# Options to pass to the cryptsetup tool
+luks_opts="--key-file $key_file"
+
+# Mount options for the encrypted fileystem
+mount_opts="-fstype=ext4,defaults"
+
+# The mapped block device
+mapped="$key.cryp"
+crypt_device="/dev/mapper/$mapped"
+
+# Give up if there is no key or setup tool
+[ -r $key_file ] || exit 0
+[ -x $CRYPTSETUP ] || exit 0
+
+# If there is an encrypted device mapped in already, it must be from a
+# previous mount. It may be out-of-date so remove it now.
+[ -b $crypt_device ] && $CRYPTSETUP remove $mapped
+
+# Give up if the raw device doesn't have a LUKS header
+$CRYPTSETUP isLuks $mount_device || exit 0
+
+# Open the encrypted block device
+$CRYPTSETUP luksOpen $mount_device $mapped $luks_opts >& /dev/null || exit 1
+
+# If we ended up with a block device, echo a mount line for autofs to use
+if [ -b $crypt_device ]; then
+  echo $mount_opts / :$crypt_device
+fi

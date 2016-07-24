@@ -818,6 +818,9 @@ Ejemplos:
 Sustituir la contraseña por `!` en `/etc/shadow` bloquea el usuario, el cual
 podemos editar usando `sudo vipw`
 
+Si nos olvidamos de crearle la home al usuario podemos hacerlo posteriormente
+con `mkhomedir_helper usuario`
+
 http://www.tecmint.com/manage-users-and-groups-in-linux/
 
 ### Manage system-wide environment profiles
@@ -2032,7 +2035,7 @@ mount: tipo de sistema de ficheros 'crypto_LUKS' desconocido
 Añadir fichero de clave para que automonte en el reinicio:
 
 ```console
-me@lub ~ $  sudo dd if=/dev/urandom of=/root/keyfile bs=1024 count=4
+me@lub ~ $ sudo dd if=/dev/urandom of=/root/keyfile bs=1024 count=4
 4+0 registros leídos
 4+0 registros escritos
 4096 bytes (4,1 kB) copiados, 0,0406153 s, 101 kB/s
@@ -2175,9 +2178,199 @@ Esto hará que el disco de reserva (`sdd1`) pase a ocupar el puesto del defectuo
 http://www.tecmint.com/creating-and-managing-raid-backups-in-linux/
 
 ### Configure systems to mount standard, encrypted, and network file systems on demand
+
+`autofs` lee `/etc/auto.master` y compañia para montar dispositivos cuando estos se
+demandan y desmontarlos cuando llevan x tiempo de inactividad.
+
+Las lineas que añadamos a `/etc/auto.master` tendran el siguiente aspecto:
+
+```
+/mmnt	/etc/auto.mnt	--timeout=60
+```
+
+Donde `/mnt` es el directorio donde se colocaran los puntos de montaje inidcados
+en `/etc/auto.mnt`, y `--timeout=60` indica que estos se desmontaran tras un minuto 
+sin ser usados.
+
+Mientras que en `/etc/auto.mnt``tendremos:
+
+```
+nfs	-fstype=nfs4 10.13.13.102:/home/me/nfsshare
+```
+
+Donde indicamos que se monte en `nfs` (es decir `/mnt/nfs`) un sistema de ficheros de tipo `nfs4` que esta en `10.13.13.102:/home/me/nfsshare`
+
+Tras esto:
+
+```console
+me@lub ~ $ sudo service autofs restart
+autofs stop/waiting
+autofs start/running, process 5214
+me@lub ~ $ sudo mount | grep nfs
+me@lub ~ $ ls /mnt/nfs
+file1  file2  file3
+me@lub ~ $ sudo mount | grep nfs
+10.13.13.102:/home/me/nfsshare on /mnt/nfs type nfs4 (rw,addr=10.13.13.102,clientaddr=10.13.13.101)
+me@lub ~ $ sleep 60
+me@lub ~ $ sudo mount | grep nfs
+me@lub ~ $ 
+```
+
+Otros ejemplos:
+
+```console
+me@lub ~ $ cat /etc/auto.mnt 
+nfs	-fstype=nfs4 10.13.13.102:/home/me/nfsshare
+smb	-fstype=cifs,credentials=/home/me/.smbcredentials ://10.13.13.102/share
+ext	-fstype=ext4 :/dev/sdk1
+me@lub ~ $ tail -n 1 /etc/auto.master 
+/media/luks	/etc/auto.luks	--timeout=60
+```
+
+Siendo `/etc/auto.luks` une script `sh` ejecutable que monta dispositiovos
+encriptados.
+
+http://www.tecmint.com/configure-nfs-server/ -> Mounting exported network shares using autofs
+https://help.ubuntu.com/community/Autofs
+https://debian-administration.org/article/127/Automounting_card_readers_and_USB_keys_using_autofs
+
 ### Create and manage filesystem Access Control Lists (ACLs)
+
+Con `tune2fs -l /dev/sda1 | grep "Default mount options:"` vemos si `/dev/sda1`
+tiene habilitado las `acl`. Si no tiene acl puede ser porque en `/etc/fstab`
+use la opción noacl.
+
+```console
+me@lub ~ $ sudo groupadd developers
+me@lub ~ $ sudo useradd walterwhite
+me@lub ~ $ sudo useradd saulgoodman
+me@lub ~ $ sudo usermod -a -G developers walterwhite
+me@lub ~ $ sudo usermod -a -G developers saulgoodman
+me@lub ~ $ sudo mkdir /mnt/test
+me@lub ~ $ sudo touch /mnt/test/acl.txt
+me@lub ~ $ sudo chgrp -R developers /mnt/test
+me@lub ~ $ sudo chmod -R 770 /mnt/test
+me@lub ~ $ sudo su - walterwhite 
+walterwhite@lub:~$ echo "Wallter" > /mnt/test/acl.txt
+walterwhite@lub:~$ exit
+logout
+me@lub ~ $ sudo su - saulgoodman 
+saulgoodman@lub:~$ echo "Saul" >> /mnt/test/acl.txt 
+saulgoodman@lub:~$ exit
+logout
+me@lub ~ $ sudo cat /mnt/test/acl.txt
+Walter
+Saul
+me@lub ~ $ sudo getfacl /mnt/test/acl.txt
+getfacl: Eliminando «/» inicial en nombres de ruta absolutos
+# file: mnt/test/acl.txt
+# owner: root
+# group: developers
+user::rwx
+group::rwx
+other::---
+
+me@lub ~ $ sudo setfacl -m u:me:rw /mnt/test/acl.txt
+e@lub ~ $ sudo getfacl /mnt/test/acl.txt
+getfacl: Eliminando «/» inicial en nombres de ruta absolutos
+# file: mnt/test/acl.txt
+# owner: root
+# group: developers
+user::rwx
+user:me:rw-
+group::rwx
+mask::rwx
+other::---
+me@lub ~ $ sudo chmod +x /mnt/test
+me@lub ~ $ echo "me" >> /mnt/test/acl.txt
+me@lub ~ $ cat /mnt/test/acl.txt
+Walter
+Saul
+me
+me@lub ~ $ setfacl -m d:o:r /mnt/test
+me@lub ~ $ getfacl /mnt/test/
+getfacl: Eliminando «/» inicial en nombres de ruta absolutos
+# file: mnt/test/
+# owner: root
+# group: developers
+user::rwx
+group::rwx
+other::--x
+default:user::rwx
+default:group::rwx
+default:other::r--
+```
+
+Adicionalmente, con `setfacl -x d:o /mnt/test` se borra una regla en concreto
+y con `setfacl -b /mnt/test` todas
 
 http://www.tecmint.com/set-access-control-lists-acls-and-disk-quotas-for-users-groups/
 
 ### Diagnose and correct file permission problems
+
+*No se muy bien a que se refiere*
+
 ### Setup user and group disk quotas for filesystems
+
+Para habilitar las cuotas hemos de añadir en `/etc/fstab` la opciones
+`grpquota` para cuotas de grupo y la opción `usrquota` para cuotas de usuario.
+
+```console
+me@lub ~ $ tail -n 2 /etc/fstab
+/dev/vg00/vol_uno	/home/me/vol_uno	ext4	defaults,grpquota 0 0
+/dev/vg00/vol_dos	/home/me/vol_dos	ext4	defaults,usrquota 0 0
+me@lub ~ $ sudo mount -a
+me@lub ~ $ mount | grep vg00
+/dev/mapper/vg00-vol_uno on /home/me/vol_uno type ext4 (rw,grpquota)
+/dev/mapper/vg00-vol_dos on /home/me/vol_dos type ext4 (rw,usrquota)
+me@lub ~ $ sudo quotacheck -avugc
+quotacheck: Su núcleo probablemente soporta cuotas transaccionales pero no las está utilizando. Considere la opción de usar cuotas transaccionales para evitar tener que ejecutar quotacheck después de un apagado incorrecto.
+quotacheck: Explorando /dev/mapper/vg00-vol_uno [/home/me/vol_uno] echo
+quotacheck: Old user file name could not been determined. Usage will not be subtracted.
+quotacheck: Cannot stat old group quota file /home/me/vol_uno/aquota.group: No existe el archivo o el directorio. Usage will not be subtracted.
+quotacheck: Comprobados 2 directorios y 0 archivos.
+quotacheck: Archivo antiguo no encontrado.
+quotacheck: Explorando /dev/mapper/vg00-vol_dos [/home/me/vol_dos] echo
+quotacheck: Cannot stat old user quota file /home/me/vol_dos/aquota.user: No existe el archivo o el directorio. Usage will not be subtracted.
+quotacheck: Old group file name could not been determined. Usage will not be subtracted.
+quotacheck: Comprobados 2 directorios y 0 archivos.
+quotacheck: Archivo antiguo no encontrado.
+me@lub ~ $ sudo quotaon -vu vol_dos/
+/dev/mapper/vg00-vol_dos [/home/me/vol_dos]: user quotas activadas
+me@lub ~ $ sudo quotaon -vg vol_uno/
+/dev/mapper/vg00-vol_uno [/home/me/vol_uno]: group quotas activadas
+me@lub ~ $ sudo edquota -u me
+Cuotas de disco para user me (uid 1000):
+  Sist. arch.                  bloques     blando       duro     inodos   blando     duro
+  /dev/mapper/vg00-vol_dos         13         900       1000          2       20       25
+me@lub ~ $ cd vol_dos/
+me@lub ~/vol_dos $ dd if=/dev/zero of=f2M bs=2M count=1
+dd: error al escribir en «f2M»: Se ha excedido la cuota de disco
+1+0 registros leídos
+0+0 registros escritos
+1007616 bytes (1,0 MB) copiados, 0,0914139 s, 11,0 MB/s
+me@lub ~/vol_dos $ df -h .
+S.ficheros               Tamaño Usados  Disp Uso% Montado en
+/dev/mapper/vg00-vol_dos   6,9M  1019K  5,5M  16% /home/me/vol_dos
+me@lub ~/vol_dos $ cd ../vol_uno/
+me@lub ~/vol_uno $ setfacl -m g:developers:rwx .
+me@lub ~/vol_uno $ sudo edquota -g developers
+Cuotas de disco para group developers (gid 1001):
+  Sist. arch.                  bloques     blando       duro     inodos   blando     duro
+  /dev/mapper/vg00-vol_uno          0         900       1000          0       20       25
+me@lub ~/vol_uno $ sudo edquota -t
+Período de gracia antes de imponer límites blandos para users:
+La unidad de tiempo puede ser: días, horas, minutos, o segundos
+  Sist. arch.          Periodo gracia bloque   Periodo gracia inodo
+  /dev/mapper/vg00-vol_dos                 7días                 7días
+me@lub ~/vol_uno $ sudo su walterwhite 
+walterwhite@lub:/home/me/vol_uno$ dd if=/dev/zero of=f2M bs=2M count=1
+dd: error al escribir en «f2M»: Se ha excedido la cuota de disco
+1+0 registros leídos
+0+0 registros escritos
+1007616 bytes (1,0 MB) copiados, 0,0779684 s, 12,9 MB/s
+```
+
+Un limite de 1000 bloques equivale a 1024 bytes/block * 1000 bloques = 1024000 bytes = 1 MB
+
+http://www.tecmint.com/set-access-control-lists-acls-and-disk-quotas-for-users-groups/ -> Set Linux Disk Quotas on Users and Filesystems
