@@ -1142,13 +1142,13 @@ ONBOOT=yes
 
 Ejemplo 1: Enrutar paquetes entre red interna e internet
 
-Router: Debian Wheezy 7.7 eth0: Public IP, eth1: 10.0.0.15/24
+Router: Debian Wheezy 7.7 eth0: Public IP, eth1: 10.0.0.15/24  
 Client: openSUSE 13.2 enp0s3: 10.0.0.18/24
 
 ```console
-root@cl1:~# iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
-root@cl1:~# iptables -A FORWARD -i eth0 -o eth1 -m state --state RELATED,ESTABLISHED -j ACCEPT
-root@cl1:~# iptables -A FORWARD -i eth1 -o eth0 -j ACCEPT
+root@rtr:~# iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+root@rtr:~# iptables -A FORWARD -i eth0 -o eth1 -m state --state RELATED,ESTABLISHED -j ACCEPT
+root@rtr:~# iptables -A FORWARD -i eth1 -o eth0 -j ACCEPT
 ```
 
 http://www.tecmint.com/setup-linux-as-router/
@@ -1169,7 +1169,7 @@ ripd=1
 
 Crear ficheros de configuración
 
-``console
+```console
 root@rtr:~# touch /etc/quagga/zebra.conf
 root@rtr:~# touch /etc/quagga/ripd.conf
 root@rtr:~# chown quagga:quaggavty /etc/quagga/*.conf
