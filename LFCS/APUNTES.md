@@ -181,8 +181,10 @@ Más: [www.tecmint.com](http://www.tecmint.com/compress-files-and-finding-files-
 * Crear fichero vacio: `touch fichero.txt`
 * Editar fichero: `nano fichero.txt`
 * Comparar ficheros: `diff fichero1.txt fichero2.txt`
+* Cambiar el editor de texto por defecto: `update-alternatives --config editor`
 
 Más: [www.tecmint.com - vi](http://www.tecmint.com/vi-editor-usage/)
+http://www.elarraydejota.com/como-cambiar-el-editor-de-texto-por-defecto-en-linux/
 
 ### Compare binary files
 
@@ -490,7 +492,7 @@ http://www.tecmint.com/monitor-linux-processes-and-set-process-limits-per-user/
 * `tail` muestra el final de un fichero (con la opción `-f` actualiza la salida según se incrementa el fichero)
 * `dmesg` lista el buffer de mensajes del núcleo ( = `/var/log/dmesg`)
 * `zcat`, `zgrep`, etc sirve para usarse con ficheros `.gz` como si fuera de texto plano
-* `/var/log/cron` (`grep -i cron /var/log/syslog` si esta desactivad) para ver la actividad del `cron`
+* `/var/log/cron` (`grep -i cron /var/log/syslog` si esta desactivadoe) para ver la actividad del `cron`
 * `/var/log/boot.log` mensajes de arranque del sistema
 * `last` da los accesos de cada usuario, `lastlog` da el último acceso de cada usuario y `lastb` los accesos fallidos
 * `/var/log/messages` mensajes principales del sistema
@@ -531,13 +533,17 @@ Más: [www.alcancelibre.org](http://www.alcancelibre.org/staticpages/index.php/c
 
 * `cron` manda un email a la dirección del campo `MAILTO` o al usuario
 que ejecuta el comando
-* La linea `EXTRA_OPTS="-L 0"` en `/etc/default/cron` define el nivel de log: 
+* La linea `EXTRA_OPTS="-L 0"` en `/etc/default/cron`, o la linea `exec cron -L 0` en /etc/init/cron.conf, define el nivel de log: 
 siendo 0 nada de log, 1 log normal y 2 log detallado
 * Si no sabemos en que log escribe lo podemos buscar con `sudo grep -icr CRON /var/log/* | grep -v :0`
 * En `ubuntu` probablemente nos interese `/var/log/syslog`
 
+Si descomentamos la linea `#cron.*				/var/log/cron.log` de `/etc/rsyslog.d/50-default.conf` el log de cron estara
+en `/var/log/cron.log`
+
 Más: [bencane.com](http://bencane.com/2011/11/02/did-my-cronjob-run/)
 [help.ubuntu.com](https://help.ubuntu.com/community/CronHowto#Troubleshooting_and_Common_Problems)
+http://askubuntu.com/questions/56683/where-is-the-cron-crontab-log
 
 ### Update software to provide required functionality and security
 
@@ -571,8 +577,6 @@ Los caracteres mostrados significan:
 * c: se trata de un fichero de configuración que ha sido modificado de forma legitima
 
 Un mensaje no siempre es un error (por ejemplo, un fichero de configuración modificado).
-
-*no tengo claro a que más se refiere*
 
 ### Verify the integrity and availability of key processes
 
@@ -636,8 +640,8 @@ systemd:
 * `systemctl start [unit]` arranca una unidad
 * `systemctl stop [unit]` para una unidad
 * `systemctl restart [unit]` reinicia una unidad
-* `systemctl enable [unit]` deshabilita una unidad (se arrancara al inicio de sistema)
-* `systemctl disable [unit]` habilita una unidad (no se arrancara al inicio del sistema)
+* `systemctl enable [unit]` habilita una unidad (se arrancara al inicio de sistema)
+* `systemctl disable [unit]` deshabilita una unidad (no se arrancara al inicio del sistema)
 * `systemctl is-enabled [unit]` muestra si esta habilitado para arrancar al inicio del sistema
 
 Upstart:
@@ -818,6 +822,8 @@ Ejemplos:
 Sustituir la contraseña por `!` en `/etc/shadow` bloquea el usuario, el cual
 podemos editar usando `sudo vipw`
 
+Adicionalmente podemos eliminar un usuario de un grupo con `sudo gpasswd -d usario grupo`
+
 Si nos olvidamos de crearle la home al usuario podemos hacerlo posteriormente
 con `mkhomedir_helper usuario`
 
@@ -862,12 +868,12 @@ Al se arranca la shell bash de un usuario procesa:
 
 * `/etc/profile` para leer los valores definidos para todos los usuarios
 * Adicionalmente `/etc/profile.d/*.sh` seran ejecutados en cualquier login
-* `~/.bash_profile`, ~/.bash_login` y `~/.profile`, para leer los valores definidos para ese usuario en concreto
+* `~/.bash_profile`, `~/.bash_login` y `~/.profile`, para leer los valores definidos para ese usuario en concreto
 
 Otros ficheros a tener en cuenta:
 
 `/etc/bash.bashrc` valido para programas ejecutados desde la shell, pero puede 
-no surtir efecto con programas ejecutados desde el entorno gráfico-
+no surtir efecto con programas ejecutados desde el entorno gráfico.
 
 Los comando ejecutados con `sudo` tienen sus propias variables de entorno, indicadas
 en `/etc/sudoers`. Si se quiere que no se sobreescriba o pierda alguna variable
@@ -918,7 +924,7 @@ donde, `type` especifica el grupo de gestión al que el módulo estará asociado
 * optional: El módulo no es requerido. Si este es el único módulo, el estado que se envía a la aplicación puede causar una falla.
 * sufficient: Si este módulo termina con éxito no hay módulos subsecuentes a ser ejecutados. Si este falla, no causa una falla general en el resto de módulos, a menos de que sea el único módulo del stack.
 * include: significa que las lineas dadas por el type deben ser leidas de otro archivo
-substack: similar a includes pero los fallos o exitos del fichero incluido no provocan la salida del modulo, solo del substack.
+* substack: similar a includes pero los fallos o exitos del fichero incluido no provocan la salida del modulo, solo del substack.
 
 http://www.tecmint.com/manage-users-and-groups-in-linux/ -> PAM (Pluggable Authentication Modules)
 
@@ -926,7 +932,7 @@ http://www.tecmint.com/manage-users-and-groups-in-linux/ -> PAM (Pluggable Authe
 
 ### Configure networking and hostname resolution statically or dynamically
 
-* Resolución de nombres estaticamente: `/etc/hosts
+* Resolución de nombres estaticamente: `/etc/hosts`
 * Resolución de nombres dinamicamente: DNS
 
 http://www.tecmint.com/setup-recursive-caching-dns-server-and-configure-dns-zones/
@@ -979,7 +985,7 @@ Ejemplo 3: Redirigir trafico entrate a otro destino
 
 1. Editamos `/etc/sysctl.conf` para poner `net.ipv4.ip_forward = 1`
 2. Refrescamos la configuración con `sysctl -p /etc/sysctl.conf`
-3. Redirigimos el trafico entrante por el purto 631 a 192.168.0.10:631
+3. Redirigimos el trafico entrante por el puerto 631 a 192.168.0.10:631
 
 ```console
 me@ubu ~ $ sudo iptables -t nat -A PREROUTING -i enp0s3 -p tcp --dport 631 -j DNAT --to 192.168.0.10:631
@@ -1103,8 +1109,8 @@ root@lub:~# ip link show eth0
 
 Ejemplo 1: Rutear paquetes de una red privada a otra
 
-Cliente 1: CentOS 7 enp0s3: 192.168.0.17/24
-Router: Debian Wheezy 7.7 eth0: 192.168.0.15/24, eth1: 10.0.0.15/24
+Cliente 1: CentOS 7 enp0s3: 192.168.0.17/24  
+Router: Debian Wheezy 7.7 eth0: 192.168.0.15/24, eth1: 10.0.0.15/24  
 Cliente 2: openSUSE 13.2 enp0s3: 10.0.0.18/24
 
 ```console
