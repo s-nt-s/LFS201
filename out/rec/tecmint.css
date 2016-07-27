@@ -65,23 +65,21 @@ pre .resaltar {
 	color:red;
 }
 
-div.menu select {
-  counter-reset: capitulo;
-}
-div.menu select option:before {
-  content: counter(capitulo) ". ";
-  counter-increment: capitulo;
-}
-div.menu select option {
-	padding-left: 0.5em;
-}
-div.menu select option:nth-child(n+10) {
-	padding-left: 0;
-}
-
 hr {
     background-color: red;
     border: medium none;
     color: red;
     height: 10px;
+}
+div.h0 {
+    background-color: red;
+    border-bottom: medium none;
+    border-image: none;
+    border-left: medium none;
+    border-radius: 6px;
+    border-top: medium none;
+    color: white;
+    font-size: 200%;
+    font-weight: bold;
+    padding: 10px;
 }

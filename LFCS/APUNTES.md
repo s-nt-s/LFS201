@@ -224,8 +224,15 @@ Más: [www.tecmint.com - part 1](http://www.tecmint.com/sed-command-to-create-ed
   * `j` para comprimir con `bz2`
   * `J` para comprimir con `xz`
 
-Más: [www.tecmint.com](http://www.tecmint.com/compress-files-and-finding-files-in-linux/)
-https://www.youtube.com/watch?v=ZxVyhZEYEAU
+Otras opciones para backup:
+
+* `dd if=/dev/sda of=/system_images/sda.img`
+* `rsync -av source_directory destination directory`
+
+
+Más: [www.tecmint.com](http://www.tecmint.com/compress-files-and-finding-files-in-linux/)  
+https://www.youtube.com/watch?v=ZxVyhZEYEAU  
+http://www.tecmint.com/creating-and-managing-raid-backups-in-linux/
 
 ### Create, delete, copy, and move files and directories
 
@@ -584,7 +591,7 @@ Un mensaje no siempre es un error (por ejemplo, un fichero de configuración mod
 * `ps` da información detallada de cada proceso. Elmplo `ps -eo pid,ppid,cmd,%cpu,%mem --sort=-%cpu`
 * `kill` y `pkill` para matar procesos
 * `pgrep` para buscar procesos al estilo de `pkill` pero sin matarlos
-* `sar` da estadisticas del sistema
+* `sar` da estadisticas del sistema (ver en `/etc/default/sysstat` si esta activada la recoleción automatica de estadisticas)
 
 Más: [www.tecmint.com](http://www.tecmint.com/monitor-linux-processes-and-set-process-limits-per-user/)
 
@@ -646,7 +653,7 @@ systemd:
 
 Upstart:
 
-* Ficheros de configuración (.conf) en `/etc/init`
+* Ficheros de configuración (.conf) en `/etc/init/*.conf`
 * `initctl reload-configuration` recarga la configuración
 * `sudo start [servicio]`  arranca un servicio
 
@@ -713,6 +720,13 @@ Habilitar DocumentRoot fuera de `/var/www/html/`:
 me@deb ~ $ sudo semanage fcontext -a -t httpd_sys_content_t "/websrv/sites/gabriel/public_html(/.*)?"
 me@deb ~ $ sudo restorecon -R -v /websrv/sites/gabriel/public_html
 ```
+
+Herramientas para revisar errores (paquete `setroubleshoot-server`):
+
+* `grep httpd /var/log/audit/audit.log | audit2allow -M mypol` Crea reglas para permitir los accesos bloqueados
+* `audit2why` (similar a ala naterior) explica los errores
+* `sealert -l d51d34f9-91d5-4219-ad1e-5531e61a2dc3` muestra una alerta que hayamos visto en `/var/log/messages` por ejemplo
+
 
 **AppArmor**:
 
@@ -892,7 +906,7 @@ https://help.ubuntu.com/community/EnvironmentVariables
 
 ### Configure user resource limits
 
-Podemos definir los limites por usuario en `/etc/security/limits.conf`
+Podemos definir los limites por usuario en `/etc/security/limits.conf` y el comando `ulimit`
 
 http://www.tecmint.com/monitor-linux-processes-and-set-process-limits-per-user/ -> Setting Resource Limits on a Per-User Basis in Linux
 
@@ -1287,7 +1301,7 @@ me@deb ~ $ sudo ntpq -p
 * Los logs se pueden ver con `grep ntp /var/log/syslog`
 * Las opciones con las que se arranca el demonio `ntpd` estan en `/etc/default/ntp`
 
-Sin necesidad de tener `ntpd` se puede actualizar la feca con `ntpdate pool.ntp.org` (añadir -u si se tiene isntalado `ntpd`)
+Sin necesidad de tener `ntpd` se puede actualizar la fecha con `ntpdate pool.ntp.org` (añadir -u si se tiene isntalado `ntpd`)
 
 http://www.tecmint.com/how-to-synchronize-time-with-ntp-server-in-ubuntu-linux-mint-xubuntu-debian/  
 http://www.tecmint.com/install-and-configure-ntp-server-client-in-debian/
@@ -1711,6 +1725,9 @@ https://help.ubuntu.com/community/KVM/Installation
 ### Access a VM console
 ### Configure systems to launch virtual machines at boot
 ### Evaluate memory usage of virtual machines
+
+`vmstat`, `pmap`, `free`
+
 ### Resize RAM or storage of VMs
 
 ## Storage Management - 10%
@@ -1963,7 +1980,8 @@ Si lo queremos borrar sin hacer el merge podemos hacer `sudo lvremove /dev/vg/my
 
 http://www.tecmint.com/manage-and-create-lvm-parition-using-vgcreate-lvcreate-and-lvextend/  
 http://blog.timmattison.com/archives/2009/11/01/how-to-fix-lvm2s-no-extents-available-for-allocation-errors-when-using-pvmove/  
-http://www.tecmint.com/create-lvm-storage-in-linux/
+http://www.tecmint.com/create-lvm-storage-in-linux/  
+http://www.vilecha.com/hellguest/lvm2_migrar.asp
 
 ### Create and configure encrypted partitions
 
@@ -2150,6 +2168,9 @@ me@lub ~ $ sudo bash -c "mdadm --detail --scan >> /etc/mdadm/mdadm.conf"
 me@lub ~ $ sudo mkdir /myraid
 me@lub ~ $ sudo bash -c "echo '/dev/md0 /myraid ext4 defaults 0 2' >> /etc/fstab"
 ```
+
+Por otro lado hay que confirmar en `/etc/default/mdadm` que mdadm esta configurado para
+autoarrancar en el inicio.
 
 Si un disco tiene problemas (por ejemplo `sdc1`):
 

@@ -26,24 +26,34 @@ def get_url(url):
 
 urls=[]
 oris=[
+	"LFCS",
 	"http://www.tecmint.com/sed-command-to-create-edit-and-manipulate-files-in-linux/",
+	"LFCE",
 	"http://www.tecmint.com/installing-network-services-and-configuring-services-at-system-boot/",
+	"LVM",
 	"http://www.tecmint.com/create-lvm-storage-in-linux/",
+	"KVM",
 	"http://www.tecmint.com/install-and-configure-kvm-in-linux/"
 ]
 extra=[
-	None, #Agrega un <hr/>
+	"NTP",
 	"http://www.tecmint.com/how-to-synchronize-time-with-ntp-server-in-ubuntu-linux-mint-xubuntu-debian/",
 	"http://www.tecmint.com/install-and-configure-ntp-server-client-in-debian/",
-	None, #Agrega un <hr/>
+	"MariaDB",
 	"http://www.tecmint.com/install-secure-performance-tuning-mariadb-database-server/",
-	"http://www.tecmint.com/mysql-mariadb-performance-tuning-and-optimization/"
+	"http://www.tecmint.com/mysql-mariadb-performance-tuning-and-optimization/",
+	"TMUX",
+	"http://www.tecmint.com/tmux-to-access-multiple-linux-terminals-inside-a-single-console/"
 ]
 excluir=[
-	"http://www.tecmint.com/install-cygwin-to-run-linux-commands-on-windows-system/"
+	"http://www.tecmint.com/install-cygwin-to-run-linux-commands-on-windows-system/",
+	"http://www.tecmint.com/setup-yum-repository-in-centos-7/"
 ]
 
 for ori in oris:
+	if not ori.startswith("http"):
+		urls.append(ori)
+		continue
 	if ori not in urls and ori not in excluir:
 		urls.append(ori)
 		soup=get_url(ori)
@@ -54,7 +64,10 @@ for ori in oris:
 				if url not in urls and url not in excluir:
 					urls.append(url)
 for ext in extra:
-	if ext==None or (ext not in urls):
+	if not ext.startswith("http"):
+		urls.append(ext)
+		continue
+	if ext not in urls:
 		urls.append(ext)
 
 ini1=[
@@ -142,17 +155,18 @@ index=True
 flag=0
 part=re.compile(u"\s*[\-–—]\s*Part\s+\w+$", re.UNICODE | re.IGNORECASE)
 for url in urls:
+	if not url.startswith("http"):
+		hr=out.new_tag("div")
+		hr.attrs["class"]="h0"
+		hr.string=url
+		out.body.div.append(hr)
+		continue
+
 	if url in oris:
 		index=True
 		flag=flag+1
 	else:
 		index=False
-
-	if url==None or (index and flag>1):
-		hr=out.new_tag("hr")
-		out.body.div.append(hr)
-		if url==None:
-			continue
 	
 	soup=get_url(url)
 	title=soup.head.title.get_text().strip()
@@ -290,6 +304,9 @@ for p in out.findAll("pre"):
 		if "style" in s.attrs and "class" not in s.attrs:
 			del s.attrs["style"]
 			s.attrs["class"]="resaltar"
+for i in out.findAll("iframe"):
+	if "src" in i.attrs and i.attrs["src"].startswith("//"):
+		i.attrs["src"]="http:"+i.attrs["src"]
 
 util.set_menu(out)
 

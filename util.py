@@ -9,6 +9,7 @@ tag_round=['u','i','em','span','strong', 'a']
 tag_trim=['li', 'th', 'td', 'div','caption','h[1-6]']
 tag_right=['p']
 sp=re.compile("\s+", re.UNICODE)
+nb=re.compile("^\s*\d+\.\s+", re.UNICODE)
 
 def get_tpt(title,css):
 	soup=bs4.BeautifulSoup('''
@@ -35,7 +36,7 @@ def set_menu(out):
 	sel.attrs["onchange"]="window.location.href=this.value"
 	for h in out.findAll("h1"):
 		o=out.new_tag("option")
-		o.string=h.a.get_text().strip()
+		o.string=nb.sub("",h.a.get_text().strip())
 		o.attrs["value"]=h.a.attrs["href"]
 		sel.append(o)
 	div=out.new_tag("div")

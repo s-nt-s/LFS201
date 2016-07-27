@@ -69,10 +69,3 @@ figure > figcaption {
     border-bottom: 1px dashed black;
     text-align: center;
 }
-
-div.menu select option {
-	padding-left: 0.5em;
-}
-div.menu select option:nth-child(n+10) {
-	padding-left: 0;
-}

@@ -41,6 +41,19 @@ div.menu select {
 div.menu select option {
 	direction: ltr;
 }
+div.menu select {
+  counter-reset: capitulo;
+}
+div.menu select option:before {
+  content: counter(capitulo) ". ";
+  counter-increment: capitulo;
+}
+div.menu select option {
+	padding-left: 0.5em;
+}
+div.menu select option:nth-child(n+10) {
+	padding-left: 0;
+}
 
 table {
 	margin-top: 14px;
