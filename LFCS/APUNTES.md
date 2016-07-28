@@ -1776,6 +1776,7 @@ me@lub ~ $ sudo virt-install --name=cent --disk path=/mnt/personal-data/SPool1/S
 
 https://help.ubuntu.com/community/KVM/Installation  
 https://help.ubuntu.com/community/KVM/CreateGuests  
+http://www.naturalborncoder.com/virtualization/2014/10/27/installing-and-running-kvm-on-ubuntu-14-04-part-3/  
 http://www.naturalborncoder.com/virtualization/2014/10/27/installing-and-running-kvm-on-ubuntu-14-04-part-4/  
 http://www.tecmint.com/kvm-management-tools-to-manage-virtual-machines/
 
