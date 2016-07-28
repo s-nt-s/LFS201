@@ -1719,8 +1719,65 @@ http://www.tecmint.com/mysql-mariadb-performance-tuning-and-optimization/
 
 ### Configure a hypervisor to host virtual guests
 
-http://www.tecmint.com/install-and-configure-kvm-in-linux/  
-https://help.ubuntu.com/community/KVM/Installation
+* Ejecutar `kvm-ok` para saber si podemos virutalizar bien, o solo regular.
+* Instalar: `sudo apt-get install qemu-kvm libvirt-bin ubuntu-vm-builder bridge-utils virtinst virt-viewer ubuntu-vm-builder`
+* Comprobar instalación. `virsh -c qemu:///system list`
+* Si falla recargar el modulo: `modprobe -a kvm`
+
+`sudo apt-get install qemu-kvm qemu-img virt-manager libvirt libvirt-python libvirt-client virtualization-client virtualization-platform virtualization-tools`
+
+Hacer movidas:
+
+```console
+me@lub ~ $ sudo virsh -c qemu:///system list
+ Id    Nombre                         Estado
+----------------------------------------------------
+
+me@lub ~ $ man virsh
+me@lub ~ $ sudo virsh pool-define-as Spool1 dir - - - - "/mnt/personal-data/SPool1/"
+Se ha definido el grupo Spool1
+
+me@lub ~ $ sudo virsh pool-list --all
+ Nombre               Estado     Inicio automático
+-------------------------------------------
+ Spool1               inactivo   no        
+
+me@lub ~ $ sudo virsh pool-build Spool1
+El grupo Spool1 ya ha sido compilado
+
+me@lub ~ $ sudo virsh pool-start Spool1
+Se ha iniciado el grupo Spool1
+
+me@lub ~ $ sudo virsh pool-list --all
+ Nombre               Estado     Inicio automático
+-------------------------------------------
+ Spool1               activo     no        
+
+me@lub ~ $ sudo virsh pool-list --all
+ Nombre               Estado     Inicio automático
+-------------------------------------------
+ Spool1               activo     no        
+
+me@lub ~ $ sudo virsh pool-autostart Spool1
+El grupo Spool1 ha sido marcado como iniciable automáticamente
+
+me@lub ~ $ sudo virsh pool-list --all
+ Nombre               Estado     Inicio automático
+-------------------------------------------
+ Spool1               activo     si        
+
+me@lub ~ $ sudo qemu-img create -f raw /mnt/personal-data/SPool1/SVol1.img 1G
+Formatting '/mnt/personal-data/SPool1/SVol1.img', fmt=raw size=1073741824 
+
+me@lub ~ $ sudo virt-install --name=cent --disk path=/mnt/personal-data/SPool1/SVol1.img --graphics spice --vcpu=1 --ram=1024 --location=/home/me/Descargas/iso/CentOS-7-x86_64-Minimal-1511.iso --network bridge=virbr0
+
+
+```
+
+https://help.ubuntu.com/community/KVM/Installation  
+https://help.ubuntu.com/community/KVM/CreateGuests  
+http://www.naturalborncoder.com/virtualization/2014/10/27/installing-and-running-kvm-on-ubuntu-14-04-part-4/  
+http://www.tecmint.com/kvm-management-tools-to-manage-virtual-machines/
 
 ### Access a VM console
 ### Configure systems to launch virtual machines at boot
