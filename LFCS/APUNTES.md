@@ -120,8 +120,9 @@ detallada en los pasos anteriores
 **BONUS: Red interna**
 
 Para algunos ejercicios en los que quiero conectar varias maquinas
-virtuales entre si hago esto: https://www.youtube.com/watch?v=lhOY-KilEeE
-http://superuser.com/questions/119732/how-to-do-networking-between-virtual-machines-in-virtualbox
+virtuales entre si hago esto: [youtube - Linux Leech
+](https://www.youtube.com/watch?v=lhOY-KilEeE)
+[superuser.com/questions/119732](http://superuser.com/questions/119732/how-to-do-networking-between-virtual-machines-in-virtualbox)
 (*con debian 8 no funcionaba, he tenido que hacerlo entre un ubuntu y un lubuntu*)
 
 # Temario
@@ -170,7 +171,7 @@ Tambien podemos usar:
 * `which` busca ejecutables en el PATH
 * `locate` busca en base de datos del sistema de ficheros (que se puede actualizar con `sudo updatedb`)
 
-Más: [www.tecmint.com](http://www.tecmint.com/compress-files-and-finding-files-in-linux/)
+Más: [tecmint.com - compress files](http://www.tecmint.com/compress-files-and-finding-files-in-linux/)
 
 ### Evaluate and compare the basic file system features and options
 
@@ -183,8 +184,8 @@ Más: [www.tecmint.com](http://www.tecmint.com/compress-files-and-finding-files-
 * Comparar ficheros: `diff fichero1.txt fichero2.txt`
 * Cambiar el editor de texto por defecto: `update-alternatives --config editor`
 
-Más: [www.tecmint.com - vi](http://www.tecmint.com/vi-editor-usage/)
-http://www.elarraydejota.com/como-cambiar-el-editor-de-texto-por-defecto-en-linux/
+Más: [tecmint.com - vi](http://www.tecmint.com/vi-editor-usage/)
+[elarraydejota.com - editor por defecto](http://www.elarraydejota.com/como-cambiar-el-editor-de-texto-por-defecto-en-linux/)
 
 ### Compare binary files
 
@@ -203,7 +204,7 @@ Ejemplos:
 * `comando 2> /dev/null` desecha la salida de errores
 * `ps -a | sort` redireciona la salida de `ps` a la entrada de `sort`
 
-Más: [hipertextual.com](http://hipertextual.com/archivo/2014/07/redirecciones-y-tuberias-bash/)
+Más: [hipertextual.com - tuberias](http://hipertextual.com/archivo/2014/07/redirecciones-y-tuberias-bash/)
 
 ### Analyze text using basic regular expressions
 
@@ -211,7 +212,7 @@ Más: [hipertextual.com](http://hipertextual.com/archivo/2014/07/redirecciones-y
 * `awk`
 * `sed`
 
-Más: [www.tecmint.com - part 1](http://www.tecmint.com/sed-command-to-create-edit-and-manipulate-files-in-linux/)
+Más: [tecmint.com - sed](http://www.tecmint.com/sed-command-to-create-edit-and-manipulate-files-in-linux/)
 
 ### Archive, backup, compress, unpack, and uncompress files
 
@@ -230,9 +231,9 @@ Otras opciones para backup:
 * `rsync -av source_directory destination directory`
 
 
-Más: [www.tecmint.com](http://www.tecmint.com/compress-files-and-finding-files-in-linux/)  
-https://www.youtube.com/watch?v=ZxVyhZEYEAU  
-http://www.tecmint.com/creating-and-managing-raid-backups-in-linux/
+Más: [tecmint.com - compress](http://www.tecmint.com/compress-files-and-finding-files-in-linux/)  
+[youtube](https://www.youtube.com/watch?v=ZxVyhZEYEAU)  
+[tecmint.com - raid](http://www.tecmint.com/creating-and-managing-raid-backups-in-linux/)
 
 ### Create, delete, copy, and move files and directories
 
@@ -269,7 +270,7 @@ tambien la tiene el enlace duro
 
 Se puede comprobar si dos ficeros tienen el mismo inodo o no con `ls -li` o `stat fichero`
 
-Más: [rm-rf.es](http://rm-rf.es/diferencias-entre-soft-symbolic-y-hard-links/)
+Más: [rm-rf.es - ln](http://rm-rf.es/diferencias-entre-soft-symbolic-y-hard-links/)
 
 ### List, set, and change standard file permissions
 
@@ -285,7 +286,7 @@ Más: [rm-rf.es](http://rm-rf.es/diferencias-entre-soft-symbolic-y-hard-links/)
 * `comando --help`
 * `help comando`
 
-http://www.tecmint.com/explore-linux-installed-help-documentation-and-tools/
+[tecmint.com - documentation](http://www.tecmint.com/explore-linux-installed-help-documentation-and-tools/)
 
 ### Manage access to the root account
 
@@ -309,9 +310,9 @@ otros ejemplos:
 * `ALL = NOPASSWD: ALL` no pide autenticarse al usar `sudo`
 * `ALL = /bin/ls` solo puede usar `sudo` con `ls`
 
-Más: [www.linuxtotal.com.mx](http://www.linuxtotal.com.mx/?cont=info_admon_014)
-y [www.formandome.es](http://www.formandome.es/linux/configuracion-fichero-sudoers-en-ubuntu/)
-http://www.tecmint.com/su-vs-sudo-and-how-to-configure-sudo-in-linux/
+Más: [linuxtotal.com.mx - sudo](http://www.linuxtotal.com.mx/?cont=info_admon_014)
+y [formandome.es - sudo](http://www.formandome.es/linux/configuracion-fichero-sudoers-en-ubuntu/)
+[tecmint.com - su vs sudo](http://www.tecmint.com/su-vs-sudo-and-how-to-configure-sudo-in-linux/)
 
 ## Operation of Running Systems - 20%
 
@@ -391,11 +392,11 @@ Ejemplo 2 de reparación:
 	* `sudo umount /mnt`
 14. Reiniciamos y funciona
 
-Más: [howtoubuntu.org](http://howtoubuntu.org/how-to-repair-restore-reinstall-grub-2-with-a-ubuntu-live-cd)
-[lukeplant.me.uk](http://lukeplant.me.uk/blog/posts/sharing-internet-connection-to-chroot/)
-[ubuntuforums.org](http://ubuntuforums.org/showthread.php?t=1467147)
-[debian-handbook.info](https://debian-handbook.info/browse/es-ES/stable/sect.apt-get.html)
-http://www.tecmint.com/configure-and-troubleshoot-grub-boot-loader-linux/
+Más: [howtoubuntu.org - grub](http://howtoubuntu.org/how-to-repair-restore-reinstall-grub-2-with-a-ubuntu-live-cd)
+[lukeplant.me.uk - chroot](http://lukeplant.me.uk/blog/posts/sharing-internet-connection-to-chroot/)
+[ubuntuforums.org - grub](http://ubuntuforums.org/showthread.php?t=1467147)
+[debian-handbook.info - apt-get](https://debian-handbook.info/browse/es-ES/stable/sect.apt-get.html)
+[tecmint.com - grub](http://www.tecmint.com/configure-and-troubleshoot-grub-boot-loader-linux/)
 
 ### Change the priority of a process
 
@@ -460,7 +461,7 @@ me@lub ~ $ renice -n 0 1872
 1872 (ID de proceso) prioridad antigua 1, prioridad nueva 0
 ```
 
-http://www.tecmint.com/monitor-linux-processes-and-set-process-limits-per-user/
+[tecmint.com - processes](http://www.tecmint.com/monitor-linux-processes-and-set-process-limits-per-user/)
 
 ### Identify resource utilization by process
 
@@ -490,7 +491,7 @@ me@lub ~ $ realpath /proc/2205/cwd/
 
 En `/proc/PID/fd/1` se puede ver la salida estanadar de haberla.
 
-http://www.tecmint.com/monitor-linux-processes-and-set-process-limits-per-user/
+[tecmint.com - processes](http://www.tecmint.com/monitor-linux-processes-and-set-process-limits-per-user/)
 
 ### Locate and analyze system log files
 
@@ -506,7 +507,7 @@ http://www.tecmint.com/monitor-linux-processes-and-set-process-limits-per-user/
 * `/var/log/auth.log` información sobre el sistema de autorización de usuarios y permisos
 
 
-Más: [www.securityartwork.es](http://www.securityartwork.es/2012/05/30/analisis-forense-en-sistemas-linux-obteniendo-informacion-parte-2/)
+Más: [securityartwork.es - análisis forense](http://www.securityartwork.es/2012/05/30/analisis-forense-en-sistemas-linux-obteniendo-informacion-parte-2/)
 
 ### Schedule tasks to run at a set date and time
 
@@ -534,7 +535,7 @@ Ejemplo
 @weekly /bin/bash ~/wks/emvs/mail.sh
 ```
 
-Más: [www.alcancelibre.org](http://www.alcancelibre.org/staticpages/index.php/configuracion-uso-crond)
+Más: [alcancelibre.org - crond](http://www.alcancelibre.org/staticpages/index.php/configuracion-uso-crond)
 
 ### Verify completion of scheduled jobs
 
@@ -548,9 +549,9 @@ siendo 0 nada de log, 1 log normal y 2 log detallado
 Si descomentamos la linea `#cron.*				/var/log/cron.log` de `/etc/rsyslog.d/50-default.conf` el log de cron estara
 en `/var/log/cron.log`
 
-Más: [bencane.com](http://bencane.com/2011/11/02/did-my-cronjob-run/)
-[help.ubuntu.com](https://help.ubuntu.com/community/CronHowto#Troubleshooting_and_Common_Problems)
-http://askubuntu.com/questions/56683/where-is-the-cron-crontab-log
+Más: [bencane.com - cronjob](http://bencane.com/2011/11/02/did-my-cronjob-run/)
+[help.ubuntu.com - common problems](https://help.ubuntu.com/community/CronHowto#Troubleshooting_and_Common_Problems)
+[askubuntu.com/questions/56683](http://askubuntu.com/questions/56683/where-is-the-cron-crontab-log)
 
 ### Update software to provide required functionality and security
 
@@ -559,9 +560,9 @@ http://askubuntu.com/questions/56683/where-is-the-cron-crontab-log
 * `sudo apt-get upgrade` actualiza todo lo que se pueda actualizar sin tener que resolver conflictos (nunca eliminara paquetes)
 * `sudo apt-get dist-upgrade` actualiza intentando resolver conflictos si los hubiera (puede que elimine algún paquete)
 
-Más: http://www.tecmint.com/linux-package-management/
-http://www.tecmint.com/useful-basic-commands-of-apt-get-and-apt-cache-for-package-management/
-http://www.tecmint.com/dpkg-command-examples/
+Más: [tecmint.com - packages](http://www.tecmint.com/linux-package-management/)
+[tecmint.com - apt-get](http://www.tecmint.com/useful-basic-commands-of-apt-get-and-apt-cache-for-package-management/)
+[tecmint.com - dpkg](http://www.tecmint.com/dpkg-command-examples/)
 
 ### Verify the integrity and availability of resources
 
@@ -593,7 +594,7 @@ Un mensaje no siempre es un error (por ejemplo, un fichero de configuración mod
 * `pgrep` para buscar procesos al estilo de `pkill` pero sin matarlos
 * `sar` da estadisticas del sistema (ver en `/etc/default/sysstat` si esta activada la recoleción automatica de estadisticas)
 
-Más: [www.tecmint.com](http://www.tecmint.com/monitor-linux-processes-and-set-process-limits-per-user/)
+Más: [tecmint.com - processes](http://www.tecmint.com/monitor-linux-processes-and-set-process-limits-per-user/)
 
 ### Change kernel runtime parameters, persistent and non-persistent
 
@@ -609,7 +610,7 @@ Más: [www.tecmint.com](http://www.tecmint.com/monitor-linux-processes-and-set-p
 Para hacerlo persistente añadir una linea que diga `ip_tables` en el
 fichero `/etc/modules`
 
-http://www.tecmint.com/change-modify-linux-kernel-runtime-parameters/
+[tecmint.com - kernel](http://www.tecmint.com/change-modify-linux-kernel-runtime-parameters/)
 
 ### Use scripting to automate system maintenance tasks
 
@@ -618,7 +619,7 @@ que indica el interprete con que ejecutar dicho script. Ejemplo: `#!/bin/bash`
 * `chmod 755 myscript.sh` para que el script sea ejecutable
 * `$?` da el código de salida del último comando ejecutado (0 = OK)
 
-http://www.tecmint.com/linux-basic-shell-scripting-and-linux-filesystem-troubleshooting/
+[tecmint.com - shell](http://www.tecmint.com/linux-basic-shell-scripting-and-linux-filesystem-troubleshooting/)
 
 ### Manage the startup process and services
 
@@ -657,7 +658,7 @@ Upstart:
 * `initctl reload-configuration` recarga la configuración
 * `sudo start [servicio]`  arranca un servicio
 
-http://www.tecmint.com/linux-boot-process-and-manage-services/
+[tecmint.com - boot](http://www.tecmint.com/linux-boot-process-and-manage-services/)
 
 ### List and identify SELinux/AppArmor file and process contexts<br/>Configure and modify SELinux/AppArmor policies
 
@@ -754,9 +755,9 @@ Para deshabilitar AppArmor:
 editar `/etc/default/grub` para poner `apparmor=0` en `GRUB_CMDLINE_LINUX` 
 y ejecutar `sudo update-grub`
 
-http://www.tecmint.com/mandatory-access-control-with-selinux-or-apparmor-linux/
-https://wiki.debian.org/SELinux/Notes
-https://wiki.archlinux.org/index.php/AppArmor
+[tecmint.com - SELinux y AppArmor](http://www.tecmint.com/mandatory-access-control-with-selinux-or-apparmor-linux/)
+[wiki.debian.org - SELinux](https://wiki.debian.org/SELinux/Notes)
+[wiki.archlinux.org - AppArmor](https://wiki.archlinux.org/index.php/AppArmor)
 
 ### Install software from source
 
@@ -803,7 +804,7 @@ Pidgin 2.11.0 (libpurple 2.10.9)
 
 ```
 
-http://www.howtogeek.com/105413/how-to-compile-and-install-from-source-on-ubuntu/
+[howtogeek.com/105413 - compile and install](http://www.howtogeek.com/105413/how-to-compile-and-install-from-source-on-ubuntu/)
 
 ## User and Group Management - 15%
 
@@ -841,7 +842,7 @@ Adicionalmente podemos eliminar un usuario de un grupo con `sudo gpasswd -d usar
 Si nos olvidamos de crearle la home al usuario podemos hacerlo posteriormente
 con `mkhomedir_helper usuario`
 
-http://www.tecmint.com/manage-users-and-groups-in-linux/
+[tecmint.com - user and groups](http://www.tecmint.com/manage-users-and-groups-in-linux/)
 
 ### Manage system-wide environment profiles
 
@@ -897,8 +898,8 @@ hay que editar dicho fichero para añadir una linea de este tipo:
 Defaults env_keep += "http_proxy SOMEOTHERVARIABLES ANOTHERVARIABLE ETC"
 ```
 
-https://wiki.debian.org/EnvironmentVariables
-https://help.ubuntu.com/community/EnvironmentVariables
+[wiki.debian.org - Environment variables](https://wiki.debian.org/EnvironmentVariables)
+[help.ubuntu.com - Environment variables](https://help.ubuntu.com/community/EnvironmentVariables)
 
 ### Manage template user environment
 
@@ -908,7 +909,7 @@ https://help.ubuntu.com/community/EnvironmentVariables
 
 Podemos definir los limites por usuario en `/etc/security/limits.conf` y el comando `ulimit`
 
-http://www.tecmint.com/monitor-linux-processes-and-set-process-limits-per-user/ -> Setting Resource Limits on a Per-User Basis in Linux
+[tecmint.com - processes](http://www.tecmint.com/monitor-linux-processes-and-set-process-limits-per-user/) -> Setting Resource Limits on a Per-User Basis in Linux
 
 ### Manage user processes
 
@@ -940,7 +941,7 @@ donde, `type` especifica el grupo de gestión al que el módulo estará asociado
 * include: significa que las lineas dadas por el type deben ser leidas de otro archivo
 * substack: similar a includes pero los fallos o exitos del fichero incluido no provocan la salida del modulo, solo del substack.
 
-http://www.tecmint.com/manage-users-and-groups-in-linux/ -> PAM (Pluggable Authentication Modules)
+[tecmint.com - user and groups](http://www.tecmint.com/manage-users-and-groups-in-linux/) -> PAM (Pluggable Authentication Modules)
 
 ## Networking - 15%
 
@@ -949,13 +950,13 @@ http://www.tecmint.com/manage-users-and-groups-in-linux/ -> PAM (Pluggable Authe
 * Resolución de nombres estaticamente: `/etc/hosts`
 * Resolución de nombres dinamicamente: DNS
 
-http://www.tecmint.com/setup-recursive-caching-dns-server-and-configure-dns-zones/
+[tecmint.com - DNS](http://www.tecmint.com/setup-recursive-caching-dns-server-and-configure-dns-zones/)
 
 ### Configure network services to start automatically at boot
 
 `sysv-rc-conf` o `update-rc.d servicio defaults` p `chkconfig --level runlevel servicio on`
 
-http://www.tecmint.com/installing-network-services-and-configuring-services-at-system-boot/
+[tecmint.com - services](http://www.tecmint.com/installing-network-services-and-configuring-services-at-system-boot/)
 
 ### Implement packet filtering<br/>Configure firewall settings
 
@@ -1080,8 +1081,8 @@ me@ubu ~ $ sudo firewall-cmd --zone=MyZone --add-forward-port=port=631:proto=tcp
 me@ubu ~ $ sudo firewall-cmd --reload
 ```
 
-http://www.tecmint.com/configure-iptables-firewall/
-http://www.tecmint.com/firewalld-vs-iptables-and-control-network-traffic-in-firewall/
+[tecmint.com - iptables](http://www.tecmint.com/configure-iptables-firewall/)
+[tecmint.com - firewalld vs iptable](http://www.tecmint.com/firewalld-vs-iptables-and-control-network-traffic-in-firewall/)
 
 ### Start, stop, and check the status of network services
 
@@ -1165,7 +1166,7 @@ root@rtr:~# iptables -A FORWARD -i eth0 -o eth1 -m state --state RELATED,ESTABLI
 root@rtr:~# iptables -A FORWARD -i eth1 -o eth0 -j ACCEPT
 ```
 
-http://www.tecmint.com/setup-linux-as-router/
+[tecmint.com - router](http://www.tecmint.com/setup-linux-as-router/)
 
 ### Dynamically route IP traffic
 
@@ -1274,7 +1275,7 @@ C>* 192.168.0.0/24 [120/2] via 10.0.0.15, eth0, 00:36:09
 R>* 192.168.1.10/24 is directly connected eth1
 ```
 
-http://www.tecmint.com/setup-linux-as-router/
+[tecmint.com - router](http://www.tecmint.com/setup-linux-as-router/)
 
 ### Synchronize time using other network peers
 
@@ -1303,9 +1304,9 @@ me@deb ~ $ sudo ntpq -p
 
 Sin necesidad de tener `ntpd` se puede actualizar la fecha con `ntpdate pool.ntp.org` (añadir -u si se tiene isntalado `ntpd`)
 
-http://www.tecmint.com/how-to-synchronize-time-with-ntp-server-in-ubuntu-linux-mint-xubuntu-debian/  
-http://www.tecmint.com/install-and-configure-ntp-server-client-in-debian/
-http://www.pool.ntp.org/es/use.html
+[tecmint.com - ntp ubuntu](http://www.tecmint.com/how-to-synchronize-time-with-ntp-server-in-ubuntu-linux-mint-xubuntu-debian/)  
+[tecmint.com - ntp debian](http://www.tecmint.com/install-and-configure-ntp-server-client-in-debian/)
+[pool.ntp.org](http://www.pool.ntp.org/es/use.html)
 
 ## Service Configuration - 10%
 
@@ -1415,7 +1416,7 @@ www.web1.sales.me.com is an alias for web1.sales.me.com.
 web1.sales.me.com has address 10.13.13.104
 ```
 
-http://www.tecmint.com/setup-recursive-caching-dns-server-and-configure-dns-zones/ -> Installing and Configuring a DNS Server
+[tecmint.com - DNS](http://www.tecmint.com/setup-recursive-caching-dns-server-and-configure-dns-zones/) -> Installing and Configuring a DNS Server
 
 ### Configure an FTP server<br/>Configure anonymous-only download on FTP servers
 
@@ -1508,8 +1509,8 @@ me@lub ~ $ ls walterwhite.txt
 walterwhite.txt
 ```
 
-http://www.tecmint.com/setup-ftp-anonymous-logins-in-linux/
-https://www.benscobie.com/fixing-500-oops-vsftpd-refusing-to-run-with-writable-root-inside-chroot/
+[tecmint.com - FTP](http://www.tecmint.com/setup-ftp-anonymous-logins-in-linux/)
+[benscobie.com - vsftpd](https://www.benscobie.com/fixing-500-oops-vsftpd-refusing-to-run-with-writable-root-inside-chroot/)
 
 ### Provide/configure network shares via NFS
 
@@ -1535,9 +1536,9 @@ me@lub ~ $ sudo bash -c 'echo "10.13.13.102:/home/me/nfsshare /mnt/nfsshare  nfs
 ```
 
 
-http://www.tecmint.com/mount-filesystem-in-linux/ -> Mounting a NFS share on Linux  
-https://help.ubuntu.com/community/SettingUpNFSHowTo  
-http://systemadmin.es/2012/05/no_root_squash-vs-root_squash-de-nfs
+[tecmint.com - mount](http://www.tecmint.com/mount-filesystem-in-linux/) -> Mounting a NFS share on Linux  
+[help.ubuntu.com - NFS](https://help.ubuntu.com/community/SettingUpNFSHowTo)  
+[systemadmin.es - root squash](http://systemadmin.es/2012/05/no_root_squash-vs-root_squash-de-nfs)
 
 ### Provide/configure network shares via CIFS
 
@@ -1595,8 +1596,8 @@ me@lub ~ $ sudo bash -c 'echo "//10.13.13.102/share /mnt/samba cifs credentials=
 me@lub ~ $ sudo mount //10.13.13.102/share
 ```
 
-http://www.tecmint.com/mount-filesystem-in-linux/ -> Mounting a Samba share on Linux
-https://help.ubuntu.com/12.04/serverguide/samba-fileserver.html
+[tecmint.com - mount](http://www.tecmint.com/mount-filesystem-in-linux/) -> Mounting a Samba share on Linux
+[help.ubuntu.com - samba](https://help.ubuntu.com/12.04/serverguide/samba-fileserver.html)
 
 ### Configure email aliases
 
@@ -1679,12 +1680,12 @@ me@ubu ~ $ exit
 
 `sudo apt-get install install squid3 squidguard`
 
-http://www.tecmint.com/onfigure-squid-server-in-linux
-http://www.tecmint.com/configure-squidguard-for-squid-proxy/
+[tecmint.com - squid](http://www.tecmint.com/onfigure-squid-server-in-linux)
+[tecmint.com - squidguard](http://www.tecmint.com/configure-squidguard-for-squid-proxy/)
 
 ### Configure an IMAP and IMAPS service
 
-http://www.tecmint.com/setting-up-email-services-smtp-and-restricting-access-to-smtp/
+[tecmint.com - smtp](http://www.tecmint.com/setting-up-email-services-smtp-and-restricting-access-to-smtp/)
 
 ### Query and modify the behavior of system services at various run levels
 
@@ -1692,12 +1693,12 @@ http://www.tecmint.com/setting-up-email-services-smtp-and-restricting-access-to-
 
 ### Configure an HTTP server<br/>Configure HTTP server log files
 
-http://www.tecmint.com/setup-apache-with-name-based-virtual-hosting-with-ssl-certificate/
+[tecmint.com - apache](http://www.tecmint.com/setup-apache-with-name-based-virtual-hosting-with-ssl-certificate/)
 
 ### Restrict access to a web page
 
-http://www.tecmint.com/apache-htaccess-tricks
-https://www.cs.cmu.edu/~help/web_publishing/htaccess.html
+[tecmint.com - htaccess](http://www.tecmint.com/apache-htaccess-tricks)
+[cs.cmu.edu - htaccess](https://www.cs.cmu.edu/~help/web_publishing/htaccess.html)
 
 ### Diagnose routine SELinux/AppArmor policy violations
 
@@ -1711,9 +1712,9 @@ https://www.cs.cmu.edu/~help/web_publishing/htaccess.html
 * Configuramos editando `/etc/mysql/my.cnf`, `/etc/my.cnf`, `~/.my.cnf`
 * Reiniciamos con `sudo service mysql restart`
 
-http://www.tecmint.com/install-mariadb-in-linux/  
-http://www.tecmint.com/install-secure-performance-tuning-mariadb-database-server/  
-http://www.tecmint.com/mysql-mariadb-performance-tuning-and-optimization/
+[tecmint.com - MariaDB 1](http://www.tecmint.com/install-mariadb-in-linux/)  
+[tecmint.com - MariaDB 2](http://www.tecmint.com/install-secure-performance-tuning-mariadb-database-server/)  
+[tecmint.com - MariaDB 3](http://www.tecmint.com/mysql-mariadb-performance-tuning-and-optimization/)
 
 ## Virtualization - 5%
 
@@ -1774,11 +1775,11 @@ me@lub ~ $ sudo virt-install --name=cent --disk path=/mnt/personal-data/SPool1/S
 
 ```
 
-https://help.ubuntu.com/community/KVM/Installation  
-https://help.ubuntu.com/community/KVM/CreateGuests  
-http://www.naturalborncoder.com/virtualization/2014/10/27/installing-and-running-kvm-on-ubuntu-14-04-part-3/  
-http://www.naturalborncoder.com/virtualization/2014/10/27/installing-and-running-kvm-on-ubuntu-14-04-part-4/  
-http://www.tecmint.com/kvm-management-tools-to-manage-virtual-machines/
+[help.ubuntu.com - KVM installation](https://help.ubuntu.com/community/KVM/Installation)  
+[help.ubuntu.com - KVM create guests](https://help.ubuntu.com/community/KVM/CreateGuests)  
+[naturalborncoder.com - KVM part 3](http://www.naturalborncoder.com/virtualization/2014/10/27/installing-and-running-kvm-on-ubuntu-14-04-part-3/)  
+[naturalborncoder.com - KVM part 4](http://www.naturalborncoder.com/virtualization/2014/10/27/installing-and-running-kvm-on-ubuntu-14-04-part-4/)  
+[tecmint.com - KVM](http://www.tecmint.com/kvm-management-tools-to-manage-virtual-machines/)
 
 ### Access a VM console
 ### Configure systems to launch virtual machines at boot
@@ -1797,7 +1798,7 @@ http://www.tecmint.com/kvm-management-tools-to-manage-virtual-machines/
 * `mkswap` formatea particiones swap (se recomienda que sean del doble de la memoria ran si esta es menor de 2GB, e igual en caso contrario)
 * `/etc/fstab` tiene la información necesaria para que estas particiones se carguen al reiniciar.
 
-http://www.tecmint.com/create-partitions-and-filesystems-in-linux/
+[tecmint.com - filesystems](http://www.tecmint.com/create-partitions-and-filesystems-in-linux/)
 
 ### Create, modify and delete Logical Volumes<br/>Extend existing Logical Volumes and filesystems<br/>Add new partitions, and logical volumes
 
@@ -2036,10 +2037,10 @@ me@lub ~ $ lvconvert --merge /dev/vg/mysnap
 El snapshot se autoborra tras el merge.
 Si lo queremos borrar sin hacer el merge podemos hacer `sudo lvremove /dev/vg/mysnap`
 
-http://www.tecmint.com/manage-and-create-lvm-parition-using-vgcreate-lvcreate-and-lvextend/  
-http://blog.timmattison.com/archives/2009/11/01/how-to-fix-lvm2s-no-extents-available-for-allocation-errors-when-using-pvmove/  
-http://www.tecmint.com/create-lvm-storage-in-linux/  
-http://www.vilecha.com/hellguest/lvm2_migrar.asp
+[tecmint.com - LVM parition](http://www.tecmint.com/manage-and-create-lvm-parition-using-vgcreate-lvcreate-and-lvextend/)  
+[blog.timmattison.com - lvm2s](http://blog.timmattison.com/archives/2009/11/01/how-to-fix-lvm2s-no-extents-available-for-allocation-errors-when-using-pvmove/)  
+[tecmint.com - LVM storage](http://www.tecmint.com/create-lvm-storage-in-linux/)  
+[vilecha.com - lvm2s](http://www.vilecha.com/hellguest/lvm2_migrar.asp)
 
 ### Create and configure encrypted partitions
 
@@ -2159,9 +2160,9 @@ me@lub ~ $ sudo cryptsetup status cswap
   mode:    read/write
 ```
 
-http://www.tecmint.com/disk-encryption-in-linux/  
-https://www.howtoforge.com/automatically-unlock-luks-encrypted-drives-with-a-keyfile  
-https://www.debian.org/doc/manuals/debian-reference/ch09
+[tecmint.com - disk encryption](http://www.tecmint.com/disk-encryption-in-linux/)  
+[howtoforge.com - unlock luks](https://www.howtoforge.com/automatically-unlock-luks-encrypted-drives-with-a-keyfile)  
+[debian.org - trucos del sistema](https://www.debian.org/doc/manuals/debian-reference/ch09)
 
 ### Configure systems to mount file systems at or during boot
 
@@ -2238,7 +2239,7 @@ Si un disco tiene problemas (por ejemplo `sdc1`):
 
 Esto hará que el disco de reserva (`sdd1`) pase a ocupar el puesto del defectuoso (`sdc1`).
 
-http://www.tecmint.com/creating-and-managing-raid-backups-in-linux/
+[tecmint.com - Raid](http://www.tecmint.com/creating-and-managing-raid-backups-in-linux/)
 
 ### Configure systems to mount standard, encrypted, and network file systems on demand
 
@@ -2293,9 +2294,9 @@ me@lub ~ $ tail -n 1 /etc/auto.master
 Siendo `/etc/auto.luks` une script `sh` ejecutable que monta dispositiovos
 encriptados.
 
-http://www.tecmint.com/configure-nfs-server/ -> Mounting exported network shares using autofs  
-https://help.ubuntu.com/community/Autofs  
-https://debian-administration.org/article/127/Automounting_card_readers_and_USB_keys_using_autofs
+[tecmint.com - NFS](http://www.tecmint.com/configure-nfs-server/) -> Mounting exported network shares using autofs  
+[help.ubuntu.com - autofs](https://help.ubuntu.com/community/Autofs)  
+[debian-administration.org - autofs](https://debian-administration.org/article/127/Automounting_card_readers_and_USB_keys_using_autofs)
 
 ### Create and manage filesystem Access Control Lists (ACLs)
 
@@ -2367,7 +2368,7 @@ default:other::r--
 Adicionalmente, con `setfacl -x d:o /mnt/test` se borra una regla en concreto
 y con `setfacl -b /mnt/test` todas
 
-http://www.tecmint.com/set-access-control-lists-acls-and-disk-quotas-for-users-groups/
+[tecmint.com - ACL](http://www.tecmint.com/set-access-control-lists-acls-and-disk-quotas-for-users-groups/)
 
 ### Diagnose and correct file permission problems
 
@@ -2436,4 +2437,4 @@ dd: error al escribir en «f2M»: Se ha excedido la cuota de disco
 
 Un limite de 1000 bloques equivale a 1024 bytes/block * 1000 bloques = 1024000 bytes = 1 MB
 
-http://www.tecmint.com/set-access-control-lists-acls-and-disk-quotas-for-users-groups/ -> Set Linux Disk Quotas on Users and Filesystems
+[tecmint.com - ACL](http://www.tecmint.com/set-access-control-lists-acls-and-disk-quotas-for-users-groups/) -> Set Linux Disk Quotas on Users and Filesystems
