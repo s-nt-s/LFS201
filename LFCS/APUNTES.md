@@ -8,7 +8,7 @@ para presentarse al examen **LFCS**
 Gracias por adelantado a:
 
 * [pablox.co](https://pablox.co/obteniendo-la-linux-foundation-certified-system-administrator-lfcs/)
-* [leonelatencio.com](http://leonelatencio.com/notas-de-preparacion-para-el-examen-de-certificacion-de-linux-foundation/)
+* [leonelatencio.com](http://blog.leonelatencio.com/notas-de-preparacion-para-el-examen-de-certificacion-de-linux-foundation/)
 * [daemons.cf](http://daemons.cf/cgit/apuntes-LFS201)
 
 ## Instalación
